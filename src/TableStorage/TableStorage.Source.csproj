@@ -1,9 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <AssemblyName>Devlooped.TableStorage</AssemblyName>
+    <AssemblyName>Devlooped.TableStorage.Source</AssemblyName>
     <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
     <IsPackable>true</IsPackable>
+    <PackBuildOutput>false</PackBuildOutput>
   </PropertyGroup>
 
   <ItemGroup>
