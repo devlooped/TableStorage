@@ -1,4 +1,4 @@
-![Icon](assets/img/icon32.png) TableStorage
+![Icon](assets/img/icon-32.png) TableStorage
 ============
 
 [![Version](https://img.shields.io/nuget/v/Devlooped.TableStorage.svg?color=royalblue)](https://www.nuget.org/packages/Devlooped.TableStorage)
