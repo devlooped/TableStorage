@@ -1,0 +1,16 @@
+<svg viewBox="0 0 18 18" xmlns:svg="http://www.w3.org/2000/svg">
+    <g>
+        <path fill="white" stroke="#68217A" stroke-width="0.1" 
+            d="M.5 5.788h17v9.478a.568.568 0 01-.568.568H1.068a.568.568 0 01-.568-.568V5.788z" />
+        <path fill="#68217A" stroke="#68217A" stroke-width="0.1" d="M1.071 2.166h15.858a.568.568 0 01.568.568v3.054H.5V2.734a.568.568 0 01.571-.568z" />
+        <rect width="3.65" height="1.85" x="2.304" y="7.121" opacity=".9" rx=".283" />
+        <rect width="3.65" height="1.85" x="7.2" y="7.095" opacity=".9" rx=".283" />
+        <rect width="3.65" height="1.85" x="12.096" y="7.095" opacity=".9" rx=".283" />
+        <rect width="3.65" height="1.85" x="2.358" y="9.767" opacity=".9" rx=".283" />
+        <rect width="3.65" height="1.85" x="7.254" y="9.741" fill="#a937c5" rx=".283" />
+        <rect width="3.65" height="1.85" x="12.15" y="9.741" fill="#a937c5" rx=".283" />
+        <rect width="3.65" height="1.85" x="2.358" y="12.439" fill="#a937c5" rx=".283" />
+        <rect width="3.65" height="1.85" x="7.254" y="12.413" fill="#a937c5" rx=".283" />
+        <rect width="3.65" height="1.85" x="12.15" y="12.413" fill="#a937c5" rx=".283" />
+    </g>
+</svg>
