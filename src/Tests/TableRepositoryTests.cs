@@ -44,7 +44,7 @@ namespace Devlooped
         [Fact]
         public void ThrowsIfEntityHasNoRowKey()
         {
-            Assert.Throws<ArgumentException>(() => 
+            Assert.Throws<ArgumentException>(() =>
                 new TableRepository<EntityNoRowKey>(CloudStorageAccount.DevelopmentStorageAccount, "Entities"));
         }
 
@@ -64,7 +64,7 @@ namespace Devlooped
             public string? Name { get; set; }
         }
 
-        class EntityNoRowKey 
+        class EntityNoRowKey
         {
             public string? Id { get; set; }
         }
