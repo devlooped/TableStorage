@@ -1,5 +1,5 @@
-<svg viewBox="0 0 18 18" xmlns:svg="http://www.w3.org/2000/svg">
-    <g>
+<svg viewBox="0 0 32 32" xmlns:svg="http://www.w3.org/2000/svg">
+    <g transform="scale(1.77)">
         <path fill="white" stroke="#68217A" stroke-width="0.1" 
             d="M.5 5.788h17v9.478a.568.568 0 01-.568.568H1.068a.568.568 0 01-.568-.568V5.788z" />
         <path fill="#68217A" stroke="#68217A" stroke-width="0.1" d="M1.071 2.166h15.858a.568.568 0 01.568.568v3.054H.5V2.734a.568.568 0 01.571-.568z" />

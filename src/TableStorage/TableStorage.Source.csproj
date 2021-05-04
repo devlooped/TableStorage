@@ -5,6 +5,7 @@
     <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
     <IsPackable>true</IsPackable>
     <PackBuildOutput>false</PackBuildOutput>
+    <PackCompile>true</PackCompile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,6 +13,10 @@
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="5.0.0" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="NuGetizer" Version="0.6.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Visibility.cs" Pack="false" />
   </ItemGroup>
   
 </Project>

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Azure.Cosmos.Table;
@@ -36,8 +37,21 @@ namespace Devlooped
 
             Assert.Null(await repo.GetAsync("My", "asdf"));
 
-            await foreach (var e in repo.EnumerateAsync("My"))
+            await foreach (var _ in repo.EnumerateAsync("My"))
                 Assert.False(true, "Did not expect to find any entities");
+        }
+
+        [Fact]
+        public void ThrowsIfEntityHasNoRowKey()
+        {
+            Assert.Throws<ArgumentException>(() => 
+                new TableRepository<EntityNoRowKey>(CloudStorageAccount.DevelopmentStorageAccount, "Entities"));
+        }
+
+        [Fact]
+        public void DefaultTableNameRemovesEntitySuffix()
+        {
+            Assert.Equal("My", TableRepository<MyEntity>.DefaultTableName);
         }
 
         public class MyEntity
@@ -48,6 +62,11 @@ namespace Devlooped
             public string Id { get; }
 
             public string? Name { get; set; }
+        }
+
+        public class EntityNoRowKey 
+        {
+            public string? Id { get; set; }
         }
     }
 }
