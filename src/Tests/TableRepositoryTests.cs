@@ -54,7 +54,7 @@ namespace Devlooped
             Assert.Equal("My", TableRepository<MyEntity>.DefaultTableName);
         }
 
-        public class MyEntity
+        class MyEntity
         {
             public MyEntity(string id) => Id = id;
 
@@ -64,7 +64,7 @@ namespace Devlooped
             public string? Name { get; set; }
         }
 
-        public class EntityNoRowKey 
+        class EntityNoRowKey 
         {
             public string? Id { get; set; }
         }
