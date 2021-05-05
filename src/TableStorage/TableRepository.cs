@@ -19,9 +19,6 @@ namespace Devlooped
     {
         static readonly JsonSerializer serializer = new JsonSerializer();
 
-        static readonly Lazy<Func<T, string>> getPartitionKey = new Lazy<Func<T, string>>(() => PartitionKeyAttribute.CreateAccessor<T>());
-        static readonly Lazy<Func<T, string>> getRowKey = new Lazy<Func<T, string>>(() => RowKeyAttribute.CreateAccessor<T>());
-
         static readonly PropertyInfo partitionKeyProp = typeof(T).GetProperties()
             .FirstOrDefault(prop => prop.GetCustomAttribute<PartitionKeyAttribute>() != null);
         static readonly PropertyInfo rowKeyProp = typeof(T).GetProperties()
@@ -29,6 +26,8 @@ namespace Devlooped
 
         readonly CloudStorageAccount storageAccount;
         readonly AsyncLazy<CloudTable> table;
+        readonly Func<T, string> getPartitionKey;
+        readonly Func<T, string> getRowKey;
 
         /// <summary>
         /// Default table name to use when no value is provided via the constructor, which uses the 
@@ -49,9 +48,8 @@ namespace Devlooped
             this.storageAccount = storageAccount;
             table = new AsyncLazy<CloudTable>(() => GetTableAsync(tableName ?? DefaultTableName));
 
-            // This forces the static validation (once) of the required attributes on the entity type
-            Debug.Assert(getPartitionKey.Value != null);
-            Debug.Assert(getRowKey.Value != null);
+            getPartitionKey = PartitionKeyAttribute.CreateAccessor<T>();
+            getRowKey = RowKeyAttribute.CreateAccessor<T>();
         }
 
         /// <inheritdoc />
@@ -67,8 +65,8 @@ namespace Devlooped
         /// <inheritdoc />
         public async Task DeleteAsync(T entity, CancellationToken cancellation = default)
         {
-            var partitionKey = getPartitionKey.Value.Invoke(entity);
-            var rowKey = getRowKey.Value.Invoke(entity);
+            var partitionKey = getPartitionKey.Invoke(entity);
+            var rowKey = getRowKey.Invoke(entity);
 
             var table = await this.table.Value.ConfigureAwait(false);
 
@@ -113,8 +111,8 @@ namespace Devlooped
         /// <inheritdoc />
         public async Task<T> PutAsync(T entity, CancellationToken cancellation = default)
         {
-            var partitionKey = getPartitionKey.Value.Invoke(entity);
-            var rowKey = getRowKey.Value.Invoke(entity);
+            var partitionKey = getPartitionKey.Invoke(entity);
+            var rowKey = getRowKey.Invoke(entity);
             var properties = entity.GetType()
                 .GetProperties()
                 // Persist all properties except for the key properties, since those already have their own column
