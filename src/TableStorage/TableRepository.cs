@@ -55,6 +55,29 @@ namespace Devlooped
         }
 
         /// <inheritdoc />
+        public async Task DeleteAsync(string partitionKey, string rowKey, CancellationToken cancellation = default)
+        {
+            var table = await this.table.Value.ConfigureAwait(false);
+
+            await table.ExecuteAsync(TableOperation.Delete(
+                new DynamicTableEntity(partitionKey, rowKey) { ETag = "*" }), cancellation)
+                .ConfigureAwait(false);
+        }
+
+        /// <inheritdoc />
+        public async Task DeleteAsync(T entity, CancellationToken cancellation = default)
+        {
+            var partitionKey = getPartitionKey.Value.Invoke(entity);
+            var rowKey = getRowKey.Value.Invoke(entity);
+
+            var table = await this.table.Value.ConfigureAwait(false);
+
+            await table.ExecuteAsync(TableOperation.Delete(
+                new DynamicTableEntity(partitionKey, rowKey) { ETag = "*" }), cancellation)
+                .ConfigureAwait(false);
+        }
+
+        /// <inheritdoc />
         public async IAsyncEnumerable<T> EnumerateAsync(string partitionKey, [EnumeratorCancellation] CancellationToken cancellation = default)
         {
             var table = await this.table.Value;
@@ -105,29 +128,6 @@ namespace Devlooped
                 .ConfigureAwait(false);
 
             return ToEntity((DynamicTableEntity)result.Result);
-        }
-
-        /// <inheritdoc />
-        public async Task DeleteAsync(string partitionKey, string rowKey, CancellationToken cancellation = default)
-        {
-            var table = await this.table.Value.ConfigureAwait(false);
-
-            await table.ExecuteAsync(TableOperation.Delete(
-                new DynamicTableEntity(partitionKey, rowKey) { ETag = "*" }), cancellation)
-                .ConfigureAwait(false);
-        }
-
-        /// <inheritdoc />
-        public async Task DeleteAsync(T entity, CancellationToken cancellation = default)
-        {
-            var partitionKey = getPartitionKey.Value.Invoke(entity);
-            var rowKey = getRowKey.Value.Invoke(entity);
-
-            var table = await this.table.Value.ConfigureAwait(false);
-
-            await table.ExecuteAsync(TableOperation.Delete(
-                new DynamicTableEntity(partitionKey, rowKey) { ETag = "*" }), cancellation)
-                .ConfigureAwait(false);
         }
 
         async Task<CloudTable> GetTableAsync(string tableName)

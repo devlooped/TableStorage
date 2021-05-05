@@ -19,6 +19,21 @@ namespace Devlooped
     partial interface ITableRepository<T> where T : class
     {
         /// <summary>
+        /// Deletes an entity from the repository.
+        /// </summary>
+        /// <param name="entity">The entity to delete.</param>
+        /// <param name="cancellation">Optional <see cref="CancellationToken"/>.</param>
+        Task DeleteAsync(T entity, CancellationToken cancellation = default);
+
+        /// <summary>
+        /// Deletes an entity from the repository given its <paramref name="partitionKey"/> and <paramref name="rowKey"/>.
+        /// </summary>
+        /// <param name="partitionKey">The entity partition key.</param>
+        /// <param name="rowKey">The entity row key.</param>
+        /// <param name="cancellation">Optional <see cref="CancellationToken"/>.</param>
+        Task DeleteAsync(string partitionKey, string rowKey, CancellationToken cancellation = default);
+
+        /// <summary>
         /// Enumerates asynchronously all entities with the given <paramref name="partitionKey"/>.
         /// </summary>
         /// <param name="partitionKey">The partition key to scan and enumerate all entities from.</param>
@@ -42,20 +57,5 @@ namespace Devlooped
         /// <param name="cancellation">Optional <see cref="CancellationToken"/>.</param>
         /// <returns>The saved entity.</returns>
         Task<T> PutAsync(T entity, CancellationToken cancellation = default);
-
-        /// <summary>
-        /// Deletes an entity from the repository.
-        /// </summary>
-        /// <param name="entity">The entity to delete.</param>
-        /// <param name="cancellation">Optional <see cref="CancellationToken"/>.</param>
-        Task DeleteAsync(T entity, CancellationToken cancellation = default);
-
-        /// <summary>
-        /// Deletes an entity from the repository given its <paramref name="partitionKey"/> and <paramref name="rowKey"/>.
-        /// </summary>
-        /// <param name="partitionKey">The entity partition key.</param>
-        /// <param name="rowKey">The entity row key.</param>
-        /// <param name="cancellation">Optional <see cref="CancellationToken"/>.</param>
-        Task DeleteAsync(string partitionKey, string rowKey, CancellationToken cancellation = default);
     }
 }
