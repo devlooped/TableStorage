@@ -1,11 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <AssemblyName>Devlooped.TableStorage</AssemblyName>
+    <AssemblyName>Devlooped.TableStorage.Source</AssemblyName>
     <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
     <IsPackable>true</IsPackable>
+    <PackBuildOutput>false</PackBuildOutput>
+    <PackCompile>true</PackCompile>
     <Description>
-      Repository pattern with POCO object support for storing to Azure/Cosmos DB Table Storage.
+      Source-only package for repository pattern with POCO object support for storing to Azure/CosmosDB Table Storage.
     </Description>
   </PropertyGroup>
 
@@ -14,6 +16,10 @@
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="5.0.0" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="NuGetizer" Version="0.6.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\TableStorage\*.cs" Exclude="..\TableStorage\Visibility.cs" />
   </ItemGroup>
   
 </Project>
