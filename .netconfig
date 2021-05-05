@@ -64,11 +64,6 @@
 	sha = e68624389d8133571da53e83ab4e88de7bc028a8
 	etag = 8067230717247263ad661c69780fdfdf4b6f140287517fee9c5d4e64d4b737af
 	weak
-[file ".github/workflows/release-artifacts.yml"]
-	url = https://github.com/devlooped/oss/blob/main/.github/workflows/release-artifacts.yml
-	sha = e68624389d8133571da53e83ab4e88de7bc028a8
-	etag = 8be10a2fbeb9e6924d8b08e58a61a0f69138352c6f5477b53dcd34c26d8d35ef
-	weak
 [file ".github/workflows/release-notes.yml"]
 	url = https://github.com/devlooped/oss/blob/main/.github/workflows/release-notes.yml
 	sha = 70bc909d2ce6924385a8bcc3a9fb1cff338a3fb7
