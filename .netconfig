@@ -19,6 +19,9 @@
 [file "assets/images/sponsors.png"]
 	url = https://github.com/devlooped/oss/blob/main/assets/images/sponsors.png
 	skip
+[file ".github/workflows/release-artifacts.yml"]
+	url = https://github.com/devlooped/oss/blob/main/.github/workflows/release-artifacts.yml
+	skip
 [file ".editorconfig"]
 	url = https://github.com/devlooped/oss/blob/main/.editorconfig
 	sha = 0683ee777d7d878d4bf013d7deea352685135a05
