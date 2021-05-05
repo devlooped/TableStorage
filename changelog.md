@@ -1,5 +1,9 @@
 
 
+## [v1.0.0-beta](https://github.com/devlooped/TableStorage/tree/v1.0.0-beta) (2021-05-05)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v1.0.0-alpha...v1.0.0-beta)
+
 ## [v1.0.0-alpha](https://github.com/devlooped/TableStorage/tree/v1.0.0-alpha) (2021-05-05)
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/cf1b7f069ac6d68482b498555c8dbdda8e1ae5b4...v1.0.0-alpha)
