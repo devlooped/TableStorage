@@ -24,6 +24,11 @@ jobs:
       - name: 🙏 build
         run: dotnet build -m:1 -bl:build.binlog -p:version=${GITHUB_REF#refs/*/v} -p:RepositoryBranch=${GITHUB_REF#refs/*/}
 
+      - name: ⚙ azurite
+        run: |
+          npm install azurite
+          npx azurite-table &
+
       - name: 🧪 test
         run: dotnet test --no-build -m:1
 
