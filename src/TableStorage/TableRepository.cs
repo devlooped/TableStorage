@@ -19,9 +19,9 @@ namespace Devlooped
     {
         static readonly JsonSerializer serializer = new JsonSerializer();
 
-        static readonly PropertyInfo partitionKeyProp = typeof(T).GetProperties()
+        static readonly PropertyInfo? partitionKeyProp = typeof(T).GetProperties()
             .FirstOrDefault(prop => prop.GetCustomAttribute<PartitionKeyAttribute>() != null);
-        static readonly PropertyInfo rowKeyProp = typeof(T).GetProperties()
+        static readonly PropertyInfo? rowKeyProp = typeof(T).GetProperties()
             .FirstOrDefault(prop => prop.GetCustomAttribute<RowKeyAttribute>() != null);
 
         readonly CloudStorageAccount storageAccount;
@@ -159,7 +159,8 @@ namespace Devlooped
                 writer.WriteValue(entity.PartitionKey);
             }
 
-            writer.WritePropertyName(rowKeyProp.Name);
+            // If there is no rowkey, ctor would have failed already.
+            writer.WritePropertyName(rowKeyProp!.Name);
             writer.WriteValue(entity.RowKey);
 
             foreach (var property in entity.Properties)

@@ -58,10 +58,10 @@ namespace Devlooped
                         Expression.Equal(param, Expression.Constant(null)),
                         Expression.Throw(
                             Expression.New(
-                                typeof(ArgumentNullException).GetConstructor(new[] { typeof(string) }),
+                                typeof(ArgumentNullException).GetConstructor(new[] { typeof(string) })!,
                                 Expression.Constant("entity")))),
                     Expression.Call(
-                        typeof(TableStorageAttribute).GetMethod(nameof(EnsureValid), BindingFlags.NonPublic | BindingFlags.Static),
+                        typeof(TableStorageAttribute).GetMethod(nameof(EnsureValid), BindingFlags.NonPublic | BindingFlags.Static)!,
                         Expression.Constant(attributeName),
                         Expression.Constant(keyProp.Name, typeof(string)),
                         Expression.Property(param, keyProp))),
