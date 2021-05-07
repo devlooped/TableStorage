@@ -74,7 +74,7 @@ It can be persisted and retrieved with:
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\TableStorage\*.cs" Exclude="..\TableStorage\Visibility.cs" />
+    <Compile Include="..\TableStorage\**\*.cs" Exclude="..\TableStorage\Visibility.cs;..\TableStorage\obj\**\*.cs;" />
     <None Update="Devlooped.TableStorage.Source.targets" PackFolder="build" />
   </ItemGroup>
   
