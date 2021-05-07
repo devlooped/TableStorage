@@ -7,7 +7,7 @@ namespace Devlooped
     public partial class TableAttribute { }
     public partial class TableStorageAttribute { }
     public partial interface ITableRepository<T> { }
-    public partial class TableRepository<T> { }
-    public partial interface IEntityRepository<T> { }
-    public partial class EntityRepository<T> { }
+    public partial interface ITablePartition<T> { }
+    public partial class TableRepository { }
+    public partial class TablePartition { }
 }

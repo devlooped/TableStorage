@@ -19,6 +19,11 @@ namespace Devlooped
     partial interface ITableRepository<T> where T : class
     {
         /// <summary>
+        /// Gets the table name being used.
+        /// </summary>
+        string TableName { get; }
+
+        /// <summary>
         /// Deletes an entity from the repository.
         /// </summary>
         /// <param name="entity">The entity to delete.</param>
