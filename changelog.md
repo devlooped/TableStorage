@@ -1,12 +1,15 @@
 
 
+## [v1.0.0](https://github.com/devlooped/TableStorage/tree/v1.0.0) (2021-05-07)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v1.0.0-rc...v1.0.0)
+
 ## [v1.0.0-rc](https://github.com/devlooped/TableStorage/tree/v1.0.0-rc) (2021-05-07)
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/v1.0.0-beta...v1.0.0-rc)
 
 :twisted_rightwards_arrows: Merged:
 
-- Bump files with dotnet-file sync [\#4](https://github.com/devlooped/TableStorage/pull/4) (@kzu)
 - Add SourceLink to get repo/pdb linking [\#3](https://github.com/devlooped/TableStorage/pull/3) (@kzu)
 
 ## [v1.0.0-beta](https://github.com/devlooped/TableStorage/tree/v1.0.0-beta) (2021-05-05)
