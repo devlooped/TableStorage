@@ -7,7 +7,61 @@
     <PackBuildOutput>false</PackBuildOutput>
     <PackCompile>true</PackCompile>
     <Description>
-      Source-only package for repository pattern with POCO object support for storing to Azure/CosmosDB Table Storage.
+Source-only package for repository pattern with POCO object support for storing to Azure/CosmosDB Table Storage.
+      
+Usage:
+
+Given the following class: 
+
+  [Table("Products")]
+  class Product 
+  {
+    // NOTE: custom constructor
+    public Product(string category, string id) 
+    {
+      Category = category;
+      Id = id;
+    }
+
+    // NOTE: read-only property
+    [PartitionKey]
+    public string Category { get; }  
+
+    [RowKey]
+    public string Id { get; }
+
+    public string? Title { get; set; }
+
+    public double Price { get; set; }
+  }
+
+It can be persisted and retrieved with:
+
+  var account = CloudStorageAccount.DevelopmentStorageAccount; // or production one
+  var repo = new TableRepository&lt;Product&gt;(storageAccount);
+
+  var product = new Product("catId-asdf", "1234") 
+  {
+    Title = "Table Storage is Cool",
+    Price = 25.5,
+  };
+
+  // Insert or Update behavior (aka "upsert")
+  await repo.PutAsync(product);
+
+  // Enumerate all products in category "catId-asdf"
+  await foreach (var p in repo.EnumerateAsync("catId-asdf")
+     Console.WriteLine(p.Price);
+
+  // Get previously saved product.
+  Product saved = await repo.GetAsync("catId-asdf", "1234");
+
+  // Delete product
+  await repo.DeleteAsync("catId-asdf", "1234");
+
+  // Can also delete passing entity
+  await repo.DeleteAsync(saved);
+
     </Description>
   </PropertyGroup>
 
