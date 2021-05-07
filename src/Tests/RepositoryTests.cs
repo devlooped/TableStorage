@@ -11,7 +11,7 @@ namespace Devlooped
         [Fact]
         public async Task TableEndToEnd()
         {
-            var repo = new TableRepository<MyEntity>(CloudStorageAccount.DevelopmentStorageAccount, "Entities");
+            var repo = TableRepository.Create<MyEntity>(CloudStorageAccount.DevelopmentStorageAccount, "Entities");
             var entity = await repo.PutAsync(new MyEntity("asdf"));
 
             Assert.Equal("asdf", entity.Id);
@@ -44,7 +44,7 @@ namespace Devlooped
         [Fact]
         public async Task EntityEndToEnd()
         {
-            var repo = new EntityRepository<MyEntity>(CloudStorageAccount.DevelopmentStorageAccount);
+            var repo = TablePartition.Create<MyEntity>(CloudStorageAccount.DevelopmentStorageAccount);
             var entity = await repo.PutAsync(new MyEntity("asdf"));
 
             Assert.Equal("asdf", entity.Id);
@@ -78,19 +78,27 @@ namespace Devlooped
         public void ThrowsIfEntityHasNoRowKey()
         {
             Assert.Throws<ArgumentException>(() =>
-                new TableRepository<EntityNoRowKey>(CloudStorageAccount.DevelopmentStorageAccount, "Entities"));
+                TableRepository.Create<EntityNoRowKey>(CloudStorageAccount.DevelopmentStorageAccount, "Entities"));
         }
 
         [Fact]
-        public void DefaultTableNameRemovesEntitySuffix()
+        public void CanSpecifyPartitionAndRowKeyLambdas()
         {
-            Assert.Equal("My", TableRepository<MyEntity>.DefaultTableName);
+            TableRepository.Create<EntityNoRowKey>(CloudStorageAccount.DevelopmentStorageAccount, "Entities",
+                e => "FixedPartition",
+                e => e.Id ?? "");
+        }
+
+        [Fact]
+        public void CanSpecifyRowKeyLambda()
+        {
+            TablePartition.Create<EntityNoRowKey>(CloudStorageAccount.DevelopmentStorageAccount, e => e.Id ?? "");
         }
 
         [Fact]
         public void DefaultTableNameUsesAttribute()
         {
-            Assert.Equal("Entities", TableRepository<MyTableEntity>.DefaultTableName);
+            Assert.Equal("Entities", TableRepository.Create<MyTableEntity>(CloudStorageAccount.DevelopmentStorageAccount).TableName);
         }
 
         class MyEntity

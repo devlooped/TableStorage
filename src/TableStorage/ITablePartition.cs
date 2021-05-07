@@ -7,28 +7,29 @@ using System.Threading.Tasks;
 namespace Devlooped
 {
     /// <summary>
-    /// A generic repository that stores entities stores the entity type as 
-    /// the partition key, and therefore only requires <see cref="RowKeyAttribute"/> 
-    /// applied to the entity identifier property. If <see cref="TableAttribute"/> 
-    /// is not provided, it defaults to <c>Entity</c>.
+    /// A specific partition within a <see cref="ITableRepository{T}"/>.
     /// </summary>
     /// <typeparam name="T">The type of entity being persisted.</typeparam>
-    /// <remarks>
-    /// If no <see cref="TableAttribute"/> is provided, all entities are persisted 
-    /// in the same table (<c>Entity</c> by default), since the partition key is used 
-    /// to differentiate by entity type.
-    /// </remarks>
-    partial interface IEntityRepository<T> where T : class
+    partial interface ITablePartition<T> where T : class
     {
         /// <summary>
-        /// Enumerates asynchronously all entities of the same type.
+        /// Gets the table name being used.
+        /// </summary>
+        string TableName { get; }
+
+        /// <summary>
+        /// Gets the partition key being used.
+        /// </summary>
+        string PartitionKey { get; }
+
+        /// <summary>
+        /// Enumerates asynchronously all entities in the partition..
         /// </summary>
         /// <param name="cancellation">Optional <see cref="CancellationToken"/>.</param>
-        /// <returns></returns>
         IAsyncEnumerable<T> EnumerateAsync(CancellationToken cancellation = default);
 
         /// <summary>
-        /// Retrieves an entity from the repository.
+        /// Retrieves an entity from the partition given its <paramref name="rowKey"/>.
         /// </summary>
         /// <param name="rowKey">The entity row key.</param>
         /// <param name="cancellation">Optional <see cref="CancellationToken"/>.</param>
@@ -36,7 +37,7 @@ namespace Devlooped
         Task<T?> GetAsync(string rowKey, CancellationToken cancellation = default);
 
         /// <summary>
-        /// Writes an entity to the table, overwriting an existing value, if any.
+        /// Writes an entity to the partition, overwriting an existing value, if any.
         /// </summary>
         /// <param name="entity">The entity to persist.</param>
         /// <param name="cancellation">Optional <see cref="CancellationToken"/>.</param>
@@ -44,14 +45,14 @@ namespace Devlooped
         Task<T> PutAsync(T entity, CancellationToken cancellation = default);
 
         /// <summary>
-        /// Deletes an entity from the repository.
+        /// Deletes an entity from the partition.
         /// </summary>
         /// <param name="entity">The entity to delete.</param>
         /// <param name="cancellation">Optional <see cref="CancellationToken"/>.</param>
         Task DeleteAsync(T entity, CancellationToken cancellation = default);
 
         /// <summary>
-        /// Deletes an entity from the repository given its <paramref name="partitionKey"/> and <paramref name="rowKey"/>.
+        /// Deletes an entity from the partition given its <paramref name="rowKey"/>.
         /// </summary>
         /// <param name="rowKey">The entity row key.</param>
         /// <param name="cancellation">Optional <see cref="CancellationToken"/>.</param>
