@@ -5,6 +5,11 @@ name: build
 on: 
   push:
     branches: [ main, dev, 'feature/*', 'rel/*' ]
+    paths-ignore:
+      - changelog.md
+      - code-of-conduct.md
+      - security.md
+      - support.md
   pull_request:
     types: [opened, synchronize, reopened]
 
@@ -47,11 +52,6 @@ jobs:
 
       - name: 🙏 build
         run: dotnet build -m:1 -p:VersionLabel="$GITHUB_REF.$GITHUB_RUN_NUMBER" -p:RepositoryBranch=${GITHUB_REF#refs/*/}
-
-      - name: ⚙ azurite
-        run: |
-          npm install azurite
-          npx azurite-table &
 
       - name: 🧪 test
         run: dotnet test --no-build -m:1 --blame-hang --blame-hang-timeout 5m
