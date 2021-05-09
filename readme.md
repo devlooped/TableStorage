@@ -13,7 +13,6 @@ Repository pattern with POCO object support for storing to Azure/CosmosDB Table 
 Given an entity like:
 
 ```csharp
-[Table("Products")]
 class Product 
 {
   public Product(string category, string id) 
@@ -22,10 +21,8 @@ class Product
     Id = id;
   }
 
-  [PartitionKey]
   public string Category { get; }  
 
-  [RowKey]
   public string Id { get; }
 
   public string? Title { get; set; }
@@ -35,13 +32,18 @@ class Product
 ```
 
 > NOTE: entity can have custom constructor, key properties can be read-only, 
-and it doesn't need to inherit from anything or implement any interfaces.
+> and it doesn't need to inherit from anything, implement any interfaces or use 
+> any custom attributes (unless you want to).
 
 The entity can be stored and retrieved with:
 
 ```csharp
 var account = CloudStorageAccount.DevelopmentStorageAccount; // or production one
-var repo = new TableRepository<Product>(storageAccount);
+// We lay out the parameter names for clarity only.
+var repo = TableRepository.Create<Product>(storageAccount, 
+    tableName: "Products",
+    partitionKey: p => p.Category, 
+    rowKey: p => p.Id);
 
 var product = new Product("catId-asdf", "1234") 
 {
@@ -65,6 +67,51 @@ await repo.DeleteAsync("catId-asdf", "1234");
 // Can also delete passing entity
 await repo.DeleteAsync(saved);
 ```
+
+If the `Product.Id` were unique among all products, and moreover, each of your 
+entities had such a unique property already, you might decide to store all entities 
+in a single table, with a fixed partition key matching the entity type name, for 
+example. In this case, instead of a `TableRepository`, you can use a `TablePartition`:
+
+
+```csharp
+var account = CloudStorageAccount.DevelopmentStorageAccount; // or production one
+// tableName will default to "Entity" and partition key to "Order", but they can 
+// also be provided to the factory method to override the default behavior.
+var repo = TablePartition.Create<Order>(storageAccount, order => order.Id);
+
+var order = new Order("1234") 
+{
+  Amount = 25.5,
+};
+
+// Insert or Update behavior (aka "upsert")
+await repo.PutAsync(order);
+
+// Enumerate all orders within the partition
+await foreach (var o in repo.EnumerateAsync()
+   Console.WriteLine(o.Amount);
+
+// Get previously saved order.
+Order saved = await repo.GetAsync("1234");
+
+// Delete order
+await repo.DeleteAsync("1234");
+
+// Can also delete passing entity
+await repo.DeleteAsync(saved);
+```
+
+### Attributes
+
+If you want to avoid using strings with the factory methods, you can also annotate the 
+entity type to modify the default values used:
+
+* `[Table("tableName")]`: class-level attribute to change the default when no value is provided
+* `[PartitionKey]`: annotates the property that should be used as the partition key
+* `[RowKey]`: annotates the property that should be used as the row key.
+
+
 
 ## Installation
 

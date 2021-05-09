@@ -61,7 +61,6 @@ It can be persisted and retrieved with:
 
   // Can also delete passing entity
   await repo.DeleteAsync(saved);
-
     </Description>
   </PropertyGroup>
 
