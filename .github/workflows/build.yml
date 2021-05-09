@@ -5,6 +5,11 @@ name: build
 on: 
   push:
     branches: [ main, dev, 'feature/*', 'rel/*' ]
+    paths-ignore:
+      - changelog.md
+      - code-of-conduct.md
+      - security.md
+      - support.md
   pull_request:
     types: [opened, synchronize, reopened]
 
