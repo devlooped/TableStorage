@@ -68,39 +68,51 @@ await repo.DeleteAsync("catId-asdf", "1234");
 await repo.DeleteAsync(saved);
 ```
 
-If the `Product.Id` were unique among all products, and moreover, each of your 
-entities had such a unique property already, you might decide to store all entities 
-in a single table, with a fixed partition key matching the entity type name, for 
-example. In this case, instead of a `TableRepository`, you can use a `TablePartition`:
+If a unique identifier among all entities exists already, you can also store all 
+entities in a single table, using a fixed partition key matching the entity type name, for 
+example. In such a case, instead of a `TableRepository`, you can use a `TablePartition`:
 
+```csharp
+class Region 
+{
+  public Region(string code, string name) 
+    => (Id, Amount)
+    = (id, amount);
+
+  public string Code { get; }
+
+  public string Name { get; }
+}
+```
 
 ```csharp
 var account = CloudStorageAccount.DevelopmentStorageAccount; // or production one
 // tableName will default to "Entity" and partition key to "Order", but they can 
 // also be provided to the factory method to override the default behavior.
-var repo = TablePartition.Create<Order>(storageAccount, order => order.Id);
+var repo = TablePartition.Create<Region>(storageAccount, region => region.Code);
 
-var order = new Order("1234") 
-{
-  Amount = 25.5,
-};
+var region = new Region("uk", "United Kingdom"); 
 
 // Insert or Update behavior (aka "upsert")
-await repo.PutAsync(order);
+await repo.PutAsync(region);
 
-// Enumerate all orders within the partition
-await foreach (var o in repo.EnumerateAsync()
-   Console.WriteLine(o.Amount);
+// Enumerate all regions within the partition
+await foreach (var r in repo.EnumerateAsync()
+   Console.WriteLine(r.Name);
 
 // Get previously saved order.
-Order saved = await repo.GetAsync("1234");
+Region saved = await repo.GetAsync("uk");
 
-// Delete order
-await repo.DeleteAsync("1234");
+// Delete region
+await repo.DeleteAsync("uk");
 
 // Can also delete passing entity
 await repo.DeleteAsync(saved);
 ```
+
+This is quite convenient for handing reference data, for example. Enumerating all entries 
+in the partition wouldn't be something you'd typically do for your "real" data, but for 
+reference data, it could be useful.
 
 ### Attributes
 
@@ -111,12 +123,40 @@ entity type to modify the default values used:
 * `[PartitionKey]`: annotates the property that should be used as the partition key
 * `[RowKey]`: annotates the property that should be used as the row key.
 
-
+Values passed to the `TableRepository.Create<T>` or `TablePartition.Create<T>` override 
+declarative attributes.
 
 ## Installation
 
 ```
 > Install-Package Devlooped.TableStorage
+```
+
+There is also a source-only version, if you want to avoid an additional assembly:
+
+```
+> Install-Package Devlooped.TableStorage.Source
+```
+
+The source-only package includes all types with the default visibility (internal), so you can decide 
+what types to make public by declaring a partial class with the desired visibility. To make them all 
+public, for example, you can include the same [Visibility.cs](https://github.com/devlooped/TableStorage/blob/main/src/TableStorage/Visibility.cs) 
+that the compiled version uses, like:
+
+```csharp
+namespace Devlooped
+{
+    public partial interface ITableRepository<T> { }
+    public partial interface ITablePartition<T> { }
+    public partial class TableRepository { }
+    public partial class TablePartition { }
+
+    // Perhaps make the attributes visible too if you use them?
+    public partial class TableAttribute { }
+    public partial class PartitionKeyAttribute { }
+    public partial class RowKeyAttribute { }
+    public partial class TableStorageAttribute { }
+}
 ```
 
 
