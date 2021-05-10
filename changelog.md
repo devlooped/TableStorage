@@ -1,8 +1,8 @@
 
 
-## [v1.0.0](https://github.com/devlooped/TableStorage/tree/v1.0.0) (2021-05-09)
+## [v1.0.2](https://github.com/devlooped/TableStorage/tree/v1.0.2) (2021-05-10)
 
-[Full Changelog](https://github.com/devlooped/TableStorage/compare/cf1b7f069ac6d68482b498555c8dbdda8e1ae5b4...v1.0.0)
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/cf1b7f069ac6d68482b498555c8dbdda8e1ae5b4...v1.0.2)
 
 :twisted_rightwards_arrows: Merged:
 
