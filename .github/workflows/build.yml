@@ -51,18 +51,13 @@ jobs:
           fetch-depth: 0
 
       - name: 🙏 build
-        run: dotnet build -m:1 -p:VersionLabel="$GITHUB_REF.$GITHUB_RUN_NUMBER" -p:RepositoryBranch=${GITHUB_REF#refs/*/}
-
-      - name: ⚙ azurite
-        run: |
-          npm install azurite
-          npx azurite-table &
+        run: dotnet build -m:1 -p:VersionLabel="$GITHUB_REF.$GITHUB_RUN_NUMBER"
 
       - name: 🧪 test
         run: dotnet test --no-build -m:1 --blame-hang --blame-hang-timeout 5m
 
       - name: 📦 pack
-        run: dotnet pack -m:1 -p:VersionLabel="$GITHUB_REF.$GITHUB_RUN_NUMBER" -p:RepositoryBranch=${GITHUB_REF#refs/*/}
+        run: dotnet pack -m:1 -p:VersionLabel="$GITHUB_REF.$GITHUB_RUN_NUMBER"
 
       # Only push CI package to sleet feed if building on ubuntu (fastest)
       - name: 🚀 sleet
