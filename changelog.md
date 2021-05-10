@@ -1,24 +1,12 @@
 
 
-## [v1.0.1](https://github.com/devlooped/TableStorage/tree/v1.0.1) (2021-05-07)
+## [v1.0.0](https://github.com/devlooped/TableStorage/tree/v1.0.0) (2021-05-09)
 
-[Full Changelog](https://github.com/devlooped/TableStorage/compare/v1.0.0...v1.0.1)
-
-## [v1.0.0](https://github.com/devlooped/TableStorage/tree/v1.0.0) (2021-05-07)
-
-[Full Changelog](https://github.com/devlooped/TableStorage/compare/v1.0.0-beta...v1.0.0)
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/cf1b7f069ac6d68482b498555c8dbdda8e1ae5b4...v1.0.0)
 
 :twisted_rightwards_arrows: Merged:
 
 - Add SourceLink to get repo/pdb linking [\#3](https://github.com/devlooped/TableStorage/pull/3) (@kzu)
-
-## [v1.0.0-beta](https://github.com/devlooped/TableStorage/tree/v1.0.0-beta) (2021-05-05)
-
-[Full Changelog](https://github.com/devlooped/TableStorage/compare/v1.0.0-alpha...v1.0.0-beta)
-
-## [v1.0.0-alpha](https://github.com/devlooped/TableStorage/tree/v1.0.0-alpha) (2021-05-05)
-
-[Full Changelog](https://github.com/devlooped/TableStorage/compare/cf1b7f069ac6d68482b498555c8dbdda8e1ae5b4...v1.0.0-alpha)
 
 
 
