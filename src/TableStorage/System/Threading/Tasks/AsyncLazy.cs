@@ -37,7 +37,7 @@ namespace System.Threading.Tasks
     /// var value = await lazy.Value;
     /// </code>
     /// </remarks>
-    public static class AsyncLazy
+    static partial class AsyncLazy
     {
         /// <summary>
         /// Creates an <see cref="AsyncLazy{T}"/> using the given <paramref name="valueFactory"/>.
@@ -64,7 +64,7 @@ namespace System.Threading.Tasks
     /// </code>
     /// </remarks>
     /// <typeparam name="T">The type of async lazily-initialized value.</typeparam>
-    public class AsyncLazy<T> : Lazy<Task<T>>
+    partial class AsyncLazy<T> : Lazy<Task<T>>
     {
         /// <summary>
         /// Initializes the lazy, using <see cref="Task.Run(Func{T})"/> to asynchronously 
