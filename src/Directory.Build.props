@@ -23,7 +23,7 @@
     <Copyright>Copyright (C) Daniel Cazzulino and Contributors. All rights reserved.</Copyright>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageIcon>icon.png</PackageIcon>
+    <PackageIcon Condition="Exists('$(MSBuildThisFileDirectory)icon.png')">icon.png</PackageIcon>
 
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <GenerateRepositoryUrlAttribute>true</GenerateRepositoryUrlAttribute>
@@ -41,7 +41,8 @@
     <None Include="$(MSBuildThisFileDirectory)icon.png" Link="icon.png"
           Pack="true"
           Visible="false"
-          PackagePath="%(Filename)%(Extension)" />
+          PackagePath="%(Filename)%(Extension)"
+          Condition="Exists('$(MSBuildThisFileDirectory)icon.png')" />
   </ItemGroup>
 
   <PropertyGroup Label="Build">

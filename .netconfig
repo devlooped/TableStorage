@@ -49,8 +49,8 @@
 	weak
 [file ".github/workflows/build.yml"]
 	url = https://github.com/devlooped/oss/blob/main/.github/workflows/build.yml
-	sha = 55c0b32601e94e1eed35028a0cad510c6bcbb265
-	etag = d058d2646d5be0fa5da9d73c5643f9e5a0cc3837bb8dc455ced6fcecb278df6f
+	sha = 6928fc7af55eeffbc3ecb35a2038ea6d90dbbc23
+	etag = 0c1795c13d627d9051965912a0ff6fda07dd7d408d913ec477fb0a9aa753918e
 	weak
 [file ".github/workflows/changelog.yml"]
 	url = https://github.com/devlooped/oss/blob/main/.github/workflows/changelog.yml
@@ -114,8 +114,8 @@
 	weak
 [file "src/Directory.Build.props"]
 	url = https://github.com/devlooped/oss/blob/main/src/Directory.Build.props
-	sha = 0fc6e0ebd01d48d92f995541b6277edefa747606
-	etag = c582b53fd97a10eb3f326dda1672be92a8d83b760de93d6a952b2d7e12055fb6
+	sha = ae442c0e142d8948b1d26136c057a73ece224581
+	etag = d9d8096ce24bfa68e7bd23728e737c8440fc05eb1a56a190fd671946ad89c277
 	weak
 [file "src/Directory.Build.targets"]
 	url = https://github.com/devlooped/oss/blob/main/src/Directory.Build.targets
@@ -154,6 +154,6 @@
 	weak
 [file "src/TableStorage/System/Threading/Tasks/AsyncLazy.cs"]
 	url = https://github.com/devlooped/catbag/blob/main/System/Threading/Tasks/AsyncLazy.cs
-	sha = 193c30ff3291a30277cc278ca24a31cc43fc159f
-	etag = 46cf756f9cd1115ccf9957103ce19e2b0007af79e8787cd361f29bc930bd3f2b
+	sha = f2a68a668dcbab4ba87c792ed5fd2ca5ca8229de
+	etag = b6b9f5e7c57e294ba3d59382409171dfa20f220008dbeb725d7b9e2bb4c7aa91
 	weak
