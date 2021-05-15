@@ -53,6 +53,11 @@ jobs:
       - name: 🙏 build
         run: dotnet build -m:1 -p:VersionLabel="$GITHUB_REF.$GITHUB_RUN_NUMBER"
 
+      - name: ⚙ azurite
+        run: |
+          npm install azurite
+          npx azurite-table &
+
       - name: 🧪 test
         run: dotnet test --no-build -m:1 --blame-hang --blame-hang-timeout 5m
 
