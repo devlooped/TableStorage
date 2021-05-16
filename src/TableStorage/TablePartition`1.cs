@@ -20,7 +20,7 @@ namespace Devlooped
         /// </summary>
         /// <param name="storageAccount">The storage account to use.</param>
         /// <param name="tableName">Optional table name. If no value is provided, <see cref="DefaultTableName"/> will be used.</param>
-        internal TablePartition(CloudStorageAccount storageAccount, string tableName, string partitionKey, Func<T, string> rowKey)
+        public TablePartition(CloudStorageAccount storageAccount, string tableName, string partitionKey, Func<T, string> rowKey)
             => (this.repository, TableName, this.partitionKey)
             = (new TableRepository<T>(storageAccount, tableName, _ => partitionKey, rowKey), tableName, partitionKey);
 

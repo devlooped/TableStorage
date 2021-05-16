@@ -28,7 +28,7 @@ namespace Devlooped
         readonly Func<T, string> rowKey;
         readonly AsyncLazy<CloudTable> table;
 
-        internal TableRepository(CloudStorageAccount storageAccount, string tableName, Func<T, string> partitionKey, Func<T, string> rowKey)
+        public TableRepository(CloudStorageAccount storageAccount, string tableName, Func<T, string> partitionKey, Func<T, string> rowKey)
         {
             this.storageAccount = storageAccount;
             table = new AsyncLazy<CloudTable>(() => GetTableAsync(tableName));
