@@ -1,5 +1,13 @@
 
 
+## [v1.0.4](https://github.com/devlooped/TableStorage/tree/v1.0.4) (2021-05-16)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v1.0.3...v1.0.4)
+
+:sparkles: Implemented enhancements:
+
+- Make TableRepository\<T\>/TablePartition\<T\> public [\#10](https://github.com/devlooped/TableStorage/issues/10)
+
 ## [v1.0.3](https://github.com/devlooped/TableStorage/tree/v1.0.3) (2021-05-15)
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/v1.0.2...v1.0.3)
