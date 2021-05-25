@@ -13,7 +13,6 @@ namespace Devlooped
     partial class TablePartition<T> : ITablePartition<T> where T : class
     {
         readonly ITableRepository<T> repository;
-        readonly string partitionKey;
 
         /// <summary>
         /// Initializes the repository with the given storage account and optional table name.
@@ -21,14 +20,20 @@ namespace Devlooped
         /// <param name="storageAccount">The storage account to use.</param>
         /// <param name="tableName">Optional table name. If no value is provided, <see cref="DefaultTableName"/> will be used.</param>
         public TablePartition(CloudStorageAccount storageAccount, string tableName, string partitionKey, Func<T, string> rowKey)
-            => (this.repository, TableName, this.partitionKey)
-            = (new TableRepository<T>(storageAccount, tableName, _ => partitionKey, rowKey), tableName, partitionKey);
+        {
+            TableName = tableName ?? TablePartition.GetDefaultTableName<T>();
+            PartitionKey = partitionKey ?? TablePartition.GetDefaultPartitionKey<T>();
+            repository = new TableRepository<T>(storageAccount,
+                TableName,
+                _ => PartitionKey,
+                rowKey ?? RowKeyAttribute.CreateAccessor<T>());
+        }
 
         /// <inheritdoc />
         public string TableName { get; }
 
         /// <inheritdoc />
-        public string PartitionKey => partitionKey;
+        public string PartitionKey { get; }
 
         /// <inheritdoc />
         public Task DeleteAsync(T entity, CancellationToken cancellation = default)
@@ -36,15 +41,15 @@ namespace Devlooped
 
         /// <inheritdoc />
         public Task DeleteAsync(string rowKey, CancellationToken cancellation = default)
-            => repository.DeleteAsync(partitionKey, rowKey, cancellation);
+            => repository.DeleteAsync(PartitionKey, rowKey, cancellation);
         
         /// <inheritdoc />
         public IAsyncEnumerable<T> EnumerateAsync(CancellationToken cancellation = default) 
-            => repository.EnumerateAsync(partitionKey, cancellation);
+            => repository.EnumerateAsync(PartitionKey, cancellation);
 
         /// <inheritdoc />
         public Task<T?> GetAsync(string rowKey, CancellationToken cancellation = default)
-            => repository.GetAsync(partitionKey, rowKey, cancellation);
+            => repository.GetAsync(PartitionKey, rowKey, cancellation);
 
         /// <inheritdoc />
         public Task<T> PutAsync(T entity, CancellationToken cancellation = default)

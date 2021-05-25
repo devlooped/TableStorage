@@ -31,10 +31,10 @@ namespace Devlooped
         public TableRepository(CloudStorageAccount storageAccount, string tableName, Func<T, string> partitionKey, Func<T, string> rowKey)
         {
             this.storageAccount = storageAccount;
-            table = new AsyncLazy<CloudTable>(() => GetTableAsync(tableName));
-            TableName = tableName;
-            this.partitionKey = partitionKey;
-            this.rowKey = rowKey;
+            TableName = tableName ?? TableRepository.GetDefaultTableName<T>();
+            this.partitionKey = partitionKey ?? PartitionKeyAttribute.CreateAccessor<T>();
+            this.rowKey = rowKey ?? RowKeyAttribute.CreateAccessor<T>();
+            table = new AsyncLazy<CloudTable>(() => GetTableAsync(TableName));
         }
 
         /// <inheritdoc />

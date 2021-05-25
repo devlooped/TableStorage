@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Linq;
 using System.Reflection;
 using Microsoft.Azure.Cosmos.Table;
 
@@ -48,11 +47,18 @@ namespace Devlooped
             Func<T, string>? partitionKey = null,
             Func<T, string>? rowKey = null) where T : class
         {
-            tableName ??= defaultTableNames.GetOrAdd(typeof(T), type => type.GetCustomAttribute<TableAttribute>()?.Name ?? type.Name);
+            tableName ??= GetDefaultTableName<T>();
             partitionKey ??= PartitionKeyAttribute.CreateAccessor<T>();
             rowKey ??= RowKeyAttribute.CreateAccessor<T>();
 
             return new TableRepository<T>(storageAccount, tableName, partitionKey, rowKey);
         }
+
+        /// <summary>
+        /// Gets a default table name for entities of type <typeparamref name="T"/>. Will be the 
+        /// <see cref="TableAttribute.Name"/> if the attribute is present, or the type name otherwise.
+        /// </summary>
+        public static string GetDefaultTableName<T>() =>
+            defaultTableNames.GetOrAdd(typeof(T), type => type.GetCustomAttribute<TableAttribute>()?.Name ?? type.Name);
     }
 }

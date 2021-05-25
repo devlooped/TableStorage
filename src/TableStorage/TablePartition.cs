@@ -67,16 +67,26 @@ namespace Devlooped
             string? partitionKey = null,
             Func<T, string>? rowKey = null) where T : class
         {
-            tableName ??= tableName ??= defaultTableNames.GetOrAdd(typeof(T),
-                type => type.GetCustomAttribute<TableAttribute>()?.Name ?? DefaultTableName);
-
-            partitionKey ??= (typeof(T).Name.EndsWith("Entity") ?
-                    typeof(T).Name.Substring(0, typeof(T).Name.Length - 6) :
-                    typeof(T).Name);
-
+            tableName ??= GetDefaultTableName<T>();
+            partitionKey ??= GetDefaultPartitionKey<T>();
             rowKey ??= RowKeyAttribute.CreateAccessor<T>();
 
             return new TablePartition<T>(storageAccount, tableName, partitionKey, rowKey);
         }
+
+        /// <summary>
+        /// Gets a default table name for entities of type <typeparamref name="T"/>. Will be the 
+        /// <see cref="TableAttribute.Name"/> if the attribute is present, or <see cref="DefaultTableName"/> otherwise.
+        /// </summary>
+        public static string GetDefaultTableName<T>() =>
+            defaultTableNames.GetOrAdd(typeof(T), type => type.GetCustomAttribute<TableAttribute>()?.Name ?? DefaultTableName);
+
+        /// <summary>
+        /// Gets a default partition key to use for entities of type <typeparamref name="T"/>. Will be the 
+        /// the type name, stripped of a suffix <c>Entity</c> if present.
+        /// </summary>
+        public static string GetDefaultPartitionKey<T>() => typeof(T).Name.EndsWith("Entity") ?
+            typeof(T).Name.Substring(0, typeof(T).Name.Length - 6) :
+            typeof(T).Name;
     }
 }
