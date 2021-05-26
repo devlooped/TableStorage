@@ -1,5 +1,14 @@
 
 
+## [v1.1.0](https://github.com/devlooped/TableStorage/tree/v1.1.0) (2021-05-26)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v1.0.4...v1.1.0)
+
+:sparkles: Implemented enhancements:
+
+- Force factory method usage for default implementations [\#14](https://github.com/devlooped/TableStorage/issues/14)
+- Apply factory method defaults to TableRepository/TablePartition constructors [\#13](https://github.com/devlooped/TableStorage/issues/13)
+
 ## [v1.0.4](https://github.com/devlooped/TableStorage/tree/v1.0.4) (2021-05-16)
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/v1.0.3...v1.0.4)
