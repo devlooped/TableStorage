@@ -19,7 +19,7 @@ namespace Devlooped
         /// </summary>
         /// <param name="storageAccount">The storage account to use.</param>
         /// <param name="tableName">Optional table name. If no value is provided, <see cref="DefaultTableName"/> will be used.</param>
-        public TablePartition(CloudStorageAccount storageAccount, string tableName, string partitionKey, Func<T, string> rowKey)
+        protected internal TablePartition(CloudStorageAccount storageAccount, string tableName, string partitionKey, Func<T, string> rowKey)
         {
             TableName = tableName ?? TablePartition.GetDefaultTableName<T>();
             PartitionKey = partitionKey ?? TablePartition.GetDefaultPartitionKey<T>();
