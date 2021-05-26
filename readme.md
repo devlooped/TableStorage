@@ -149,7 +149,9 @@ namespace Devlooped
     public partial interface ITableRepository<T> { }
     public partial interface ITablePartition<T> { }
     public partial class TableRepository { }
+    public partial class TableRepository<T> { }
     public partial class TablePartition { }
+    public partial class TablePartition<T> { }
 
     // Perhaps make the attributes visible too if you use them?
     public partial class TableAttribute { }
