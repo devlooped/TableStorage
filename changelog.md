@@ -1,5 +1,13 @@
 
 
+## [v1.2.0](https://github.com/devlooped/TableStorage/tree/v1.2.0) (2021-05-26)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v1.1.1...v1.2.0)
+
+:sparkles: Implemented enhancements:
+
+- Add an AttributedTableRepository\<T\> for easy consumption in DI scenarios [\#16](https://github.com/devlooped/TableStorage/issues/16)
+
 ## [v1.1.1](https://github.com/devlooped/TableStorage/tree/v1.1.1) (2021-05-26)
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/v1.1.0...v1.1.1)
