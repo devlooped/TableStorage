@@ -10,6 +10,7 @@ namespace Devlooped
     public partial interface ITablePartition<T> { }
     public partial class TableRepository { }
     public partial class TableRepository<T> { }
+    public partial class AttributedTableRepository<T> { }
     public partial class TablePartition { }
     public partial class TablePartition<T> { }
 }
