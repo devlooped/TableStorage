@@ -17,8 +17,10 @@ namespace Devlooped
         /// <summary>
         /// Initializes the repository with the given storage account and optional table name.
         /// </summary>
-        /// <param name="storageAccount">The storage account to use.</param>
-        /// <param name="tableName">Optional table name. If no value is provided, <see cref="DefaultTableName"/> will be used.</param>
+        /// <param name="storageAccount">The <see cref="CloudStorageAccount"/> to use to connect to the table.</param>
+        /// <param name="tableName">The table that backs this table partition.</param>
+        /// <param name="partitionKey">The fixed partition key that backs this table partition.</param>
+        /// <param name="rowKey">A function to determine the row key for an entity of type <typeparamref name="T"/> within the partition.</param>
         protected internal TablePartition(CloudStorageAccount storageAccount, string tableName, string partitionKey, Func<T, string> rowKey)
         {
             TableName = tableName ?? TablePartition.GetDefaultTableName<T>();

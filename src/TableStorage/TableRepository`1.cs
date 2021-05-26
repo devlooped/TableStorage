@@ -28,6 +28,13 @@ namespace Devlooped
         readonly Func<T, string> rowKey;
         readonly AsyncLazy<CloudTable> table;
 
+        /// <summary>
+        /// Initializes the table repository.
+        /// </summary>
+        /// <param name="storageAccount">The <see cref="CloudStorageAccount"/> to use to connect to the table.</param>
+        /// <param name="tableName">The table that backs this repository.</param>
+        /// <param name="partitionKey">A function to determine the partition key for an entity of type <typeparamref name="T"/>.</param>
+        /// <param name="rowKey">A function to determine the row key for an entity of type <typeparamref name="T"/>.</param>
         protected internal TableRepository(CloudStorageAccount storageAccount, string tableName, Func<T, string> partitionKey, Func<T, string> rowKey)
         {
             this.storageAccount = storageAccount;
