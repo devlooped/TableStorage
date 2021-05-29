@@ -13,6 +13,17 @@ namespace Devlooped
         static readonly ConcurrentDictionary<Type, string> defaultTableNames = new();
 
         /// <summary>
+        /// Creates an <see cref="ITableRepository{TableEntity}"/> repository.
+        /// </summary>
+        /// <param name="storageAccount">The storage account to use.</param>
+        /// <param name="tableName">Table name to use.</param>
+        /// <returns>The new <see cref="ITableRepository{TableEntity}"/>.</returns>
+        public static ITableRepository<TableEntity> Create(
+            CloudStorageAccount storageAccount,
+            string tableName)
+            => new TableEntityRepository(storageAccount, tableName);
+
+        /// <summary>
         /// Creates an <see cref="ITableRepository{T}"/> for the given entity type 
         /// <typeparamref name="T"/>, using the <typeparamref name="T"/> <c>Name</c> as 
         /// the table name.

@@ -55,7 +55,7 @@ var product = new Product("catId-asdf", "1234")
 await repo.PutAsync(product);
 
 // Enumerate all products in category "catId-asdf"
-await foreach (var p in repo.EnumerateAsync("catId-asdf")
+await foreach (var p in repo.EnumerateAsync("catId-asdf"))
    Console.WriteLine(p.Price);
 
 // Get previously saved product.
@@ -76,8 +76,8 @@ example. In such a case, instead of a `TableRepository`, you can use a `TablePar
 class Region 
 {
   public Region(string code, string name) 
-    => (Id, Amount)
-    = (id, amount);
+    => (Code, Name)
+    = (code, name);
 
   public string Code { get; }
 
@@ -87,9 +87,14 @@ class Region
 
 ```csharp
 var account = CloudStorageAccount.DevelopmentStorageAccount; // or production one
-// tableName will default to "Entity" and partition key to "Order", but they can 
+// We lay out the parameter names for clarity only.
 // also be provided to the factory method to override the default behavior.
-var repo = TablePartition.Create<Region>(storageAccount, region => region.Code);
+var repo = TablePartition.Create<Region>(storageAccount, 
+  // tableName defaults to "Entity" if not provided
+  tableName: "Reference",
+  // partitionKey would default to "Region" too if not provided
+  partitionKey: "Region",
+  rowKey: region => region.Code);
 
 var region = new Region("uk", "United Kingdom"); 
 
@@ -97,10 +102,10 @@ var region = new Region("uk", "United Kingdom");
 await repo.PutAsync(region);
 
 // Enumerate all regions within the partition
-await foreach (var r in repo.EnumerateAsync()
+await foreach (var r in repo.EnumerateAsync())
    Console.WriteLine(r.Name);
 
-// Get previously saved order.
+// Get previously saved region.
 Region saved = await repo.GetAsync("uk");
 
 // Delete region
@@ -110,7 +115,7 @@ await repo.DeleteAsync("uk");
 await repo.DeleteAsync(saved);
 ```
 
-This is quite convenient for handing reference data, for example. Enumerating all entries 
+This is quite convenient for handling reference data, for example. Enumerating all entries 
 in the partition wouldn't be something you'd typically do for your "real" data, but for 
 reference data, it could be useful.
 
@@ -125,6 +130,30 @@ entity type to modify the default values used:
 
 Values passed to the `TableRepository.Create<T>` or `TablePartition.Create<T>` override 
 declarative attributes.
+
+### TableEntity Support
+
+Since these repository APIs are quite a bit more intuitive than working against a direct 
+`TableClient`, you might want to retrieve/enumerate entities just by their built-in `ITableEntity` 
+properties, like `PartitionKey`, `RowKey`, `Timestamp` and `ETag`. For this scenario, we 
+also support creating `ITableRepository<TableEntity>` and `ITablePartition<TableEntity>` 
+by using the factory methods `TableRepository.Create(...)` and `TablePartition.Create(...)` 
+without a (generic) entity type argument.
+
+For example, given you know all `Region` entities saved in the example above, use the region `Code` 
+as the `RowKey`, you could simply enumerate all regions without using the `Region` type at all:
+
+```csharp
+var account = CloudStorageAccount.DevelopmentStorageAccount; // or production one
+var repo = TablePartition.Create(storageAccount, 
+  tableName: "Reference",
+  partitionKey: "Region");
+
+// Enumerate all regions within the partition as plain TableEntities
+await foreach (TableEntity region in repo.EnumerateAsync())
+   Console.WriteLine(region.RowKey);
+```
+
 
 ## Installation
 
