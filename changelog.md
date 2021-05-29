@@ -1,5 +1,13 @@
 
 
+## [v1.2.1](https://github.com/devlooped/TableStorage/tree/v1.2.1) (2021-05-29)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v1.2.0...v1.2.1)
+
+:sparkles: Implemented enhancements:
+
+- Add support for TableEntity via ITableRepository and ITablePartition APIs [\#18](https://github.com/devlooped/TableStorage/issues/18)
+
 ## [v1.2.0](https://github.com/devlooped/TableStorage/tree/v1.2.0) (2021-05-26)
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/v1.1.1...v1.2.0)
