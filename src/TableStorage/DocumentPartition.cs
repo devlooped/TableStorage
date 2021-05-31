@@ -8,28 +8,18 @@ using Microsoft.Azure.Cosmos.Table;
 namespace Devlooped
 {
     /// <summary>
-    /// Factory methods to create <see cref="ITablePartition{T}"/> instances 
-    /// that store entities using individual columns for entity properties.
+    /// Factory methods to create <see cref="ITableRepository{T}"/> instances
+    /// that store entities as a serialized document.
     /// </summary>
-    static partial class TablePartition
+    static partial class DocumentPartition
     {
         static readonly ConcurrentDictionary<Type, string> defaultTableNames = new();
 
         /// <summary>
         /// Default table name to use when a value is not not provided 
-        /// (or overriden via <see cref="TableAttribute"/>), which is <c>Entity</c>.
+        /// (or overriden via <see cref="TableAttribute"/>), which is <c>Document</c>.
         /// </summary>
-        public const string DefaultTableName = "Entity";
-
-        /// <summary>
-        /// Creates an <see cref="ITablePartition{TableEntity}"/>, using 
-        /// <see cref="DefaultTableName"/> as the table name and the 
-        /// <typeparamref name="T"/> <c>Name</c> as the partition key.
-        /// </summary>
-        /// <param name="storageAccount">The storage account to use.</param>
-        /// <returns>The new <see cref="ITablePartition{TEntity}"/>.</returns>
-        public static ITablePartition<TableEntity> Create(CloudStorageAccount storageAccount, string tableName, string partitionKey)
-            => new TableEntityPartition(storageAccount, tableName, partitionKey);
+        public const string DefaultTableName = "Document";
 
         /// <summary>
         /// Creates an <see cref="ITablePartition{T}"/> for the given entity type 
@@ -42,8 +32,9 @@ namespace Devlooped
         /// <returns>The new <see cref="ITablePartition{T}"/>.</returns>
         public static ITablePartition<T> Create<T>(
             CloudStorageAccount storageAccount,
-            Func<T, string> rowKey) where T : class
-            => Create<T>(storageAccount, DefaultTableName, default, rowKey);
+            Func<T, string> rowKey,
+            IBinaryDocumentSerializer? serializer = default) where T : class
+            => Create<T>(storageAccount, DefaultTableName, typeof(T).Name, rowKey);
 
         /// <summary>
         /// Creates an <see cref="ITablePartition{T}"/> for the given entity type 
@@ -58,7 +49,8 @@ namespace Devlooped
         public static ITablePartition<T> Create<T>(
             CloudStorageAccount storageAccount,
             string tableName,
-            Func<T, string> rowKey) where T : class
+            Func<T, string> rowKey,
+            IDocumentSerializer? serializer = default) where T : class
             => Create<T>(storageAccount, tableName, default, rowKey);
 
         /// <summary>
@@ -78,13 +70,15 @@ namespace Devlooped
             CloudStorageAccount storageAccount,
             string? tableName = default,
             string? partitionKey = null,
-            Func<T, string>? rowKey = null) where T : class
+            Func<T, string>? rowKey = null,
+            IDocumentSerializer? serializer = default) where T : class
         {
             tableName ??= GetDefaultTableName<T>();
-            partitionKey ??= GetDefaultPartitionKey<T>();
+            partitionKey ??= TablePartition.GetDefaultPartitionKey<T>();
             rowKey ??= RowKeyAttribute.CreateAccessor<T>();
+            serializer ??= JsonDocumentSerializer.Default;
 
-            return new TablePartition<T>(storageAccount, tableName, partitionKey, rowKey);
+            return new DocumentPartition<T>(storageAccount, tableName, partitionKey, rowKey, serializer);
         }
 
         /// <summary>
@@ -93,13 +87,5 @@ namespace Devlooped
         /// </summary>
         public static string GetDefaultTableName<T>() =>
             defaultTableNames.GetOrAdd(typeof(T), type => type.GetCustomAttribute<TableAttribute>()?.Name ?? DefaultTableName);
-
-        /// <summary>
-        /// Gets a default partition key to use for entities of type <typeparamref name="T"/>. Will be the 
-        /// the type name, stripped of a suffix <c>Entity</c> if present.
-        /// </summary>
-        public static string GetDefaultPartitionKey<T>() => typeof(T).Name.EndsWith("Entity") ?
-            typeof(T).Name.Substring(0, typeof(T).Name.Length - 6) :
-            typeof(T).Name;
     }
 }

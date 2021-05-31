@@ -13,20 +13,21 @@ namespace Devlooped
     /// When attributed entities are used, this is a convenient generic implementation for use with 
     /// a dependency injection container, such as in ASP.NET Core:
     /// <code>
-    /// services.AddScoped(typeof(ITableRepository&lt;&gt;), typeof(AttributedTableRepository&lt;&gt;));
+    /// services.AddScoped(typeof(ITableRepository&lt;&gt;), typeof(AttributedDocumentRepository&lt;&gt;));
     /// </code>
     /// </remarks>
-    partial class AttributedTableRepository<T> : TableRepository<T> where T : class
+    partial class AttributedDocumentRepository<T> : DocumentRepository<T> where T : class
     {
         /// <summary>
         /// Initializes the repository using the given storage account.
         /// </summary>
         /// <param name="storageAccount">Storage account to connect to.</param>
-        public AttributedTableRepository(CloudStorageAccount storageAccount)
+        public AttributedDocumentRepository(CloudStorageAccount storageAccount, IDocumentSerializer? serializer = default)
             : base(storageAccount,
                   TableRepository.GetDefaultTableName<T>(),
                   PartitionKeyAttribute.CreateAccessor<T>(),
-                  RowKeyAttribute.CreateAccessor<T>())
+                  RowKeyAttribute.CreateAccessor<T>(),
+                  serializer ?? JsonDocumentSerializer.Default)
         {
         }
     }

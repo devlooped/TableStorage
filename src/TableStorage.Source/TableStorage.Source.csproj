@@ -38,7 +38,7 @@ Given the following class:
 It can be persisted and retrieved with:
 
   var account = CloudStorageAccount.DevelopmentStorageAccount; // or production one
-  var repo = new TableRepository&lt;Product&gt;(storageAccount);
+  var repo = TableRepository.Create&lt;Product&gt;(storageAccount);
 
   var product = new Product("catId-asdf", "1234") 
   {
@@ -76,5 +76,11 @@ It can be persisted and retrieved with:
     <Compile Include="..\TableStorage\**\*.cs" Exclude="..\TableStorage\Visibility.cs;..\TableStorage\obj\**\*.cs;" />
     <None Update="Devlooped.TableStorage.Source.targets" PackFolder="build" />
   </ItemGroup>
-  
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Devlooped.TableStorage.Bson.Source" />
+    <InternalsVisibleTo Include="Devlooped.TableStorage.MessagePack.Source" />
+    <InternalsVisibleTo Include="Devlooped.TableStorage.Protobuf.Source" />
+  </ItemGroup>
+
 </Project>

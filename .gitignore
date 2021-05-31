@@ -27,3 +27,4 @@ _site
 .jekyll-cache
 Gemfile.lock
 package-lock.json
+__azurite_db_table__.json
