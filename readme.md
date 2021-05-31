@@ -119,6 +119,62 @@ This is quite convenient for handling reference data, for example. Enumerating a
 in the partition wouldn't be something you'd typically do for your "real" data, but for 
 reference data, it could be useful.
 
+Stored entities will use individual columns for properties, which makes it easy to browse 
+the data. If you don't need the individual columns, and would like a document-like storage 
+mechanism instead, you can use the `DocumentRepository.Create` and `DocumentPartition.Create` 
+factory methods instead. The API is otherwise the same, but you can see the effect of using 
+one or the other in the following screenshots of the [Storage Explorer](https://azure.microsoft.com/en-us/features/storage-explorer/) 
+for the same `Product` entity shown in the first example above:
+
+![Screenshot of entity persisted with separate columns for properties](assets/img/entity.png)
+
+![Screenshot of entity persisted as a document](assets/img/document.png)
+
+The code that persisted both entities is:
+
+```csharp
+var repo = TableRepository.Create<Product>(
+    CloudStorageAccount.DevelopmentStorageAccount,
+    tableName: "Products",
+    partitionKey: p => p.Category,
+    rowKey: p => p.Id);
+
+await repo.PutAsync(new Product("book", "9781473217386")
+{
+    Title = "Neuromancer",
+    Price = 7.32
+});
+
+var docs = DocumentRepository.Create<Product>(
+    CloudStorageAccount.DevelopmentStorageAccount,
+    tableName: "Documents",
+    partitionKey: p => p.Category,
+    rowKey: p => p.Id);
+
+await docs.PutAsync(new Product("book", "9781473217386")
+{
+    Title = "Neuromancer",
+    Price = 7.32
+});
+```
+
+The `DocumentType` is the `Type.FullName` of the entity type, and the `DocumentVersion` is 
+the `Major.Minor` of its assembly, which could be used for advanced data migration scenarios.
+
+In addition to the default built-in JSON plain-text based serializer, you can choose from 
+various binary serializers which will instead persist the document as a byte array:
+
+[![Bson](https://img.shields.io/nuget/v/Devlooped.TableStorage.svg?color=royalblue&label=Bson)](https://www.nuget.org/packages/Devlooped.TableStorage)
+[![MessagePack](https://img.shields.io/nuget/v/Devlooped.TableStorage.svg?color=royalblue&label=MessagePack)](https://www.nuget.org/packages/Devlooped.TableStorage)
+[![Protobuf](https://img.shields.io/nuget/v/Devlooped.TableStorage.svg?color=royalblue&label=Protobuf)](https://www.nuget.org/packages/Devlooped.TableStorage)
+
+You can pass the serializer to use to the factory method as follows: 
+
+```csharp
+var repo = TableRepository.Create<Product>(...,
+    serializer: [BsonDocumentSerializer|MessagePackDocumentSerializer|ProtobufDocumentSerializer].Default);
+```
+
 ### Attributes
 
 If you want to avoid using strings with the factory methods, you can also annotate the 
@@ -128,12 +184,11 @@ entity type to modify the default values used:
 * `[PartitionKey]`: annotates the property that should be used as the partition key
 * `[RowKey]`: annotates the property that should be used as the row key.
 
-Values passed to the `TableRepository.Create<T>` or `TablePartition.Create<T>` override 
-declarative attributes.
+Values passed to the factory methods override declarative attributes.
 
 ### TableEntity Support
 
-Since these repository APIs are quite a bit more intuitive than working against a direct 
+Since these repository APIs are quite a bit more intuitive than working directly against a  
 `TableClient`, you might want to retrieve/enumerate entities just by their built-in `ITableEntity` 
 properties, like `PartitionKey`, `RowKey`, `Timestamp` and `ETag`. For this scenario, we 
 also support creating `ITableRepository<TableEntity>` and `ITablePartition<TableEntity>` 
@@ -161,7 +216,7 @@ await foreach (TableEntity region in repo.EnumerateAsync())
 > Install-Package Devlooped.TableStorage
 ```
 
-There is also a source-only version, if you want to avoid an additional assembly:
+There is also a source-only version, if you want to avoid an additional assembly dependency:
 
 ```
 > Install-Package Devlooped.TableStorage.Source
@@ -179,8 +234,16 @@ namespace Devlooped
     public partial interface ITablePartition<T> { }
     public partial class TableRepository { }
     public partial class TableRepository<T> { }
+    public partial class AttributedTableRepository<T> { }
+    public partial class DocumentRepository { }
+    public partial class DocumentRepository<T> { }
+    public partial class AttributedDocumentRepository<T> { }
+    public partial interface IDocumentSerializer { }
+    public partial interface IBinaryDocumentSerializer { }
+    public partial interface IStringDocumentSerializer { }
     public partial class TablePartition { }
     public partial class TablePartition<T> { }
+    public partial class DocumentPartition { }
 
     // Perhaps make the attributes visible too if you use them?
     public partial class TableAttribute { }

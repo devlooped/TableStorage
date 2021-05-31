@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>Devlooped.TableStorage.MessagePack</AssemblyName>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <IsPackable>true</IsPackable>
+    <Description>A MessagePack binary serializer for use with document-based repositories.
+
+Usage:
+
+  var repo = DocumentRepository.Create&lt;Product&gt;(storageAccount, serializer: BsonDocumentSerializer.Default);
+    </Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NuGetizer" Version="0.7.0" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="all" />
+    <PackageReference Include="MessagePack" Version="2.2.85" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TableStorage\TableStorage.csproj" />
+  </ItemGroup>
+
+</Project>

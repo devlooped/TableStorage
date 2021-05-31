@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>Devlooped.TableStorage.Protobuf.Source</AssemblyName>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <IsPackable>true</IsPackable>
+    <PackBuildOutput>false</PackBuildOutput>
+    <PackCompile>true</PackCompile>
+    <Description>A source-only Protocol Buffers binary serializer for use with document-based repositories.
+
+Usage:
+
+  var repo = DocumentRepository.Create&lt;Product&gt;(storageAccount, serializer: ProtobufDocumentSerializer.Default);
+    </Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NuGetizer" Version="0.7.0" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="all" />
+    <PackageReference Include="protobuf-net" Version="3.0.101" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TableStorage.Source\TableStorage.Source.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\TableStorage.Protobuf\**\*.cs" Exclude="..\TableStorage.Protobuf\Visibility.cs;..\TableStorage.Protobuf\obj\**\*.cs;" />
+    <None Update="Devlooped.TableStorage.Protobuf.Source.targets" PackFolder="build" />
+  </ItemGroup>
+  
+</Project>

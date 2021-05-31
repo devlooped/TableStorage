@@ -1,0 +1,10 @@
+﻿<Project>
+
+  <ItemGroup>
+    <Compile Update="@(Compile -> WithMetadataValue('NuGetPackageId', 'Devlooped.TableStorage.Protobuf.Source'))">
+      <Visible>false</Visible>
+      <Link>Devlooped\TableStorage.Protobuf\%(Filename)%(Extension)</Link>
+    </Compile>
+  </ItemGroup>
+  
+</Project>
