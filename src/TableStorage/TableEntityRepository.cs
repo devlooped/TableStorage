@@ -12,7 +12,7 @@ namespace Devlooped
     partial class TableEntityRepository : ITableRepository<TableEntity>
     {
         readonly CloudStorageAccount storageAccount;
-        readonly AsyncLazy<CloudTable> table;
+        readonly Task<CloudTable> table;
 
         /// <summary>
         /// Initializes the table repository.
@@ -23,7 +23,7 @@ namespace Devlooped
         {
             this.storageAccount = storageAccount;
             TableName = tableName;
-            table = new AsyncLazy<CloudTable>(() => GetTableAsync(TableName));
+            table = GetTableAsync(TableName);
         }
 
         /// <inheritdoc />
@@ -32,7 +32,7 @@ namespace Devlooped
         /// <inheritdoc />
         public async Task DeleteAsync(string partitionKey, string rowKey, CancellationToken cancellation = default)
         {
-            var table = await this.table.Value.ConfigureAwait(false);
+            var table = await this.table.ConfigureAwait(false);
 
             await table.ExecuteAsync(TableOperation.Delete(
                 new TableEntity(partitionKey, rowKey) { ETag = "*" }), cancellation)
@@ -42,7 +42,7 @@ namespace Devlooped
         /// <inheritdoc />
         public async Task DeleteAsync(TableEntity entity, CancellationToken cancellation = default)
         {
-            var table = await this.table.Value.ConfigureAwait(false);
+            var table = await this.table.ConfigureAwait(false);
             entity.ETag = "*";
             await table.ExecuteAsync(TableOperation.Delete(entity), cancellation)
                 .ConfigureAwait(false);
@@ -51,7 +51,7 @@ namespace Devlooped
         /// <inheritdoc />
         public async IAsyncEnumerable<TableEntity> EnumerateAsync(string partitionKey, [EnumeratorCancellation] CancellationToken cancellation = default)
         {
-            var table = await this.table.Value;
+            var table = await this.table;
             var query = new TableQuery<TableEntity>()
                 .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));
 
@@ -71,7 +71,7 @@ namespace Devlooped
         /// <inheritdoc />
         public async Task<TableEntity?> GetAsync(string partitionKey, string rowKey, CancellationToken cancellation = default)
         {
-            var table = await this.table.Value.ConfigureAwait(false);
+            var table = await this.table.ConfigureAwait(false);
             var result = await table.ExecuteAsync(TableOperation.Retrieve(
                 partitionKey, rowKey,
                 (partitionKey, rowKey, timestamp, properties, etag) => new TableEntity(partitionKey, rowKey) { Timestamp = timestamp, ETag = etag }), 
@@ -84,7 +84,7 @@ namespace Devlooped
         /// <inheritdoc />
         public async Task<TableEntity> PutAsync(TableEntity entity, CancellationToken cancellation = default)
         {
-            var table = await this.table.Value.ConfigureAwait(false);
+            var table = await this.table.ConfigureAwait(false);
             entity.ETag = "*";
             var result = await table.ExecuteAsync(TableOperation.InsertOrReplace(entity), cancellation)
                 .ConfigureAwait(false);

@@ -25,7 +25,7 @@ namespace Devlooped
         readonly CloudStorageAccount storageAccount;
         readonly Func<T, string> partitionKey;
         readonly Func<T, string> rowKey;
-        readonly AsyncLazy<CloudTable> table;
+        readonly Task<CloudTable> table;
 
         /// <summary>
         /// Initializes the table repository.
@@ -40,7 +40,7 @@ namespace Devlooped
             TableName = tableName ?? TableRepository.GetDefaultTableName<T>();
             this.partitionKey = partitionKey ?? PartitionKeyAttribute.CreateAccessor<T>();
             this.rowKey = rowKey ?? RowKeyAttribute.CreateAccessor<T>();
-            table = new AsyncLazy<CloudTable>(() => GetTableAsync(TableName));
+            table = GetTableAsync(TableName);
         }
 
         /// <inheritdoc />
@@ -49,7 +49,7 @@ namespace Devlooped
         /// <inheritdoc />
         public async Task DeleteAsync(string partitionKey, string rowKey, CancellationToken cancellation = default)
         {
-            var table = await this.table.Value.ConfigureAwait(false);
+            var table = await this.table.ConfigureAwait(false);
 
             await table.ExecuteAsync(TableOperation.Delete(
                 new TableEntity(partitionKey, rowKey) { ETag = "*" }), cancellation)
@@ -61,7 +61,7 @@ namespace Devlooped
         {
             var partitionKey = this.partitionKey.Invoke(entity);
             var rowKey = this.rowKey.Invoke(entity);
-            var table = await this.table.Value.ConfigureAwait(false);
+            var table = await this.table.ConfigureAwait(false);
 
             await table.ExecuteAsync(TableOperation.Delete(
                 new TableEntity(partitionKey, rowKey) { ETag = "*" }), cancellation)
@@ -71,7 +71,7 @@ namespace Devlooped
         /// <inheritdoc />
         public async IAsyncEnumerable<T> EnumerateAsync(string partitionKey, [EnumeratorCancellation] CancellationToken cancellation = default)
         {
-            var table = await this.table.Value;
+            var table = await this.table;
             var query = new TableQuery<DynamicTableEntity>()
                 .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));
 
@@ -91,7 +91,7 @@ namespace Devlooped
         /// <inheritdoc />
         public async Task<T?> GetAsync(string partitionKey, string rowKey, CancellationToken cancellation = default)
         {
-            var table = await this.table.Value.ConfigureAwait(false);
+            var table = await this.table.ConfigureAwait(false);
             var result = await table.ExecuteAsync(TableOperation.Retrieve(partitionKey, rowKey), cancellation)
                 .ConfigureAwait(false);
 
@@ -111,7 +111,7 @@ namespace Devlooped
                 .Where(prop => prop.GetCustomAttribute<BrowsableAttribute>()?.Browsable != false)
                 .ToArray());
 
-            var table = await this.table.Value.ConfigureAwait(false);
+            var table = await this.table.ConfigureAwait(false);
             var values = properties
                 .ToDictionary(prop => prop.Name, prop => EntityProperty.CreateEntityPropertyFromObject(prop.GetValue(entity)));
 

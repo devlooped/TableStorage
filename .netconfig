@@ -152,8 +152,3 @@
 	sha = f2dc1370469bec1b2d32d82faf659b050cdc7e2a
 	etag = d45832acd078778ffebf260000f6d25172a131f51684744d7e982da2a47170ce
 	weak
-[file "src/TableStorage/System/Threading/Tasks/AsyncLazy.cs"]
-	url = https://github.com/devlooped/catbag/blob/main/System/Threading/Tasks/AsyncLazy.cs
-	sha = f2a68a668dcbab4ba87c792ed5fd2ca5ca8229de
-	etag = b6b9f5e7c57e294ba3d59382409171dfa20f220008dbeb725d7b9e2bb4c7aa91
-	weak
