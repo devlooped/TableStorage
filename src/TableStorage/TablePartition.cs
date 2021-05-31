@@ -6,7 +6,8 @@ using Microsoft.Azure.Cosmos.Table;
 namespace Devlooped
 {
     /// <summary>
-    /// Factory methods to create <see cref="ITablePartition{T}"/> instances.
+    /// Factory methods to create <see cref="ITablePartition{T}"/> instances 
+    /// that store entities using individual columns for entity properties.
     /// </summary>
     static partial class TablePartition
     {
@@ -40,7 +41,7 @@ namespace Devlooped
         public static ITablePartition<T> Create<T>(
             CloudStorageAccount storageAccount,
             Func<T, string> rowKey) where T : class
-            => Create<T>(storageAccount, DefaultTableName, typeof(T).Name, rowKey);
+            => Create<T>(storageAccount, DefaultTableName, default, rowKey);
 
         /// <summary>
         /// Creates an <see cref="ITablePartition{T}"/> for the given entity type 
@@ -56,7 +57,7 @@ namespace Devlooped
             CloudStorageAccount storageAccount,
             string tableName,
             Func<T, string> rowKey) where T : class
-            => Create<T>(storageAccount, tableName, typeof(T).Name, rowKey);
+            => Create<T>(storageAccount, tableName, default, rowKey);
 
         /// <summary>
         /// Creates an <see cref="ITablePartition{T}"/> for the given entity type 
