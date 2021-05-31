@@ -175,6 +175,9 @@ var repo = TableRepository.Create<Product>(...,
     serializer: [BsonDocumentSerializer|MessagePackDocumentSerializer|ProtobufDocumentSerializer].Default);
 ```
 
+> NOTE: when using alternative serializers, entities will need to be annotated with whatever 
+> attributes are required by the underlying libraries.
+
 ### Attributes
 
 If you want to avoid using strings with the factory methods, you can also annotate the 
