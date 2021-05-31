@@ -1,5 +1,21 @@
 
 
+## [v1.3.0](https://github.com/devlooped/TableStorage/tree/v1.3.0) (2021-05-31)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v1.2.1...v1.3.0)
+
+:sparkles: Implemented enhancements:
+
+- Allow persisting entities as documents instead of individual columns [\#24](https://github.com/devlooped/TableStorage/issues/24)
+- Avoid creating a separate Task for lazily initialization of CloudTable [\#23](https://github.com/devlooped/TableStorage/issues/23)
+- No need to use DynamicTableEntity when deleting [\#21](https://github.com/devlooped/TableStorage/issues/21)
+- When doing a PutAsync, use InsertOrMerge instead of InsertOrReplace [\#20](https://github.com/devlooped/TableStorage/issues/20)
+- Allow persisting entities as documents [\#25](https://github.com/devlooped/TableStorage/pull/25) (@kzu)
+
+:bug: Fixed bugs:
+
+- Inconsistent default partition name in TablePartition.Create [\#22](https://github.com/devlooped/TableStorage/issues/22)
+
 ## [v1.2.1](https://github.com/devlooped/TableStorage/tree/v1.2.1) (2021-05-29)
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/v1.2.0...v1.2.1)
