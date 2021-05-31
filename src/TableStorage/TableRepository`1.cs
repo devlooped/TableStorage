@@ -4,7 +4,6 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -53,7 +52,7 @@ namespace Devlooped
             var table = await this.table.Value.ConfigureAwait(false);
 
             await table.ExecuteAsync(TableOperation.Delete(
-                new DynamicTableEntity(partitionKey, rowKey) { ETag = "*" }), cancellation)
+                new TableEntity(partitionKey, rowKey) { ETag = "*" }), cancellation)
                 .ConfigureAwait(false);
         }
 
@@ -65,7 +64,7 @@ namespace Devlooped
             var table = await this.table.Value.ConfigureAwait(false);
 
             await table.ExecuteAsync(TableOperation.Delete(
-                new DynamicTableEntity(partitionKey, rowKey) { ETag = "*" }), cancellation)
+                new TableEntity(partitionKey, rowKey) { ETag = "*" }), cancellation)
                 .ConfigureAwait(false);
         }
 
