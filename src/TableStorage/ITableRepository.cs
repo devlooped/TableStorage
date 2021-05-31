@@ -7,15 +7,10 @@ using System.Threading.Tasks;
 namespace Devlooped
 {
     /// <summary>
-    /// A generic repository that stores entities in table storage, using the properties 
-    /// annotated with <see cref="PartitionKeyAttribute"/> and <see cref="RowKeyAttribute"/> 
-    /// and optional <see cref="TableAttribute"/>.
+    /// A generic repository that stores entities in table storage, using individual 
+    /// columns for entity properties.
     /// </summary>
     /// <typeparam name="T">The type of entity being persisted.</typeparam>
-    /// <remarks>
-    /// If no <see cref="TableAttribute"/> is provided, entities are persisted in a table 
-    /// named after the <typeparamref name="T"/>, without the <c>Entity</c> word (if any).
-    /// </remarks>
     partial interface ITableRepository<T> where T : class
     {
         /// <summary>

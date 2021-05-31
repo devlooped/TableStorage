@@ -6,7 +6,8 @@ using Microsoft.Azure.Cosmos.Table;
 namespace Devlooped
 {
     /// <summary>
-    /// Factory methods to create <see cref="ITableRepository{T}"/> instances.
+    /// Factory methods to create <see cref="ITableRepository{T}"/> instances
+    /// that store entities using individual columns for entity properties.
     /// </summary>
     static partial class TableRepository
     {

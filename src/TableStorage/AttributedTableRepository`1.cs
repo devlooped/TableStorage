@@ -21,7 +21,10 @@ namespace Devlooped
         /// </summary>
         /// <param name="storageAccount">Storage account to connect to.</param>
         public AttributedTableRepository(CloudStorageAccount storageAccount)
-            : base(storageAccount, TableRepository.GetDefaultTableName<T>(), PartitionKeyAttribute.CreateAccessor<T>(), RowKeyAttribute.CreateAccessor<T>())
+            : base(storageAccount, 
+                  TableRepository.GetDefaultTableName<T>(), 
+                  PartitionKeyAttribute.CreateAccessor<T>(), 
+                  RowKeyAttribute.CreateAccessor<T>())
         {
         }
     }
