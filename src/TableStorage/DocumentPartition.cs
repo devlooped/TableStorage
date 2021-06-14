@@ -20,7 +20,7 @@ namespace Devlooped
         /// Default table name to use when a value is not not provided 
         /// (or overriden via <see cref="TableAttribute"/>), which is <c>Document</c>.
         /// </summary>
-        public const string DefaultTableName = "Document";
+        public const string DefaultTableName = "Documents";
 
         /// <summary>
         /// Creates an <see cref="ITablePartition{T}"/> for the given entity type 

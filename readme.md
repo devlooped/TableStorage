@@ -90,7 +90,7 @@ var account = CloudStorageAccount.DevelopmentStorageAccount; // or production on
 // We lay out the parameter names for clarity only.
 // also be provided to the factory method to override the default behavior.
 var repo = TablePartition.Create<Region>(storageAccount, 
-  // tableName defaults to "Entity" if not provided
+  // tableName defaults to "Entities" if not provided
   tableName: "Reference",
   // partitionKey would default to "Region" too if not provided
   partitionKey: "Region",
