@@ -42,6 +42,36 @@ namespace Devlooped
         }
 
         [Fact]
+        public async Task DoesNotDuplicateKeyProperties()
+        {
+            var repo = TableRepository.Create<RecordEntity>(CloudStorageAccount.DevelopmentStorageAccount,
+                x => x.Kind,
+                x => x.ID);
+
+            var entity = new RecordEntity("Request", "1234") { Status = "OK" };
+            var saved = await repo.PutAsync(entity);
+
+            Assert.True(entity.Equals(saved));
+
+            var client = CloudStorageAccount.DevelopmentStorageAccount.CreateCloudTableClient();
+            var table = client.GetTableReference(repo.TableName);
+
+            var result = await table.ExecuteAsync(TableOperation.Retrieve("Request", "1234"));
+
+            Assert.NotNull(result.Result);
+
+            var dynamic = (DynamicTableEntity)result.Result;
+
+            Assert.False(dynamic.Properties.ContainsKey(nameof(RecordEntity.Kind)));
+            Assert.False(dynamic.Properties.ContainsKey(nameof(RecordEntity.ID)));
+            Assert.True(dynamic.Properties.ContainsKey(nameof(RecordEntity.Status)));
+
+            saved = await repo.GetAsync("Request", "1234");
+
+            Assert.True(entity.Equals(saved));
+        }
+
+        [Fact]
         public async Task EntityEndToEnd()
         {
             var repo = TablePartition.Create<MyEntity>(CloudStorageAccount.DevelopmentStorageAccount);
@@ -214,6 +244,11 @@ namespace Devlooped
         class EntityNoRowKey
         {
             public string? Id { get; set; }
+        }
+
+        record RecordEntity(string Kind, string ID)
+        {
+            public string? Status { get; set; }
         }
     }
 }

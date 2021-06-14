@@ -2,6 +2,7 @@
 #nullable enable
 using System;
 using System.Collections.Concurrent;
+using System.Linq.Expressions;
 using System.Reflection;
 using Microsoft.Azure.Cosmos.Table;
 
@@ -42,7 +43,7 @@ namespace Devlooped
         /// <returns>The new <see cref="ITablePartition{T}"/>.</returns>
         public static ITablePartition<T> Create<T>(
             CloudStorageAccount storageAccount,
-            Func<T, string> rowKey) where T : class
+            Expression<Func<T, string>> rowKey) where T : class
             => Create<T>(storageAccount, DefaultTableName, default, rowKey);
 
         /// <summary>
@@ -58,7 +59,7 @@ namespace Devlooped
         public static ITablePartition<T> Create<T>(
             CloudStorageAccount storageAccount,
             string tableName,
-            Func<T, string> rowKey) where T : class
+            Expression<Func<T, string>> rowKey) where T : class
             => Create<T>(storageAccount, tableName, default, rowKey);
 
         /// <summary>
@@ -78,7 +79,7 @@ namespace Devlooped
             CloudStorageAccount storageAccount,
             string? tableName = default,
             string? partitionKey = null,
-            Func<T, string>? rowKey = null) where T : class
+            Expression<Func<T, string>>? rowKey = null) where T : class
         {
             tableName ??= GetDefaultTableName<T>();
             partitionKey ??= GetDefaultPartitionKey<T>();
@@ -91,7 +92,7 @@ namespace Devlooped
         /// Gets a default table name for entities of type <typeparamref name="T"/>. Will be the 
         /// <see cref="TableAttribute.Name"/> if the attribute is present, or <see cref="DefaultTableName"/> otherwise.
         /// </summary>
-        public static string GetDefaultTableName<T>() =>
+        public static string GetDefaultTableName<T>(string fallbackName = DefaultTableName) =>
             defaultTableNames.GetOrAdd(typeof(T), type => type.GetCustomAttribute<TableAttribute>()?.Name ?? DefaultTableName);
 
         /// <summary>

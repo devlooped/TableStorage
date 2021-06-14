@@ -23,12 +23,12 @@ namespace Devlooped
         /// <param name="serializer">The serializer to use.</param>
         protected internal DocumentPartition(CloudStorageAccount storageAccount, string tableName, string partitionKey, Func<T, string> rowKey, IDocumentSerializer serializer)
         {
-            TableName = tableName ?? TablePartition.GetDefaultTableName<T>();
+            TableName = tableName ?? DocumentPartition.GetDefaultTableName<T>();
             PartitionKey = partitionKey ?? TablePartition.GetDefaultPartitionKey<T>();
             repository = new DocumentRepository<T>(storageAccount,
                 TableName,
                 _ => PartitionKey,
-                rowKey ?? RowKeyAttribute.CreateAccessor<T>(),
+                rowKey ?? RowKeyAttribute.CreateCompiledAccessor<T>(),
                 serializer);
         }
 

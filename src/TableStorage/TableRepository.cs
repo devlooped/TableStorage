@@ -2,6 +2,7 @@
 #nullable enable
 using System;
 using System.Collections.Concurrent;
+using System.Linq.Expressions;
 using System.Reflection;
 using Microsoft.Azure.Cosmos.Table;
 
@@ -38,8 +39,8 @@ namespace Devlooped
         /// <returns>The new <see cref="ITableRepository{T}"/>.</returns>
         public static ITableRepository<T> Create<T>(
             CloudStorageAccount storageAccount,
-            Func<T, string> partitionKey,
-            Func<T, string> rowKey) where T : class
+            Expression<Func<T, string>> partitionKey,
+            Expression<Func<T, string>> rowKey) where T : class
             => Create<T>(storageAccount, typeof(T).Name, partitionKey, rowKey);
 
         /// <summary>
@@ -58,8 +59,8 @@ namespace Devlooped
         public static ITableRepository<T> Create<T>(
             CloudStorageAccount storageAccount,
             string? tableName = default,
-            Func<T, string>? partitionKey = null,
-            Func<T, string>? rowKey = null) where T : class
+            Expression<Func<T, string>>? partitionKey = null,
+            Expression<Func<T, string>>? rowKey = null) where T : class
         {
             tableName ??= GetDefaultTableName<T>();
             partitionKey ??= PartitionKeyAttribute.CreateAccessor<T>();

@@ -11,7 +11,8 @@ namespace Devlooped
 {
     abstract partial class TableStorageAttribute : Attribute
     {
-        static readonly ConcurrentDictionary<(Type EntityType, Type AttributeType), Delegate> accessors = new();
+        static readonly ConcurrentDictionary<(Type EntityType, Type AttributeType), Expression> getters = new();
+        static readonly ConcurrentDictionary<(Type EntityType, Type AttributeType), Delegate> compiledGetters = new();
 
         // See https://stackoverflow.com/questions/11514707/azure-table-storage-rowkey-restricted-character-patterns
         static readonly HashSet<char> InvalidChars = new HashSet<char>(new[]
@@ -19,10 +20,13 @@ namespace Devlooped
             ' ', '/', '\\', '#', '?', '\t', '\n', '\r', '+', '|', '[', ']', '{', '}', '<', '>', '$', '^', '&'
         });
 
-        protected static Func<TEntity, string> CreateAccessor<TEntity, TAttribute>() where TAttribute : Attribute
-            => (Func<TEntity, string>)accessors.GetOrAdd((typeof(TEntity), typeof(TAttribute)), _ => CreateAccessorCore<TEntity, TAttribute>());
+        protected static Expression<Func<TEntity, string>> CreateGetter<TEntity, TAttribute>() where TAttribute : Attribute
+            => (Expression<Func<TEntity, string>>)getters.GetOrAdd((typeof(TEntity), typeof(TAttribute)), _ => CreateGetterCore<TEntity, TAttribute>());
 
-        static Func<TEntity, string> CreateAccessorCore<TEntity, TAttribute>() where TAttribute : Attribute
+        protected static Func<TEntity, string> CreateCompiledGetter<TEntity, TAttribute>() where TAttribute : Attribute
+            => (Func<TEntity, string>)compiledGetters.GetOrAdd((typeof(TEntity), typeof(TAttribute)), _ => CreateGetter<TEntity, TAttribute>().Compile());
+
+        static Expression<Func<TEntity, string>> CreateGetterCore<TEntity, TAttribute>() where TAttribute : Attribute
         {
             var attributeName = typeof(TAttribute).Name.Substring(0, typeof(TAttribute).Name.Length - 9);
 
@@ -65,8 +69,7 @@ namespace Devlooped
                         Expression.Constant(attributeName),
                         Expression.Constant(keyProp.Name, typeof(string)),
                         Expression.Property(param, keyProp))),
-                param)
-               .Compile();
+                param);
         }
 
         static string EnsureValid(string attributeName, string propertyName, string value)

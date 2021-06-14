@@ -2,6 +2,7 @@
 #nullable enable
 using System;
 using System.Collections.Concurrent;
+using System.Linq.Expressions;
 using System.Reflection;
 using Microsoft.Azure.Cosmos.Table;
 
@@ -75,7 +76,7 @@ namespace Devlooped
         {
             tableName ??= GetDefaultTableName<T>();
             partitionKey ??= TablePartition.GetDefaultPartitionKey<T>();
-            rowKey ??= RowKeyAttribute.CreateAccessor<T>();
+            rowKey ??= RowKeyAttribute.CreateCompiledAccessor<T>();
             serializer ??= JsonDocumentSerializer.Default;
 
             return new DocumentPartition<T>(storageAccount, tableName, partitionKey, rowKey, serializer);
