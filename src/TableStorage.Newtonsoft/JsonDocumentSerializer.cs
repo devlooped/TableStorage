@@ -10,7 +10,7 @@ namespace Devlooped
     /// Implementation of <see cref="IStringDocumentSerializer"/> which 
     /// uses Newtonsoft.Json implementation for serialization.
     /// </summary>
-    partial class DocumentSerializer : IStringDocumentSerializer
+    partial class JsonDocumentSerializer : IStringDocumentSerializer
     {
         /// <summary>
         /// Default serializer settings to use for the <see cref="Default"/> singleton 
@@ -48,20 +48,20 @@ namespace Devlooped
         /// <summary>
         /// Default instance of the serializer, using the <see cref="DefaultSettings"/>.
         /// </summary>
-        public static IDocumentSerializer Default { get; } = new DocumentSerializer();
+        public static IDocumentSerializer Default { get; } = new JsonDocumentSerializer();
 
         readonly JsonSerializerSettings settings;
 
         /// <summary>
         /// Initializes the document serializer using the <see cref="DefaultSettings"/>.
         /// </summary>
-        public DocumentSerializer()
+        public JsonDocumentSerializer()
             : this(DefaultSettings) { }
 
         /// <summary>
         /// Initializes the document serializer using the given <see cref="JsonSerializerSettings"/>.
         /// </summary>
-        public DocumentSerializer(JsonSerializerSettings settings) => this.settings = settings;
+        public JsonDocumentSerializer(JsonSerializerSettings settings) => this.settings = settings;
 
         /// <inheritdoc />
         public T? Deserialize<T>(string data) => JsonConvert.DeserializeObject<T>(data, settings);

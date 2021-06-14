@@ -2,5 +2,5 @@
 namespace Devlooped
 {
     // Sets default visibility when using compiled version, where everything is public
-    public partial class DocumentSerializer { }
+    public partial class JsonDocumentSerializer { }
 }

@@ -10,7 +10,7 @@
 
 Usage:
 
-  var repo = DocumentRepository.Create&lt;Product&gt;(storageAccount, serializer: DocumentSerializer.Default);
+  var repo = DocumentRepository.Create&lt;Product&gt;(storageAccount, serializer: JsonDocumentSerializer.Default);
     </Description>
   </PropertyGroup>
 

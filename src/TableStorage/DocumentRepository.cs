@@ -34,7 +34,7 @@ namespace Devlooped
             tableName ??= TableRepository.GetDefaultTableName<T>();
             partitionKey ??= PartitionKeyAttribute.CreateCompiledAccessor<T>();
             rowKey ??= RowKeyAttribute.CreateCompiledAccessor<T>();
-            serializer ??= JsonDocumentSerializer.Default;
+            serializer ??= DocumentSerializer.Default;
 
             return new DocumentRepository<T>(storageAccount, tableName, partitionKey, rowKey, serializer);
         }

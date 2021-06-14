@@ -76,7 +76,7 @@ namespace Devlooped
             tableName ??= GetDefaultTableName<T>();
             partitionKey ??= TablePartition.GetDefaultPartitionKey<T>();
             rowKey ??= RowKeyAttribute.CreateCompiledAccessor<T>();
-            serializer ??= JsonDocumentSerializer.Default;
+            serializer ??= DocumentSerializer.Default;
 
             return new DocumentPartition<T>(storageAccount, tableName, partitionKey, rowKey, serializer);
         }

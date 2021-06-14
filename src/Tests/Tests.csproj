@@ -18,6 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\TableStorage.Bson\TableStorage.Bson.csproj" />
     <ProjectReference Include="..\TableStorage.MessagePack\TableStorage.MessagePack.csproj" />
+    <ProjectReference Include="..\TableStorage.Newtonsoft\TableStorage.Newtonsoft.csproj" />
     <ProjectReference Include="..\TableStorage.Protobuf\TableStorage.Protobuf.csproj" />
     <ProjectReference Include="..\TableStorage\TableStorage.csproj" />
   </ItemGroup>

@@ -161,21 +161,22 @@ await docs.PutAsync(new Product("book", "9781473217386")
 The `DocumentType` is the `Type.FullName` of the entity type, and the `DocumentVersion` is 
 the `Major.Minor` of its assembly, which could be used for advanced data migration scenarios.
 
-In addition to the default built-in JSON plain-text based serializer, you can choose from 
-various binary serializers which will instead persist the document as a byte array:
+In addition to the default built-in JSON plain-text based serializer, there are other alternative 
+serializers, including various binary serializers which will instead persist the document as a byte array:
 
-[![Bson](https://img.shields.io/nuget/v/Devlooped.TableStorage.svg?color=royalblue&label=Bson)](https://www.nuget.org/packages/Devlooped.TableStorage)
-[![MessagePack](https://img.shields.io/nuget/v/Devlooped.TableStorage.svg?color=royalblue&label=MessagePack)](https://www.nuget.org/packages/Devlooped.TableStorage)
-[![Protobuf](https://img.shields.io/nuget/v/Devlooped.TableStorage.svg?color=royalblue&label=Protobuf)](https://www.nuget.org/packages/Devlooped.TableStorage)
+[![Json.NET](https://img.shields.io/nuget/v/Devlooped.TableStorage.Newtonsoft.svg?color=royalblue&label=Bson)](https://www.nuget.org/packages/Devlooped.TableStorage.Newtonsoft)
+[![Bson](https://img.shields.io/nuget/v/Devlooped.TableStorage.Bson.svg?color=royalblue&label=Bson)](https://www.nuget.org/packages/Devlooped.TableStorage.Bson)
+[![MessagePack](https://img.shields.io/nuget/v/Devlooped.TableStorage.MessagePack.svg?color=royalblue&label=MessagePack)](https://www.nuget.org/packages/Devlooped.TableStorage.MessagePack)
+[![Protobuf](https://img.shields.io/nuget/v/Devlooped.TableStorage.Protobuf.svg?color=royalblue&label=Protobuf)](https://www.nuget.org/packages/Devlooped.TableStorage.Protobuf)
 
 You can pass the serializer to use to the factory method as follows: 
 
 ```csharp
 var repo = TableRepository.Create<Product>(...,
-    serializer: [BsonDocumentSerializer|MessagePackDocumentSerializer|ProtobufDocumentSerializer].Default);
+    serializer: [JsonDocumentSerializer|BsonDocumentSerializer|MessagePackDocumentSerializer|ProtobufDocumentSerializer].Default);
 ```
 
-> NOTE: when using alternative serializers, entities will need to be annotated with whatever 
+> NOTE: when using alternative serializers, entities might need to be annotated with whatever 
 > attributes are required by the underlying libraries.
 
 ### Attributes
@@ -219,13 +220,13 @@ await foreach (TableEntity region in repo.EnumerateAsync())
 > Install-Package Devlooped.TableStorage
 ```
 
-There is also a source-only version, if you want to avoid an additional assembly dependency:
+All packages also come in source-only versions, if you want to avoid an additional assembly dependency:
 
 ```
 > Install-Package Devlooped.TableStorage.Source
 ```
 
-The source-only package includes all types with the default visibility (internal), so you can decide 
+The source-only packages includes all types with the default visibility (internal), so you can decide 
 what types to make public by declaring a partial class with the desired visibility. To make them all 
 public, for example, you can include the same [Visibility.cs](https://github.com/devlooped/TableStorage/blob/main/src/TableStorage/Visibility.cs) 
 that the compiled version uses, like:

@@ -12,6 +12,7 @@ namespace Devlooped
     {
         public static IEnumerable<object[]> Serializers => new object[][]
         {
+            new object[] { DocumentSerializer.Default },
             new object[] { JsonDocumentSerializer.Default },
             new object[] { BsonDocumentSerializer.Default },
             new object[] { MessagePackDocumentSerializer.Default },

@@ -27,7 +27,7 @@ namespace Devlooped
                   TableRepository.GetDefaultTableName<T>(),
                   PartitionKeyAttribute.CreateCompiledAccessor<T>(),
                   RowKeyAttribute.CreateCompiledAccessor<T>(),
-                  serializer ?? JsonDocumentSerializer.Default)
+                  serializer ?? DocumentSerializer.Default)
         {
         }
     }
