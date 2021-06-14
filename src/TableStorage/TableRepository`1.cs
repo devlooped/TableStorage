@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -19,12 +20,13 @@ namespace Devlooped
     partial class TableRepository<T> : ITableRepository<T> where T : class
     {
         static readonly ConcurrentDictionary<Type, PropertyInfo[]> entityProperties = new();
-
         static readonly JsonSerializer serializer = new JsonSerializer();
 
         readonly CloudStorageAccount storageAccount;
         readonly Func<T, string> partitionKey;
+        readonly string? partitionKeyPropertyName;
         readonly Func<T, string> rowKey;
+        readonly string? rowKeyPropertyName;
         readonly Task<CloudTable> table;
 
         /// <summary>
@@ -34,13 +36,25 @@ namespace Devlooped
         /// <param name="tableName">The table that backs this repository.</param>
         /// <param name="partitionKey">A function to determine the partition key for an entity of type <typeparamref name="T"/>.</param>
         /// <param name="rowKey">A function to determine the row key for an entity of type <typeparamref name="T"/>.</param>
-        protected internal TableRepository(CloudStorageAccount storageAccount, string tableName, Func<T, string> partitionKey, Func<T, string> rowKey)
+        protected internal TableRepository(CloudStorageAccount storageAccount, string tableName, Expression<Func<T, string>> partitionKey, Expression<Func<T, string>> rowKey)
         {
             this.storageAccount = storageAccount;
             TableName = tableName ?? TableRepository.GetDefaultTableName<T>();
-            this.partitionKey = partitionKey ?? PartitionKeyAttribute.CreateAccessor<T>();
-            this.rowKey = rowKey ?? RowKeyAttribute.CreateAccessor<T>();
+
+            this.partitionKey = partitionKey == null ?
+                PartitionKeyAttribute.CreateCompiledAccessor<T>() :
+                partitionKey.Compile();
+
+            partitionKeyPropertyName = partitionKey.GetPropertyName();
+
+            this.rowKey = rowKey == null ?
+                RowKeyAttribute.CreateCompiledAccessor<T>() :
+                rowKey.Compile();
+
+            rowKeyPropertyName = rowKey.GetPropertyName();
+
             table = GetTableAsync(TableName);
+
         }
 
         /// <inheritdoc />
@@ -108,7 +122,10 @@ namespace Devlooped
             var rowKey = this.rowKey.Invoke(entity);
             var properties = entityProperties.GetOrAdd(entity.GetType(), type => type
                 .GetProperties()
-                .Where(prop => prop.GetCustomAttribute<BrowsableAttribute>()?.Browsable != false)
+                .Where(prop => 
+                    prop.GetCustomAttribute<BrowsableAttribute>()?.Browsable != false && 
+                    prop.Name != partitionKeyPropertyName && 
+                    prop.Name != rowKeyPropertyName)
                 .ToArray());
 
             var table = await this.table.ConfigureAwait(false);
@@ -143,11 +160,24 @@ namespace Devlooped
             // Write entity properties in json format so deserializer can 
             // perform its advanced ctor and conversion detection as usual.
             writer.WriteStartObject();
+
+            if (partitionKeyPropertyName != null)
+            {
+                writer.WritePropertyName(partitionKeyPropertyName);
+                writer.WriteValue(entity.PartitionKey);
+            }
+            if (rowKeyPropertyName != null)
+            {
+                writer.WritePropertyName(rowKeyPropertyName);
+                writer.WriteValue(entity.RowKey);
+            }
+
             foreach (var property in entity.Properties)
             {
                 writer.WritePropertyName(property.Key);
                 writer.WriteValue(property.Value.PropertyAsObject);
             }
+
             writer.WriteEndObject();
 
             using var reader = new JsonTextReader(new StringReader(json.ToString()));

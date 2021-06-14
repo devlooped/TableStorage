@@ -25,8 +25,8 @@ namespace Devlooped
         public AttributedDocumentRepository(CloudStorageAccount storageAccount, IDocumentSerializer? serializer = default)
             : base(storageAccount,
                   TableRepository.GetDefaultTableName<T>(),
-                  PartitionKeyAttribute.CreateAccessor<T>(),
-                  RowKeyAttribute.CreateAccessor<T>(),
+                  PartitionKeyAttribute.CreateCompiledAccessor<T>(),
+                  RowKeyAttribute.CreateCompiledAccessor<T>(),
                   serializer ?? JsonDocumentSerializer.Default)
         {
         }

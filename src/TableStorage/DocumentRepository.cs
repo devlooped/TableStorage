@@ -32,8 +32,8 @@ namespace Devlooped
             IDocumentSerializer? serializer = default) where T : class
         {
             tableName ??= TableRepository.GetDefaultTableName<T>();
-            partitionKey ??= PartitionKeyAttribute.CreateAccessor<T>();
-            rowKey ??= RowKeyAttribute.CreateAccessor<T>();
+            partitionKey ??= PartitionKeyAttribute.CreateCompiledAccessor<T>();
+            rowKey ??= RowKeyAttribute.CreateCompiledAccessor<T>();
             serializer ??= JsonDocumentSerializer.Default;
 
             return new DocumentRepository<T>(storageAccount, tableName, partitionKey, rowKey, serializer);

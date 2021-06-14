@@ -2,6 +2,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,7 +22,7 @@ namespace Devlooped
         /// <param name="tableName">The table that backs this table partition.</param>
         /// <param name="partitionKey">The fixed partition key that backs this table partition.</param>
         /// <param name="rowKey">A function to determine the row key for an entity of type <typeparamref name="T"/> within the partition.</param>
-        protected internal TablePartition(CloudStorageAccount storageAccount, string tableName, string partitionKey, Func<T, string> rowKey)
+        protected internal TablePartition(CloudStorageAccount storageAccount, string tableName, string partitionKey, Expression<Func<T, string>> rowKey)
         {
             TableName = tableName ?? TablePartition.GetDefaultTableName<T>();
             PartitionKey = partitionKey ?? TablePartition.GetDefaultPartitionKey<T>();
