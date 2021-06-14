@@ -11,14 +11,21 @@ namespace Devlooped
     partial class MessagePackDocumentSerializer : IBinaryDocumentSerializer
     {
         /// <summary>
-        /// Default instance of the serializer.
+        /// Default instance of the serializer using default serialization options.
         /// </summary>
         public static IDocumentSerializer Default { get; } = new MessagePackDocumentSerializer();
 
-        /// <inheritdoc />
-        public T? Deserialize<T>(byte[] data) => data.Length == 0 ? default : MessagePackSerializer.Deserialize<T>(data);
+        readonly MessagePackSerializerOptions? options;
+
+        /// <summary>
+        /// Initializes the document serializer with the given optional serializer options.
+        /// </summary>
+        public MessagePackDocumentSerializer(MessagePackSerializerOptions? options = default) => this.options = options;
 
         /// <inheritdoc />
-        public byte[] Serialize<T>(T value) => value == null ? new byte[0] : MessagePackSerializer.Serialize(value.GetType(), value);
+        public T? Deserialize<T>(byte[] data) => data.Length == 0 ? default : MessagePackSerializer.Deserialize<T>(data, options);
+
+        /// <inheritdoc />
+        public byte[] Serialize<T>(T value) => value == null ? new byte[0] : MessagePackSerializer.Serialize(value.GetType(), value, options);
     }
 }
