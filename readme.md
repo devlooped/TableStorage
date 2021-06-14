@@ -164,7 +164,7 @@ the `Major.Minor` of its assembly, which could be used for advanced data migrati
 In addition to the default built-in JSON plain-text based serializer, there are other alternative 
 serializers, including various binary serializers which will instead persist the document as a byte array:
 
-[![Json.NET](https://img.shields.io/nuget/v/Devlooped.TableStorage.Newtonsoft.svg?color=royalblue&label=Bson)](https://www.nuget.org/packages/Devlooped.TableStorage.Newtonsoft)
+[![Json.NET](https://img.shields.io/nuget/v/Devlooped.TableStorage.Newtonsoft.svg?color=royalblue&label=Newtonsoft)](https://www.nuget.org/packages/Devlooped.TableStorage.Newtonsoft)
 [![Bson](https://img.shields.io/nuget/v/Devlooped.TableStorage.Bson.svg?color=royalblue&label=Bson)](https://www.nuget.org/packages/Devlooped.TableStorage.Bson)
 [![MessagePack](https://img.shields.io/nuget/v/Devlooped.TableStorage.MessagePack.svg?color=royalblue&label=MessagePack)](https://www.nuget.org/packages/Devlooped.TableStorage.MessagePack)
 [![Protobuf](https://img.shields.io/nuget/v/Devlooped.TableStorage.Protobuf.svg?color=royalblue&label=Protobuf)](https://www.nuget.org/packages/Devlooped.TableStorage.Protobuf)
