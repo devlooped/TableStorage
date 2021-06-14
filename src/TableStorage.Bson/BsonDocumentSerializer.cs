@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 namespace Devlooped
 {
     /// <summary>
-    /// Default implementation of <see cref="IBinaryDocumentSerializer"/> which 
+    /// Implementation of <see cref="IBinaryDocumentSerializer"/> which 
     /// uses Newtonsoft.Json implementation of BSON for serialization.
     /// </summary>
     partial class BsonDocumentSerializer : IBinaryDocumentSerializer

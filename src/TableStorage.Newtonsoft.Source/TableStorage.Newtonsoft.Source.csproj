@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>Devlooped.TableStorage.Newtonsoft.Source</AssemblyName>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <IsPackable>true</IsPackable>
+    <PackBuildOutput>false</PackBuildOutput>
+    <PackCompile>true</PackCompile>
+    <Description>A source-only Newtonsoft.Json-based serializer for use with document-based repositories.
+
+Usage:
+
+  var repo = DocumentRepository.Create&lt;Product&gt;(storageAccount, serializer: DocumentSerializer.Default);
+    </Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NuGetizer" Version="0.7.0" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="all" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TableStorage.Source\TableStorage.Source.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\TableStorage.Newtonsoft\**\*.cs" Exclude="..\TableStorage.Newtonsoft\Visibility.cs;..\TableStorage.Newtonsoft\obj\**\*.cs;" />
+    <None Update="Devlooped.TableStorage.Newtonsoft.Source.targets" PackFolder="build" />
+  </ItemGroup>
+  
+</Project>
