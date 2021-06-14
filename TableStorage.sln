@@ -32,6 +32,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TableStorage.Protobuf", "sr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TableStorage.Protobuf.Source", "src\TableStorage.Protobuf.Source\TableStorage.Protobuf.Source.csproj", "{7801FE93-4A6C-4C49-82B0-F32DEFE3A2E2}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TableStorage.Newtonsoft", "src\TableStorage.Newtonsoft\TableStorage.Newtonsoft.csproj", "{B291DE8D-0261-4762-85EB-728342EDFB2E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TableStorage.Newtonsoft.Source", "src\TableStorage.Newtonsoft.Source\TableStorage.Newtonsoft.Source.csproj", "{72663FB4-F999-4EC0-94A8-9E0E002C5F87}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -74,6 +78,14 @@ Global
 		{7801FE93-4A6C-4C49-82B0-F32DEFE3A2E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7801FE93-4A6C-4C49-82B0-F32DEFE3A2E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7801FE93-4A6C-4C49-82B0-F32DEFE3A2E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B291DE8D-0261-4762-85EB-728342EDFB2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B291DE8D-0261-4762-85EB-728342EDFB2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B291DE8D-0261-4762-85EB-728342EDFB2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B291DE8D-0261-4762-85EB-728342EDFB2E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{72663FB4-F999-4EC0-94A8-9E0E002C5F87}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72663FB4-F999-4EC0-94A8-9E0E002C5F87}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72663FB4-F999-4EC0-94A8-9E0E002C5F87}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72663FB4-F999-4EC0-94A8-9E0E002C5F87}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -83,6 +95,7 @@ Global
 		{3CDC8EBB-39EB-4195-8A65-2CAEBF6C250B} = {7412B98E-AA65-4B6E-AD83-6F9960C1C452}
 		{09DC6B3D-2950-4C2A-9D53-CFFCBBBA612C} = {7412B98E-AA65-4B6E-AD83-6F9960C1C452}
 		{7801FE93-4A6C-4C49-82B0-F32DEFE3A2E2} = {7412B98E-AA65-4B6E-AD83-6F9960C1C452}
+		{72663FB4-F999-4EC0-94A8-9E0E002C5F87} = {7412B98E-AA65-4B6E-AD83-6F9960C1C452}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9E26BFEF-9184-4EA2-8A64-BCD61E247C33}

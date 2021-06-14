@@ -2,7 +2,6 @@
 #nullable enable
 using System;
 using System.Collections.Concurrent;
-using System.Linq.Expressions;
 using System.Reflection;
 using Microsoft.Azure.Cosmos.Table;
 

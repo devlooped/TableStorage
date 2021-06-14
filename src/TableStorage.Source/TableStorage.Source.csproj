@@ -68,8 +68,7 @@ It can be persisted and retrieved with:
     <PackageReference Include="NuGetizer" Version="0.7.0" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="all" />
     <PackageReference Include="Microsoft.Azure.Cosmos.Table" Version="1.0.8" />
-    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="5.0.0" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="System.Text.Json" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -78,6 +77,7 @@ It can be persisted and retrieved with:
   </ItemGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="Devlooped.TableStorage.Newtonsoft.Source" />
     <InternalsVisibleTo Include="Devlooped.TableStorage.Bson.Source" />
     <InternalsVisibleTo Include="Devlooped.TableStorage.MessagePack.Source" />
     <InternalsVisibleTo Include="Devlooped.TableStorage.Protobuf.Source" />
