@@ -9,7 +9,7 @@ using Microsoft.Azure.Cosmos.Table;
 namespace Devlooped
 {
     /// <inheritdoc />
-    partial class TableEntityRepository : ITableRepository<TableEntity>
+    partial class TableEntityRepository : IDocumentRepository<TableEntity>
     {
         readonly CloudStorageAccount storageAccount;
         readonly Task<CloudTable> table;
@@ -49,11 +49,12 @@ namespace Devlooped
         }
 
         /// <inheritdoc />
-        public async IAsyncEnumerable<TableEntity> EnumerateAsync(string partitionKey, [EnumeratorCancellation] CancellationToken cancellation = default)
+        public async IAsyncEnumerable<TableEntity> EnumerateAsync(string? partitionKey = default, [EnumeratorCancellation] CancellationToken cancellation = default)
         {
             var table = await this.table;
-            var query = new TableQuery<TableEntity>()
-                .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));
+            var query = new TableQuery<TableEntity>();
+            if (partitionKey != null)
+                query = query.Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));
 
             TableContinuationToken? continuation = null;
             do

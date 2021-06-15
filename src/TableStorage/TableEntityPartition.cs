@@ -9,9 +9,9 @@ using Microsoft.Azure.Cosmos.Table;
 namespace Devlooped
 {
     /// <inheritdoc />
-    partial class TableEntityPartition : ITablePartition<TableEntity>
+    partial class TableEntityPartition : IDocumentPartition<TableEntity>
     {
-        readonly ITableRepository<TableEntity> repository;
+        readonly IDocumentRepository<TableEntity> repository;
 
         /// <summary>
         /// Initializes the repository with the given storage account and optional table name.

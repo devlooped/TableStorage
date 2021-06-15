@@ -7,11 +7,10 @@ using System.Threading.Tasks;
 namespace Devlooped
 {
     /// <summary>
-    /// A generic repository that stores entities in table storage, using individual 
-    /// columns for entity properties.
+    /// A generic repository that stores entities in table storage.
     /// </summary>
     /// <typeparam name="T">The type of entity being persisted.</typeparam>
-    partial interface ITableRepository<T> where T : class
+    partial interface IDocumentRepository<T> where T : class
     {
         /// <summary>
         /// Gets the table name being used.
@@ -34,12 +33,12 @@ namespace Devlooped
         Task DeleteAsync(string partitionKey, string rowKey, CancellationToken cancellation = default);
 
         /// <summary>
-        /// Enumerates asynchronously all entities with the given <paramref name="partitionKey"/>.
+        /// Enumerates asynchronously all entities, optionally within the given <paramref name="partitionKey"/>.
         /// </summary>
-        /// <param name="partitionKey">The partition key to scan and enumerate all entities from.</param>
+        /// <param name="partitionKey">The optional partition key to scope the enumeration to.</param>
         /// <param name="cancellation">Optional <see cref="CancellationToken"/>.</param>
         /// <returns></returns>
-        IAsyncEnumerable<T> EnumerateAsync(string partitionKey, CancellationToken cancellation = default);
+        IAsyncEnumerable<T> EnumerateAsync(string? partitionKey = default, CancellationToken cancellation = default);
 
         /// <summary>
         /// Retrieves an entity from the repository.

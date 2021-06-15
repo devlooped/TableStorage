@@ -9,7 +9,7 @@ using Microsoft.Azure.Cosmos.Table;
 namespace Devlooped
 {
     /// <summary>
-    /// Factory methods to create <see cref="ITablePartition{T}"/> instances 
+    /// Factory methods to create <see cref="IDocumentPartition{T}"/> instances 
     /// that store entities using individual columns for entity properties.
     /// </summary>
     static partial class TablePartition
@@ -23,13 +23,13 @@ namespace Devlooped
         public const string DefaultTableName = "Entities";
 
         /// <summary>
-        /// Creates an <see cref="ITablePartition{TableEntity}"/>, using 
+        /// Creates an <see cref="IDocumentPartition{TableEntity}"/>, using 
         /// <see cref="DefaultTableName"/> as the table name and the 
         /// <typeparamref name="T"/> <c>Name</c> as the partition key.
         /// </summary>
         /// <param name="storageAccount">The storage account to use.</param>
-        /// <returns>The new <see cref="ITablePartition{TEntity}"/>.</returns>
-        public static ITablePartition<TableEntity> Create(CloudStorageAccount storageAccount, string tableName, string partitionKey)
+        /// <returns>The new <see cref="IDocumentPartition{TEntity}"/>.</returns>
+        public static IDocumentPartition<TableEntity> Create(CloudStorageAccount storageAccount, string tableName, string partitionKey)
             => new TableEntityPartition(storageAccount, tableName, partitionKey);
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace Devlooped
         /// <typeparam name="T">The type of entity that the repository will manage.</typeparam>
         /// <param name="storageAccount">The storage account to use.</param>
         /// <param name="rowKey">Function to retrieve the row key for a given entity.</param>
-        /// <returns>The new <see cref="ITablePartition{T}"/>.</returns>
+        /// <returns>The new <see cref="IDocumentPartition{T}"/>.</returns>
         public static ITablePartition<T> Create<T>(
             CloudStorageAccount storageAccount,
             Expression<Func<T, string>> rowKey) where T : class
@@ -74,7 +74,7 @@ namespace Devlooped
         /// If not provided, the <typeparamref name="T"/> <c>Name</c> will be used.</param>
         /// <param name="rowKey">Optional function to retrieve the row key for a given entity. 
         /// If not provided, the class will need a property annotated with <see cref="RowKeyAttribute"/>.</param>
-        /// <returns>The new <see cref="ITablePartition{T}"/>.</returns>
+        /// <returns>The new <see cref="IDocumentPartition{T}"/>.</returns>
         public static ITablePartition<T> Create<T>(
             CloudStorageAccount storageAccount,
             string? tableName = default,
