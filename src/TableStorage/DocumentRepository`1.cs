@@ -10,7 +10,7 @@ using Microsoft.Azure.Cosmos.Table;
 namespace Devlooped
 {
     /// <inheritdoc />
-    partial class DocumentRepository<T> : ITableRepository<T> where T : class
+    partial class DocumentRepository<T> : IDocumentRepository<T> where T : class
     {
         static readonly string documentVersion = (typeof(T).Assembly.GetName().Version ?? new Version(1, 0)).ToString(2);
 
@@ -23,7 +23,7 @@ namespace Devlooped
         readonly Func<T, string> rowKey;
         readonly Task<CloudTable> table;
 
-        readonly Func<string, CancellationToken, IAsyncEnumerable<T>> enumerate;
+        readonly Func<string?, CancellationToken, IAsyncEnumerable<T>> enumerate;
         readonly Func<string, string, CancellationToken, Task<T?>> get;
         readonly Func<T, CancellationToken, Task<T>> put;
 
@@ -91,7 +91,7 @@ namespace Devlooped
         }
 
         /// <inheritdoc />
-        public IAsyncEnumerable<T> EnumerateAsync(string partitionKey, CancellationToken cancellation = default) 
+        public IAsyncEnumerable<T> EnumerateAsync(string? partitionKey = default, CancellationToken cancellation = default) 
             => enumerate(partitionKey, cancellation);
 
         /// <inheritdoc />
@@ -104,11 +104,12 @@ namespace Devlooped
 
         #region Binary
 
-        async IAsyncEnumerable<T> EnumerateBinaryAsync(string partitionKey, [EnumeratorCancellation] CancellationToken cancellation = default)
+        async IAsyncEnumerable<T> EnumerateBinaryAsync(string? partitionKey = default, [EnumeratorCancellation] CancellationToken cancellation = default)
         {
             var table = await this.table.ConfigureAwait(false);
-            var query = new TableQuery<BinaryDocumentEntity>()
-                .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));
+            var query = new TableQuery<BinaryDocumentEntity>();
+            if (partitionKey != null)
+                query = query.Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));
 
             TableContinuationToken? continuation = null;
             do
@@ -173,11 +174,12 @@ namespace Devlooped
 
         #region String
 
-        async IAsyncEnumerable<T> EnumerateStringAsync(string partitionKey, [EnumeratorCancellation] CancellationToken cancellation = default)
+        async IAsyncEnumerable<T> EnumerateStringAsync(string? partitionKey = default, [EnumeratorCancellation] CancellationToken cancellation = default)
         {
             var table = await this.table.ConfigureAwait(false);
-            var query = new TableQuery<DocumentEntity>()
-                .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));
+            var query = new TableQuery<DocumentEntity>();
+            if (partitionKey != null)
+               query = query.Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));
 
             TableContinuationToken? continuation = null;
             do

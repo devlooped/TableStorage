@@ -29,7 +29,7 @@ namespace Devlooped
         /// <summary>
         /// Default instance of the serializer.
         /// </summary>
-        public static IDocumentSerializer Default { get; } = new DocumentSerializer();
+        public static IStringDocumentSerializer Default { get; } = new DocumentSerializer();
 
         readonly JsonSerializerOptions options;
 

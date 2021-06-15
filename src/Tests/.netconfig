@@ -1,0 +1,5 @@
+[file "System/Collections/Generic/IAsyncEnumerableExtensions.cs"]
+	url = https://github.com/devlooped/catbag/blob/main/System/Collections/Generic/IAsyncEnumerableExtensions.cs
+	sha = fd4229d4b2ebcad93768ddb6afee652d4a476fe2
+	etag = 8710a896af867e690062b025b3f95de9f2e3f219555942ec91e1364ad8d9bfac
+	weak

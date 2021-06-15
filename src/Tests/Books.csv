@@ -1,0 +1,12 @@
+PartitionKey,RowKey,Title,Author,Format,Pages,IsPublished
+Book,9780141339245,The Blood of Olympus,Rick Riordan,Paperback,560,FALSE
+Book,9780141346809,Percy Jackson and the Lightning Thief,Rick Riordan,Paperback,400,TRUE
+Book,9781368013611,The Kane Chronicles Box Set,Rick Riordan,Hardback,1472,TRUE
+Book,9781423140597,The Son of Neptune,Rick Riordan,Hardback,521,FALSE
+Book,9781423140603,The Mark of Athena,Rick Riordan,Hardback,608,FALSE
+Book,9781423141891,Percy Jackson & the Olympians Boxed Set,Rick Riordan,Hardback,1744,TRUE
+Book,9781423146735,The Blood of Olympus,Rick Riordan,Hardback,516,TRUE
+Book,9781484707234,Percy Jackson and the Olympians,Rick Riordan,Paperback,1840,TRUE
+Book,9781484720721,The Heroes of Olympus Hardcover Boxed Set,Rick Riordan,Hardback,2404,FALSE
+Book,9781484732748,Trials of Apollo,Rick Riordan,Hardback,384,TRUE
+Book,9781484746455,The Tower of Nero,Rick Riordan,Hardback,416,TRUE

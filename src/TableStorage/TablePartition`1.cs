@@ -2,8 +2,8 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.Cosmos.Table;
@@ -13,7 +13,7 @@ namespace Devlooped
     /// <inheritdoc />
     partial class TablePartition<T> : ITablePartition<T> where T : class
     {
-        readonly ITableRepository<T> repository;
+        readonly TableRepository<T> repository;
 
         /// <summary>
         /// Initializes the repository with the given storage account and optional table name.
@@ -25,10 +25,12 @@ namespace Devlooped
         protected internal TablePartition(CloudStorageAccount storageAccount, string tableName, string partitionKey, Expression<Func<T, string>> rowKey)
         {
             TableName = tableName ?? TablePartition.GetDefaultTableName<T>();
-            PartitionKey = partitionKey ?? TablePartition.GetDefaultPartitionKey<T>();
+            partitionKey ??= TablePartition.GetDefaultPartitionKey<T>();
+            PartitionKey = partitionKey;
+
             repository = new TableRepository<T>(storageAccount,
                 TableName,
-                _ => PartitionKey,
+                _ => partitionKey,
                 rowKey ?? RowKeyAttribute.CreateAccessor<T>());
         }
 
@@ -37,6 +39,14 @@ namespace Devlooped
 
         /// <inheritdoc />
         public string PartitionKey { get; }
+
+        /// <inheritdoc />
+        public IQueryable<T> CreateQuery()
+        {
+            var query = (TableRepositoryQuery<T>)repository.CreateQuery();
+            query.PartitionKey = PartitionKey;
+            return query;
+        }
 
         /// <inheritdoc />
         public Task DeleteAsync(T entity, CancellationToken cancellation = default)
