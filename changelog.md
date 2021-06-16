@@ -1,5 +1,28 @@
 
 
+## [v2.0.0](https://github.com/devlooped/TableStorage/tree/v2.0.0) (2021-06-16)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v1.3.0...v2.0.0)
+
+:sparkles: Implemented enhancements:
+
+- Add support for enhanced filtering for document-based repositories [\#37](https://github.com/devlooped/TableStorage/issues/37)
+- Add support for filtering by enum property types [\#35](https://github.com/devlooped/TableStorage/issues/35)
+- Add support for querying [\#33](https://github.com/devlooped/TableStorage/issues/33)
+- Allow passing serialization options for MessagePack serializer [\#32](https://github.com/devlooped/TableStorage/issues/32)
+- Switch default built-in serializer to System.Text.Json  [\#30](https://github.com/devlooped/TableStorage/issues/30)
+- Make Document/Entity default table names plural [\#28](https://github.com/devlooped/TableStorage/issues/28)
+- Don't duplicate PartitionKey/RowKey properties in storage [\#26](https://github.com/devlooped/TableStorage/issues/26)
+
+:twisted_rightwards_arrows: Merged:
+
+- Add support for enhanced filtering for document-based repo [\#38](https://github.com/devlooped/TableStorage/pull/38) (@kzu)
+- Add support for filtering by enum property types [\#36](https://github.com/devlooped/TableStorage/pull/36) (@kzu)
+- Add support for querying with LINQ and expressions [\#34](https://github.com/devlooped/TableStorage/pull/34) (@kzu)
+- Switch default built-in serializer to System.Text.Json [\#31](https://github.com/devlooped/TableStorage/pull/31) (@kzu)
+- Make Document/Entity default table names plural [\#29](https://github.com/devlooped/TableStorage/pull/29) (@kzu)
+- Don't duplicate PartitionKey/RowKey properties in storage [\#27](https://github.com/devlooped/TableStorage/pull/27) (@kzu)
+
 ## [v1.3.0](https://github.com/devlooped/TableStorage/tree/v1.3.0) (2021-05-31)
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/v1.2.1...v1.3.0)
