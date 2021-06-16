@@ -86,6 +86,28 @@ namespace Devlooped
         }
 
         [Fact]
+        public async Task CanFilterByRowKey()
+        {
+            var account = CloudStorageAccount.DevelopmentStorageAccount;
+            await LoadBooksAsync(TableRepository.Create<Book>(account, nameof(CanFilterByRowKey), x => x.Author, x => x.ISBN));
+
+            var repo = TablePartition.Create<Book>(account, nameof(CanFilterByRowKey), "Rick Riordan", x => x.ISBN);
+
+            // Get specific set of books from one particular publisher/country combination
+            // in this case, 978-[English-speaking country, 1][Disney Editions, 4231]
+            // See https://en.wikipedia.org/wiki/List_of_group-1_ISBN_publisher_codes
+            var query = from book in repo.CreateQuery()
+                        where 
+                            book.ISBN.CompareTo("97814231") >= 0 &&
+                            book.ISBN.CompareTo("97814232") < 0
+                        select new { book.ISBN, book.Title };
+
+            var result = await query.AsAsyncEnumerable().ToListAsync();
+
+            Assert.Equal(4, result.Count);
+        }
+
+        [Fact]
         public async Task EnumFailsInTableClient()
         {
             var account = CloudStorageAccount.DevelopmentStorageAccount;
@@ -99,7 +121,6 @@ namespace Devlooped
                  select new { book.Title })
                 .ToList());
         }
-
 
         async Task LoadBooksAsync(ITableRepository<Book> books)
         {
