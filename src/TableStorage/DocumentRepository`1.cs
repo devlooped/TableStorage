@@ -2,6 +2,8 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,7 +14,9 @@ namespace Devlooped
     /// <inheritdoc />
     partial class DocumentRepository<T> : IDocumentRepository<T> where T : class
     {
-        static readonly string documentVersion = (typeof(T).Assembly.GetName().Version ?? new Version(1, 0)).ToString(2);
+        static readonly string documentVersion;
+        static readonly int documentMajorVersion;
+        static readonly int documentMinorVersion;
 
         readonly CloudStorageAccount storageAccount;
 
@@ -23,9 +27,17 @@ namespace Devlooped
         readonly Func<T, string> rowKey;
         readonly Task<CloudTable> table;
 
-        readonly Func<string?, CancellationToken, IAsyncEnumerable<T>> enumerate;
+        readonly Func<Expression<Func<IDocumentEntity, bool>>?, CancellationToken, IAsyncEnumerable<T>> enumerate;
         readonly Func<string, string, CancellationToken, Task<T?>> get;
         readonly Func<T, CancellationToken, Task<T>> put;
+
+        static DocumentRepository()
+        {
+            var version = (typeof(T).Assembly.GetName().Version ?? new Version(1, 0));
+            documentVersion = version.ToString(2);
+            documentMajorVersion = version.Major;
+            documentMinorVersion = version.Minor;
+        }
 
         /// <summary>
         /// Initializes the table repository.
@@ -91,8 +103,12 @@ namespace Devlooped
         }
 
         /// <inheritdoc />
-        public IAsyncEnumerable<T> EnumerateAsync(string? partitionKey = default, CancellationToken cancellation = default) 
-            => enumerate(partitionKey, cancellation);
+        public IAsyncEnumerable<T> EnumerateAsync(string? partitionKey = default, CancellationToken cancellation = default)
+            => enumerate(partitionKey == null ? null : e => e.PartitionKey == partitionKey, cancellation);
+
+        /// <inheritdoc />
+        public IAsyncEnumerable<T> EnumerateAsync(Expression<Func<IDocumentEntity, bool>> predicate, CancellationToken cancellation = default)
+            => enumerate(predicate, cancellation);
 
         /// <inheritdoc />
         public Task<T?> GetAsync(string partitionKey, string rowKey, CancellationToken cancellation = default)
@@ -104,12 +120,16 @@ namespace Devlooped
 
         #region Binary
 
-        async IAsyncEnumerable<T> EnumerateBinaryAsync(string? partitionKey = default, [EnumeratorCancellation] CancellationToken cancellation = default)
+        async IAsyncEnumerable<T> EnumerateBinaryAsync(Expression<Func<IDocumentEntity, bool>>? predicate, [EnumeratorCancellation] CancellationToken cancellation = default)
         {
             var table = await this.table.ConfigureAwait(false);
-            var query = new TableQuery<BinaryDocumentEntity>();
-            if (partitionKey != null)
-                query = query.Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));
+            var query = table.CreateQuery<BinaryDocumentEntity>();
+
+            if (predicate != null)
+            {
+                var expression = Expression.Lambda<Func<BinaryDocumentEntity, bool>>(predicate.Body, Expression.Parameter(typeof(BinaryDocumentEntity)));
+                query = (TableQuery<BinaryDocumentEntity>)((IQueryable<BinaryDocumentEntity>)query).Where(expression);
+            }
 
             TableContinuationToken? continuation = null;
             do
@@ -158,8 +178,10 @@ namespace Devlooped
                 {
                     ETag = "*",
                     Document = binarySerializer!.Serialize(entity),
-                    DocumentType = typeof(T).FullName,
-                    DocumentVersion = documentVersion,
+                    Type = typeof(T).FullName,
+                    Version = documentVersion,
+                    MajorVersion = documentMajorVersion,
+                    MinorVersion = documentMinorVersion,
                 }), cancellation)
                 .ConfigureAwait(false);
 
@@ -174,12 +196,16 @@ namespace Devlooped
 
         #region String
 
-        async IAsyncEnumerable<T> EnumerateStringAsync(string? partitionKey = default, [EnumeratorCancellation] CancellationToken cancellation = default)
+        async IAsyncEnumerable<T> EnumerateStringAsync(Expression<Func<IDocumentEntity, bool>>? predicate, [EnumeratorCancellation] CancellationToken cancellation = default)
         {
             var table = await this.table.ConfigureAwait(false);
-            var query = new TableQuery<DocumentEntity>();
-            if (partitionKey != null)
-               query = query.Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));
+            var query = table.CreateQuery<DocumentEntity>();
+
+            if (predicate != null)
+            {
+                var expression = Expression.Lambda<Func<DocumentEntity, bool>>(predicate.Body, Expression.Parameter(typeof(DocumentEntity)));
+                query = (TableQuery<DocumentEntity>)((IQueryable<DocumentEntity>)query).Where(expression);
+            }
 
             TableContinuationToken? continuation = null;
             do
@@ -228,8 +254,10 @@ namespace Devlooped
                 {
                     ETag = "*",
                     Document = stringSerializer!.Serialize(entity),
-                    DocumentType = typeof(T).FullName,
-                    DocumentVersion = documentVersion,
+                    Type = typeof(T).FullName,
+                    Version = documentVersion,
+                    MajorVersion = documentMajorVersion,
+                    MinorVersion = documentMinorVersion,
                 }), cancellation)
                 .ConfigureAwait(false);
 
@@ -250,22 +278,26 @@ namespace Devlooped
             return table;
         }
 
-        class BinaryDocumentEntity : TableEntity
+        class BinaryDocumentEntity : TableEntity, IDocumentEntity
         {
             public BinaryDocumentEntity() { }
             public BinaryDocumentEntity(string partitionKey, string rowKey) : base(partitionKey, rowKey) { }
             public byte[]? Document { get; set; }
-            public string? DocumentType { get; set; }
-            public string? DocumentVersion { get; set; }
+            public string? Type { get; set; }
+            public string? Version { get; set; }
+            public int? MajorVersion { get; set; }
+            public int? MinorVersion { get; set; }
         }
 
-        class DocumentEntity : TableEntity
+        class DocumentEntity : TableEntity, IDocumentEntity
         {
             public DocumentEntity() { }
             public DocumentEntity(string partitionKey, string rowKey) : base(partitionKey, rowKey) { }
             public string? Document { get; set; }
-            public string? DocumentType { get; set; }
-            public string? DocumentVersion { get; set; }
+            public string? Type { get; set; }
+            public string? Version { get; set; }
+            public int? MajorVersion { get; set; }
+            public int? MinorVersion { get; set; }
         }
     }
 }

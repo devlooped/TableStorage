@@ -6,13 +6,13 @@ using Microsoft.Azure.Cosmos.Table;
 namespace Devlooped
 {
     /// <summary>
-    /// Factory methods to create <see cref="IDocumentRepository{T}"/> instances
+    /// Factory methods to create <see cref="ITableRepository{T}"/> instances
     /// that store entities as a serialized document.
     /// </summary>
     static partial class DocumentRepository
     {
         /// <summary>
-        /// Creates an <see cref="IDocumentRepository{T}"/> for the given entity type 
+        /// Creates an <see cref="ITableRepository{T}"/> for the given entity type 
         /// <typeparamref name="T"/>.
         /// </summary>
         /// <typeparam name="T">The type of entity that the repository will manage.</typeparam>
@@ -23,7 +23,7 @@ namespace Devlooped
         /// If not provided, the class will need a property annotated with <see cref="PartitionKeyAttribute"/>.</param>
         /// <param name="rowKey">Optional function to retrieve the row key for a given entity. 
         /// If not provided, the class will need a property annotated with <see cref="RowKeyAttribute"/>.</param>
-        /// <returns>The new <see cref="IDocumentRepository{T}"/>.</returns>
+        /// <returns>The new <see cref="ITableRepository{T}"/>.</returns>
         public static IDocumentRepository<T> Create<T>(
             CloudStorageAccount storageAccount,
             string? tableName = default,

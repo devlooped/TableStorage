@@ -10,7 +10,7 @@ namespace Devlooped
     /// A generic repository that stores entities in table storage.
     /// </summary>
     /// <typeparam name="T">The type of entity being persisted.</typeparam>
-    partial interface IDocumentRepository<T> where T : class
+    partial interface ITableStorage<T> where T : class
     {
         /// <summary>
         /// Gets the table name being used.

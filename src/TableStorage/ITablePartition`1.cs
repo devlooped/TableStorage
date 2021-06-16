@@ -9,7 +9,7 @@ namespace Devlooped
     /// by the entity properties, since they are stored in individual columns.
     /// </summary>
     /// <typeparam name="T">The type of entity being persisted.</typeparam>
-    partial interface ITablePartition<T> : IDocumentPartition<T> where T : class
+    partial interface ITablePartition<T> : ITableStoragePartition<T> where T : class
     {
         /// <summary>
         /// Creates a query for use with LINQ expressions. See 

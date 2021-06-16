@@ -5,7 +5,7 @@ using Microsoft.Azure.Cosmos.Table;
 namespace Devlooped
 {
     /// <summary>
-    /// A <see cref="IDocumentRepository{T}"/> implementation which relies on the entity type <typeparamref name="T"/>
+    /// An <see cref="IDocumentRepository{T}{T}"/> implementation which relies on the entity type <typeparamref name="T"/>
     /// being annotated with <see cref="PartitionKeyAttribute"/> and <see cref="RowKeyAttribute"/>, and 
     /// optionally <see cref="TableAttribute"/> (defaults to type name).
     /// </summary>
@@ -13,7 +13,7 @@ namespace Devlooped
     /// When attributed entities are used, this is a convenient generic implementation for use with 
     /// a dependency injection container, such as in ASP.NET Core:
     /// <code>
-    /// services.AddScoped(typeof(ITableRepository&lt;&gt;), typeof(AttributedDocumentRepository&lt;&gt;));
+    /// services.AddScoped(typeof(IDocumentRepository&lt;&gt;), typeof(AttributedDocumentRepository&lt;&gt;));
     /// </code>
     /// </remarks>
     partial class AttributedDocumentRepository<T> : DocumentRepository<T> where T : class

@@ -9,7 +9,7 @@ using Microsoft.Azure.Cosmos.Table;
 namespace Devlooped
 {
     /// <summary>
-    /// Factory methods to create <see cref="IDocumentRepository{T}"/> instances
+    /// Factory methods to create <see cref="ITableRepository{T}"/> instances
     /// that store entities using individual columns for entity properties.
     /// </summary>
     static partial class TableRepository
@@ -17,18 +17,18 @@ namespace Devlooped
         static readonly ConcurrentDictionary<Type, string> defaultTableNames = new();
 
         /// <summary>
-        /// Creates an <see cref="IDocumentRepository{TableEntity}"/> repository.
+        /// Creates an <see cref="ITableRepository{TableEntity}"/> repository.
         /// </summary>
         /// <param name="storageAccount">The storage account to use.</param>
         /// <param name="tableName">Table name to use.</param>
-        /// <returns>The new <see cref="IDocumentRepository{TableEntity}"/>.</returns>
-        public static IDocumentRepository<TableEntity> Create(
+        /// <returns>The new <see cref="ITableRepository{TableEntity}"/>.</returns>
+        public static ITableRepository<TableEntity> Create(
             CloudStorageAccount storageAccount,
             string tableName)
             => new TableEntityRepository(storageAccount, tableName);
 
         /// <summary>
-        /// Creates an <see cref="IDocumentRepository{T}"/> for the given entity type 
+        /// Creates an <see cref="ITableRepository{T}"/> for the given entity type 
         /// <typeparamref name="T"/>, using the <typeparamref name="T"/> <c>Name</c> as 
         /// the table name.
         /// </summary>
@@ -36,7 +36,7 @@ namespace Devlooped
         /// <param name="storageAccount">The storage account to use.</param>
         /// <param name="partitionKey">Function to retrieve the partition key for a given entity.</param>
         /// <param name="rowKey">Function to retrieve the row key for a given entity.</param>
-        /// <returns>The new <see cref="IDocumentRepository{T}"/>.</returns>
+        /// <returns>The new <see cref="ITableRepository{T}"/>.</returns>
         public static ITableRepository<T> Create<T>(
             CloudStorageAccount storageAccount,
             Expression<Func<T, string>> partitionKey,
@@ -44,7 +44,7 @@ namespace Devlooped
             => Create<T>(storageAccount, typeof(T).Name, partitionKey, rowKey);
 
         /// <summary>
-        /// Creates an <see cref="IDocumentRepository{T}"/> for the given entity type 
+        /// Creates an <see cref="ITableRepository{T}"/> for the given entity type 
         /// <typeparamref name="T"/>.
         /// </summary>
         /// <typeparam name="T">The type of entity that the repository will manage.</typeparam>
@@ -55,7 +55,7 @@ namespace Devlooped
         /// If not provided, the class will need a property annotated with <see cref="PartitionKeyAttribute"/>.</param>
         /// <param name="rowKey">Optional function to retrieve the row key for a given entity. 
         /// If not provided, the class will need a property annotated with <see cref="RowKeyAttribute"/>.</param>
-        /// <returns>The new <see cref="IDocumentRepository{T}"/>.</returns>
+        /// <returns>The new <see cref="ITableRepository{T}"/>.</returns>
         public static ITableRepository<T> Create<T>(
             CloudStorageAccount storageAccount,
             string? tableName = default,

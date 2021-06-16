@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 namespace Devlooped
 {
     /// <summary>
-    /// A specific partition within a <see cref="IDocumentRepository{T}"/>.
+    /// A specific partition within an <see cref="ITableStorage{T}"/>.
     /// </summary>
     /// <typeparam name="T">The type of entity being persisted.</typeparam>
-    partial interface IDocumentPartition<T> where T : class
+    partial interface ITableStoragePartition<T> where T : class
     {
         /// <summary>
         /// Gets the table name being used.
