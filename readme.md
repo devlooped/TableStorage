@@ -28,7 +28,7 @@ public record Product(string Category, string Id)
 The entity can be stored and retrieved with:
 
 ```csharp
-var account = CloudStorageAccount.DevelopmentStorageAccount; // or production one
+var storageAccount = CloudStorageAccount.DevelopmentStorageAccount; // or production one
 // We lay out the parameter names for clarity only.
 var repo = TableRepository.Create<Product>(storageAccount, 
     tableName: "Products",
@@ -74,7 +74,7 @@ public record Book(string ISBN, string Title, string Author, BookFormat Format, 
 ```
 
 ```csharp
-var account = CloudStorageAccount.DevelopmentStorageAccount; // or production one
+var storageAccount = CloudStorageAccount.DevelopmentStorageAccount; // or production one
 
 // Leverage defaults: TableName=Entities, PartitionKey=Book
 var repo = TablePartition.Create<Region>(storageAccount, 
@@ -100,7 +100,7 @@ for example. In that case, you could use a `TableRepository<Book>` when
 saving:
 
 ```csharp
-var repo = TableRepository.Create<Book>(account, "Books", x => x.Author, x => x.ISBN);
+var repo = TableRepository.Create<Book>(storageAccount, "Books", x => x.Author, x => x.ISBN);
 
 await repo.PutAsync(book);
 ```
@@ -109,7 +109,7 @@ And later on when listing/filtering books by a particular author, you can use
 a `TablePartition<Book>` so all querying is automatically scoped to that author:
 
 ```csharp
-var partition = TablePartition.Create<Book>(account, "Books", "Rick Riordan", x => x.ISBN);
+var partition = TablePartition.Create<Book>(storageAccount, "Books", "Rick Riordan", x => x.ISBN);
 
 // Get Rick Riordan books, only from Disney/Hyperion, with over 1000 pages
 var query = from book in repo.CreateQuery()
