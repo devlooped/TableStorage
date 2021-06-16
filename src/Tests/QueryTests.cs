@@ -97,7 +97,7 @@ namespace Devlooped
             // in this case, 978-[English-speaking country, 1][Disney Editions, 4231]
             // See https://en.wikipedia.org/wiki/List_of_group-1_ISBN_publisher_codes
             var query = from book in repo.CreateQuery()
-                        where 
+                        where
                             book.ISBN.CompareTo("97814231") >= 0 &&
                             book.ISBN.CompareTo("97814232") < 0
                         select new { book.ISBN, book.Title };
@@ -105,6 +105,26 @@ namespace Devlooped
             var result = await query.AsAsyncEnumerable().ToListAsync();
 
             Assert.Equal(4, result.Count);
+        }
+
+        [Fact]
+        public async Task CanFilterByColumn()
+        {
+            var account = CloudStorageAccount.DevelopmentStorageAccount;
+            await LoadBooksAsync(TableRepository.Create<Book>(account, nameof(CanFilterByColumn), x => x.Author, x => x.ISBN));
+
+            var repo = TablePartition.Create<Book>(account, nameof(CanFilterByRowKey), "Rick Riordan", x => x.ISBN);
+
+            // Get specific set of books from one particular publisher/country combination
+            // in this case, 978-[English-speaking country, 1][Disney Editions, 4231]
+            // See https://en.wikipedia.org/wiki/List_of_group-1_ISBN_publisher_codes
+            var query = from book in repo.CreateQuery()
+                        where book.Pages >= 1000 && book.Pages <= 1500
+                        select new { book.ISBN, book.Title };
+
+            var result = await query.AsAsyncEnumerable().ToListAsync();
+
+            Assert.Single(result);
         }
 
         [Fact]

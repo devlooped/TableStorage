@@ -13,27 +13,17 @@ Repository pattern with POCO object support for storing to Azure/CosmosDB Table 
 Given an entity like:
 
 ```csharp
-class Product 
+public record Product(string Category, string Id) 
 {
-  public Product(string category, string id) 
-  {
-    Category = category;
-    Id = id;
-  }
-
-  public string Category { get; }  
-
-  public string Id { get; }
-
-  public string? Title { get; set; }
-
-  public double Price { get; set; }
+  public string? Title { get; init; }
+  public double Price { get; init; }
 }
 ```
 
 > NOTE: entity can have custom constructor, key properties can be read-only, 
 > and it doesn't need to inherit from anything, implement any interfaces or use 
-> any custom attributes (unless you want to).
+> any custom attributes (unless you want to). As shown above, it can even be 
+> a simple record type!
 
 The entity can be stored and retrieved with:
 
@@ -45,7 +35,7 @@ var repo = TableRepository.Create<Product>(storageAccount,
     partitionKey: p => p.Category, 
     rowKey: p => p.Id);
 
-var product = new Product("catId-asdf", "1234") 
+var product = new Product("Book", "1234") 
 {
   Title = "Table Storage is Cool",
   Price = 25.5,
@@ -54,77 +44,93 @@ var product = new Product("catId-asdf", "1234")
 // Insert or Update behavior (aka "upsert")
 await repo.PutAsync(product);
 
-// Enumerate all products in category "catId-asdf"
-await foreach (var p in repo.EnumerateAsync("catId-asdf"))
+// Enumerate all products in category "Book"
+await foreach (var p in repo.EnumerateAsync("Book"))
    Console.WriteLine(p.Price);
 
+// Query books priced in the 20-50 range, 
+// project just title + price
+await foreach (var info in from prod in repo.CreateQuery()
+                           where prod.Price >= 20 and prod.Price <= 50
+                           select new { prod.Title, prod.Price })
+  Console.WriteLine($"{info.Title}: {info.Price}");
+
 // Get previously saved product.
-Product saved = await repo.GetAsync("catId-asdf", "1234");
+Product saved = await repo.GetAsync("Book", "1234");
 
 // Delete product
-await repo.DeleteAsync("catId-asdf", "1234");
+await repo.DeleteAsync("Book", "1234");
 
 // Can also delete passing entity
 await repo.DeleteAsync(saved);
 ```
 
-If a unique identifier among all entities exists already, you can also store all 
+If a unique identifier among all entities already exists, you can also store all 
 entities in a single table, using a fixed partition key matching the entity type name, for 
 example. In such a case, instead of a `TableRepository`, you can use a `TablePartition`:
 
 ```csharp
-class Region 
-{
-  public Region(string code, string name) 
-    => (Code, Name)
-    = (code, name);
-
-  public string Code { get; }
-
-  public string Name { get; }
-}
+public record Book(string ISBN, string Title, string Author, BookFormat Format, int Pages);
 ```
 
 ```csharp
 var account = CloudStorageAccount.DevelopmentStorageAccount; // or production one
-// We lay out the parameter names for clarity only.
-// also be provided to the factory method to override the default behavior.
+
+// Leverage defaults: TableName=Entities, PartitionKey=Book
 var repo = TablePartition.Create<Region>(storageAccount, 
-  // tableName defaults to "Entities" if not provided
-  tableName: "Reference",
-  // partitionKey would default to "Region" too if not provided
-  partitionKey: "Region",
-  rowKey: region => region.Code);
+  rowKey: book => book.ISBN);
 
-var region = new Region("uk", "United Kingdom"); 
+// insert/get/delete same API shown above.
 
-// Insert or Update behavior (aka "upsert")
-await repo.PutAsync(region);
+// query filtering by rowKey, in this case, books by a certain 
+// language/publisher combination. For Disney/Hyperion in English, 
+// for example: ISBNs starting with 978(prefix)-1(english)-4231(publisher)
+var query = from book in repo.CreateQuery()
+            where 
+                book.ISBN.CompareTo("97814231") >= 0 &&
+                book.ISBN.CompareTo("97814232") < 0
+            select new { book.ISBN, book.Title };
 
-// Enumerate all regions within the partition
-await foreach (var r in repo.EnumerateAsync())
-   Console.WriteLine(r.Name);
-
-// Get previously saved region.
-Region saved = await repo.GetAsync("uk");
-
-// Delete region
-await repo.DeleteAsync("uk");
-
-// Can also delete passing entity
-await repo.DeleteAsync(saved);
+await foreach (var book in query)
+   ...
 ```
 
-This is quite convenient for handling reference data, for example. Enumerating all entries 
-in the partition wouldn't be something you'd typically do for your "real" data, but for 
-reference data, it could be useful.
+For the books example above, it might make sense to partition by author, 
+for example. In that case, you could use a `TableRepository<Book>` when 
+saving:
 
-Stored entities will use individual columns for properties, which makes it easy to browse 
-the data. If you don't need the individual columns, and would like a document-like storage 
-mechanism instead, you can use the `DocumentRepository.Create` and `DocumentPartition.Create` 
-factory methods instead. The API is otherwise the same, but you can see the effect of using 
-one or the other in the following screenshots of the [Storage Explorer](https://azure.microsoft.com/en-us/features/storage-explorer/) 
-for the same `Product` entity shown in the first example above:
+```csharp
+var repo = TableRepository.Create<Book>(account, "Books", x => x.Author, x => x.ISBN);
+
+await repo.PutAsync(book);
+```
+
+And later on when listing/filtering books by a particular author, you can use 
+a `TablePartition<Book>` so all querying is automatically scoped to that author:
+
+```csharp
+var partition = TablePartition.Create<Book>(account, "Books", "Rick Riordan", x => x.ISBN);
+
+// Get Rick Riordan books, only from Disney/Hyperion, with over 1000 pages
+var query = from book in repo.CreateQuery()
+            where 
+                book.ISBN.CompareTo("97814231") >= 0 &&
+                book.ISBN.CompareTo("97814232") < 0 && 
+                book.Pages >= 1000
+            select new { book.ISBN, book.Title };
+```
+
+Using table partitions is quite convenient for handling reference data too, for example.
+Enumerating all entries in the partition wouldn't be something you'd typically do for 
+your "real" data, but for reference data, it could come in handy.
+
+Stored entities use individual columns for properties, which makes it easy to browse 
+the data (and query, as shown above!). If you don't need the individual columns, and would 
+like a document-like storage mechanism instead, you can use the `DocumentRepository.Create` 
+and `DocumentPartition.Create` factory methods instead. The API is otherwise the same, but 
+you can see the effect of using one or the other in the following screenshots of the 
+[Storage Explorer](https://azure.microsoft.com/en-us/features/storage-explorer/) for the same 
+`Product` entity shown in the first example above:
 
 ![Screenshot of entity persisted with separate columns for properties](assets/img/entity.png)
 
@@ -161,8 +167,10 @@ await docs.PutAsync(new Product("book", "9781473217386")
 The `DocumentType` is the `Type.FullName` of the entity type, and the `DocumentVersion` is 
 the `Major.Minor` of its assembly, which could be used for advanced data migration scenarios.
 
-In addition to the default built-in JSON plain-text based serializer, there are other alternative 
-serializers, including various binary serializers which will instead persist the document as a byte array:
+In addition to the default built-in JSON plain-text based serializer (which uses the 
+[System.Text.Json](https://www.nuget.org/packages/system.text.json) package), there are other 
+alternative serializers for the document-based repository, including various binary serializers 
+which will instead persist the document as a byte array:
 
 [![Json.NET](https://img.shields.io/nuget/v/Devlooped.TableStorage.Newtonsoft.svg?color=royalblue&label=Newtonsoft)](https://www.nuget.org/packages/Devlooped.TableStorage.Newtonsoft)
 [![Bson](https://img.shields.io/nuget/v/Devlooped.TableStorage.Bson.svg?color=royalblue&label=Bson)](https://www.nuget.org/packages/Devlooped.TableStorage.Bson)
