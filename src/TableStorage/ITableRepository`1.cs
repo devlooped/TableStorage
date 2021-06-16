@@ -5,12 +5,12 @@ using System.Linq;
 namespace Devlooped
 {
     /// <summary>
-    /// A specialized <see cref="IDocumentRepository{T}"/> which allows querying 
+    /// A specialized <see cref="ITableRepository{T}"/> which allows querying 
     /// the repository by the entity properties, since they are stored in individual 
     /// columns.
     /// </summary>
     /// <typeparam name="T">The type of entity being persisted.</typeparam>
-    partial interface ITableRepository<T> : IDocumentRepository<T> where T : class
+    partial interface ITableRepository<T> : ITableStorage<T> where T : class
     {
         /// <summary>
         /// Creates a query for use with LINQ expressions. See 

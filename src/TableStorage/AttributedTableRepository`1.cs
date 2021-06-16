@@ -5,7 +5,7 @@ using Microsoft.Azure.Cosmos.Table;
 namespace Devlooped
 {
     /// <summary>
-    /// A <see cref="IDocumentRepository{T}"/> implementation which relies on the entity type <typeparamref name="T"/>
+    /// An <see cref="ITableRepository{T}"/> implementation which relies on the entity type <typeparamref name="T"/>
     /// being annotated with <see cref="PartitionKeyAttribute"/> and <see cref="RowKeyAttribute"/>, and 
     /// optionally <see cref="TableAttribute"/> (defaults to type name).
     /// </summary>

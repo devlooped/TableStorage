@@ -2,13 +2,17 @@
 namespace Devlooped
 {
     // Sets default visibility when using compiled version, where everything is public
-    public partial interface IDocumentRepository<T> { }
+    public partial interface ITableStorage<T> { }
+    public partial interface ITableStoragePartition<T> { }
     public partial interface ITableRepository<T> { }
-    public partial interface IDocumentPartition<T> { }
+    public partial interface ITableRepository<T> { }
     public partial interface ITablePartition<T> { }
+    public partial interface IDocumentRepository<T> { }
+    public partial interface IDocumentPartition<T> { }
     public partial interface IDocumentSerializer { }
     public partial interface IBinaryDocumentSerializer { }
     public partial interface IStringDocumentSerializer { }
+    public partial interface IDocumentEntity { }
 
     public partial class TableRepository { }
     public partial class TableRepository<T> { }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Threading.Tasks;
 using MessagePack;
 using Microsoft.Azure.Cosmos.Table;
@@ -122,6 +123,51 @@ namespace Devlooped
             finally
             {
                 await table.DeleteAsync();
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(Serializers))]
+        public async Task CanQueryDocument(IDocumentSerializer serializer)
+        {
+            var table = CloudStorageAccount.DevelopmentStorageAccount.CreateCloudTableClient()
+                .GetTableReference(nameof(CanQueryDocument) + serializer.GetType().Name);
+            await table.DeleteIfExistsAsync();
+            await table.CreateAsync();
+
+            try
+            {
+                var repo = DocumentRepository.Create<DocumentEntity>(CloudStorageAccount.DevelopmentStorageAccount,
+                    table.Name, serializer: serializer);
+
+                var partitionKey = "P" + Guid.NewGuid().ToString("N");
+
+                await repo.PutAsync(new DocumentEntity
+                {
+                    PartitionKey = partitionKey,
+                    RowKey = "Bar",
+                    Title = "Bar",
+                });
+
+                await repo.PutAsync(new DocumentEntity
+                {
+                    PartitionKey = partitionKey,
+                    RowKey = "Foo",
+                    Title = "Foo",
+                });
+
+                var entities = await repo.EnumerateAsync(e =>
+                    e.PartitionKey == partitionKey &&
+                    e.RowKey.CompareTo("Foo") >= 0 && e.RowKey.CompareTo("Fop") < 0 &&
+                    e.Version != "1.0" &&
+                    e.Type == typeof(DocumentEntity).FullName)
+                    .ToListAsync();
+
+                Assert.Single(entities);
+            }
+            finally
+            {
+                await table.DeleteIfExistsAsync();
             }
         }
 

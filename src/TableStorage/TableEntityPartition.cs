@@ -2,6 +2,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.Cosmos.Table;
@@ -9,9 +10,9 @@ using Microsoft.Azure.Cosmos.Table;
 namespace Devlooped
 {
     /// <inheritdoc />
-    partial class TableEntityPartition : IDocumentPartition<TableEntity>
+    partial class TableEntityPartition : ITablePartition<TableEntity>
     {
-        readonly IDocumentRepository<TableEntity> repository;
+        readonly TableEntityRepository repository;
 
         /// <summary>
         /// Initializes the repository with the given storage account and optional table name.
@@ -31,6 +32,9 @@ namespace Devlooped
 
         /// <inheritdoc />
         public string PartitionKey { get; }
+
+        /// <inheritdoc />
+        public IQueryable<TableEntity> CreateQuery() => repository.CreateQuery().Where(x => x.PartitionKey == PartitionKey);
 
         /// <inheritdoc />
         public async Task DeleteAsync(TableEntity entity, CancellationToken cancellation = default)
