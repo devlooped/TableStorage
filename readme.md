@@ -164,8 +164,10 @@ await docs.PutAsync(new Product("book", "9781473217386")
 });
 ```
 
-The `DocumentType` is the `Type.FullName` of the entity type, and the `DocumentVersion` is 
-the `Major.Minor` of its assembly, which could be used for advanced data migration scenarios.
+The `Type` column persisted in the table is the `Type.FullName` of the persited entity, and the 
+`Version` is the `Major.Minor` of its assembly, which could be used for advanced data migration scenarios. 
+The major and minor version components are also provided as individual columns for easier querying 
+by various version ranges, using `IDocumentRepository.EnumerateAsync(predicate)`.
 
 In addition to the default built-in JSON plain-text based serializer (which uses the 
 [System.Text.Json](https://www.nuget.org/packages/system.text.json) package), there are other 
