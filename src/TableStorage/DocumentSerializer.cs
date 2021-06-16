@@ -24,6 +24,11 @@ namespace Devlooped
             AllowTrailingCommas = true,
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
             WriteIndented = true,
+            Converters =
+            {
+                // Enums should persist/parse with their string values instead
+                new JsonStringEnumConverter(allowIntegerValues: false)
+            }
         };
 
         /// <summary>

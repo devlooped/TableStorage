@@ -46,10 +46,18 @@ namespace Devlooped
             var query = (DataServiceQuery)new DataServiceContext(account.TableStorageUri.PrimaryUri).CreateQuery<T>(tableName)
                 .Provider.CreateQuery(expression);
 
+            // OData will translate the enum value in a filter to TYPENAME.'ENUMVALUE'.
+            // The type name can contain the + sign if it's a nested type, too. So we
+            // need to remove the type name plus the dot and just leave the string 
+            // value as part of the filter string.
+            var rawqs = Regex.Replace(
+                query.RequestUri.GetComponents(UriComponents.Query, UriFormat.Unescaped),
+                "(\\W)[\\w\\+\\.]+('\\w+')", "$1$2");
+
             // We need to count & break manually because $top is interpreted as the max records per page 
             // if the set matches more items. This is clearly unintuitive and *not* what one typically 
             // wants when using LINQ queries! See Note on https://docs.microsoft.com/en-us/rest/api/storageservices/querying-tables-and-entities#supported-query-options
-            var qs = HttpUtility.ParseQueryString(query.RequestUri.GetComponents(UriComponents.Query, UriFormat.Unescaped));
+            var qs = HttpUtility.ParseQueryString(rawqs);
             if (!long.TryParse(qs["$top"], out var top))
                 top = -1;
 
