@@ -8,6 +8,8 @@
 
 Repository pattern with POCO object support for storing to Azure/CosmosDB Table Storage
 
+![Screenshot of basic usage](assets/img/tablestorage.png)
+
 ## Usage
 
 Given an entity like:
