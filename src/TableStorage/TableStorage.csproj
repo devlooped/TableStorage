@@ -5,92 +5,13 @@
     <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
     <IsPackable>true</IsPackable>
     <Description>
-Repository pattern with POCO object support for storing to Azure/Cosmos DB Table Storage.
-      
-Usage:
-
-Given the following class: 
-
-  [Table("Products")]
-  class Product 
-  {
-    // NOTE: custom constructor
-    public Product(string category, string id) 
-    {
-      Category = category;
-      Id = id;
-    }
-
-    // NOTE: read-only property
-    [PartitionKey]
-    public string Category { get; }  
-
-    [RowKey]
-    public string Id { get; }
-
-    public string? Title { get; set; }
-
-    public double Price { get; set; }
-  }
-
-It can be persisted and retrieved with:
-
-  var storageAccount = CloudStorageAccount.DevelopmentStorageAccount; // or production one
-  var repo = TableRepository.Create&lt;Product&gt;(storageAccount);
-
-  var product = new Product("Book", "9781473217386") 
-  {
-    Title = "Neuromancer",
-    Price = 7.5,
-  };
-
-  // Insert or Update behavior (aka "upsert")
-  await repo.PutAsync(product);
-
-  // Enumerate all products in category "Book"
-  await foreach (var p in repo.EnumerateAsync("Book")
-     Console.WriteLine(p.Price);
-
-  // Query for books in ISBN range (aka 'by publisher') below a certain price
-  await foreach (var p in from book in repo.CreateQuery()
-                          where book.Category == "Book" &amp;&amp;
-                                book.Id.CompareTo("97814231") &gt;= 0 &amp;&amp;
-                                book.Id.CompareTo("97814232") &lt; 0 &amp;&amp;
-                                book.Price &lt;= 7.5)
-                          select new { book.Title, book.Price }
-     Console.WriteLine($"Found cheap title '{p.Title}' for {p.Price}.");
-
-  // Get previously saved product.
-  Product saved = await repo.GetAsync("Book", "9781473217386");
-
-  // Delete product
-  await repo.DeleteAsync("Book", "9781473217386");
-
-  // Can also delete passing entity
-  await repo.DeleteAsync(saved);
-  
-
-Alternatively, you can avoid annotating classes altogether by simply specifying 
-via lambdas which properties should be used for PartitionKey and RowKey, as well 
-as the desired table name to use. Your entity type can even be a simple C# 9 record:
-
-  public record Product(string Category, string Id) 
-  {
-    public string? Title { get; init; }
-    public double Price { get; init; }
-  }
-
-  // Configure repository accordingly
-  var repo = TableRepository.Create&lt;Product&gt;(storageAccount, 
-      "Products",        // TableName
-      x => x.Category,   // PartitionKey
-      x => x.Id);        // RowKey
-
+      Repository pattern with POCO object (including C# 9 records!) support for storing to Azure/Cosmos DB Table Storage.
     </Description>
+    <PackageReadmeFile>readme.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NuGetizer" Version="0.7.0" />
+    <PackageReference Include="NuGetizer" Version="0.7.1" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="all" />
     <PackageReference Include="Microsoft.Azure.Cosmos.Table" Version="1.0.8" />
     <PackageReference Include="Microsoft.OData.Client" Version="7.9.0" />
@@ -99,6 +20,7 @@ as the desired table name to use. Your entity type can even be a simple C# 9 rec
 
   <ItemGroup>
     <InternalsVisibleTo Include="Tests" />
+    <None Include="..\..\readme.md" PackagePath="readme.md" />
   </ItemGroup>
 
 </Project>
