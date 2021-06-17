@@ -1,8 +1,8 @@
 
 
-## [v2.0.1-rc](https://github.com/devlooped/TableStorage/tree/v2.0.1-rc) (2021-06-17)
+## [v2.0.1](https://github.com/devlooped/TableStorage/tree/v2.0.1) (2021-06-17)
 
-[Full Changelog](https://github.com/devlooped/TableStorage/compare/v2.0.0...v2.0.1-rc)
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v2.0.0...v2.0.1)
 
 :sparkles: Implemented enhancements:
 
@@ -21,7 +21,6 @@
 - Switch default built-in serializer to System.Text.Json  [\#30](https://github.com/devlooped/TableStorage/issues/30)
 - Make Document/Entity default table names plural [\#28](https://github.com/devlooped/TableStorage/issues/28)
 - Don't duplicate PartitionKey/RowKey properties in storage [\#26](https://github.com/devlooped/TableStorage/issues/26)
-- Significant refactoring for simplified API and less dependency on reflection [\#6](https://github.com/devlooped/TableStorage/pull/6) (@kzu)
 
 :twisted_rightwards_arrows: Merged:
 
@@ -30,7 +29,7 @@
 - Add support for querying with LINQ and expressions [\#34](https://github.com/devlooped/TableStorage/pull/34) (@kzu)
 - Switch default built-in serializer to System.Text.Json [\#31](https://github.com/devlooped/TableStorage/pull/31) (@kzu)
 - Make Document/Entity default table names plural [\#29](https://github.com/devlooped/TableStorage/pull/29) (@kzu)
-- Don't duplicate PartitionKey/RowKey properties in storage [\#27](https://github.com/devlooped/TableStorage/pull/27) (@kzu)
+- Add SourceLink to get repo/pdb linking [\#3](https://github.com/devlooped/TableStorage/pull/3) (@kzu)
 
 ## [v1.3.0](https://github.com/devlooped/TableStorage/tree/v1.3.0) (2021-05-31)
 
@@ -96,10 +95,6 @@
 ## [v1.0.2](https://github.com/devlooped/TableStorage/tree/v1.0.2) (2021-05-10)
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/cf1b7f069ac6d68482b498555c8dbdda8e1ae5b4...v1.0.2)
-
-:twisted_rightwards_arrows: Merged:
-
-- Add SourceLink to get repo/pdb linking [\#3](https://github.com/devlooped/TableStorage/pull/3) (@kzu)
 
 
 
