@@ -1,10 +1,7 @@
 ![Icon](https://raw.githubusercontent.com/devlooped/TableStorage/main/assets/img/icon-32.png) TableStorage
 ============
 
-[![Version](https://img.shields.io/nuget/v/Devlooped.TableStorage.svg?color=royalblue)](https://www.nuget.org/packages/Devlooped.TableStorage)
-[![Downloads](https://img.shields.io/nuget/dt/Devlooped.TableStorage.svg?color=green)](https://www.nuget.org/packages/Devlooped.TableStorage)
-[![License](https://img.shields.io/github/license/devlooped/TableStorage.svg?color=blue)](https://github.com/devlooped/TableStorage/blob/main/LICENSE)
-[![Build](https://github.com/devlooped/TableStorage/workflows/build/badge.svg?branch=main)](https://github.com/devlooped/TableStorage/actions)
+[![Version](https://img.shields.io/nuget/v/Devlooped.TableStorage.svg?color=royalblue)](https://www.nuget.org/packages/Devlooped.TableStorage) [![Downloads](https://img.shields.io/nuget/dt/Devlooped.TableStorage.svg?color=green)](https://www.nuget.org/packages/Devlooped.TableStorage) [![License](https://img.shields.io/github/license/devlooped/TableStorage.svg?color=blue)](https://github.com/devlooped/TableStorage/blob/main/LICENSE) [![Build](https://github.com/devlooped/TableStorage/workflows/build/badge.svg?branch=main)](https://github.com/devlooped/TableStorage/actions)
 
 Repository pattern with POCO object support for storing to Azure/CosmosDB Table Storage
 
@@ -176,10 +173,7 @@ In addition to the default built-in JSON plain-text based serializer (which uses
 alternative serializers for the document-based repository, including various binary serializers 
 which will instead persist the document as a byte array:
 
-[![Json.NET](https://img.shields.io/nuget/v/Devlooped.TableStorage.Newtonsoft.svg?color=royalblue&label=Newtonsoft)](https://www.nuget.org/packages/Devlooped.TableStorage.Newtonsoft)
-[![Bson](https://img.shields.io/nuget/v/Devlooped.TableStorage.Bson.svg?color=royalblue&label=Bson)](https://www.nuget.org/packages/Devlooped.TableStorage.Bson)
-[![MessagePack](https://img.shields.io/nuget/v/Devlooped.TableStorage.MessagePack.svg?color=royalblue&label=MessagePack)](https://www.nuget.org/packages/Devlooped.TableStorage.MessagePack)
-[![Protobuf](https://img.shields.io/nuget/v/Devlooped.TableStorage.Protobuf.svg?color=royalblue&label=Protobuf)](https://www.nuget.org/packages/Devlooped.TableStorage.Protobuf)
+[![Json.NET](https://img.shields.io/nuget/v/Devlooped.TableStorage.Newtonsoft.svg?color=royalblue&label=Newtonsoft)](https://www.nuget.org/packages/Devlooped.TableStorage.Newtonsoft) [![Bson](https://img.shields.io/nuget/v/Devlooped.TableStorage.Bson.svg?color=royalblue&label=Bson)](https://www.nuget.org/packages/Devlooped.TableStorage.Bson) [![MessagePack](https://img.shields.io/nuget/v/Devlooped.TableStorage.MessagePack.svg?color=royalblue&label=MessagePack)](https://www.nuget.org/packages/Devlooped.TableStorage.MessagePack) [![Protobuf](https://img.shields.io/nuget/v/Devlooped.TableStorage.Protobuf.svg?color=royalblue&label=Protobuf)](https://www.nuget.org/packages/Devlooped.TableStorage.Protobuf)
 
 You can pass the serializer to use to the factory method as follows: 
 
