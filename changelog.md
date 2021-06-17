@@ -1,8 +1,8 @@
 
 
-## [v2.0.1-beta](https://github.com/devlooped/TableStorage/tree/v2.0.1-beta) (2021-06-17)
+## [v2.0.1-rc](https://github.com/devlooped/TableStorage/tree/v2.0.1-rc) (2021-06-17)
 
-[Full Changelog](https://github.com/devlooped/TableStorage/compare/v2.0.0...v2.0.1-beta)
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v2.0.0...v2.0.1-rc)
 
 :sparkles: Implemented enhancements:
 
@@ -21,6 +21,7 @@
 - Switch default built-in serializer to System.Text.Json  [\#30](https://github.com/devlooped/TableStorage/issues/30)
 - Make Document/Entity default table names plural [\#28](https://github.com/devlooped/TableStorage/issues/28)
 - Don't duplicate PartitionKey/RowKey properties in storage [\#26](https://github.com/devlooped/TableStorage/issues/26)
+- Significant refactoring for simplified API and less dependency on reflection [\#6](https://github.com/devlooped/TableStorage/pull/6) (@kzu)
 
 :twisted_rightwards_arrows: Merged:
 
