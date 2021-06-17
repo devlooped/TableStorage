@@ -1,5 +1,13 @@
 
 
+## [v2.0.1-beta](https://github.com/devlooped/TableStorage/tree/v2.0.1-beta) (2021-06-17)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v2.0.0...v2.0.1-beta)
+
+:sparkles: Implemented enhancements:
+
+- Include readme in package [\#39](https://github.com/devlooped/TableStorage/issues/39)
+
 ## [v2.0.0](https://github.com/devlooped/TableStorage/tree/v2.0.0) (2021-06-16)
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/v1.3.0...v2.0.0)
