@@ -1,4 +1,4 @@
-![Icon](assets/img/icon-32.png) TableStorage
+![Icon](https://raw.githubusercontent.com/devlooped/TableStorage/main/assets/img/icon-32.png) TableStorage
 ============
 
 [![Version](https://img.shields.io/nuget/v/Devlooped.TableStorage.svg?color=royalblue)](https://www.nuget.org/packages/Devlooped.TableStorage)
@@ -8,7 +8,7 @@
 
 Repository pattern with POCO object support for storing to Azure/CosmosDB Table Storage
 
-![Screenshot of basic usage](assets/img/tablestorage.png)
+![Screenshot of basic usage](https://raw.githubusercontent.com/devlooped/TableStorage/main/assets/img/tablestorage.png)
 
 ## Usage
 
@@ -134,9 +134,9 @@ you can see the effect of using one or the other in the following screenshots of
 [Storage Explorer](https://azure.microsoft.com/en-us/features/storage-explorer/) for the same 
 `Product` entity shown in the first example above:
 
-![Screenshot of entity persisted with separate columns for properties](assets/img/entity.png)
+![Screenshot of entity persisted with separate columns for properties](https://raw.githubusercontent.com/devlooped/TableStorage/main/assets/img/entity.png)
 
-![Screenshot of entity persisted as a document](assets/img/document.png)
+![Screenshot of entity persisted as a document](https://raw.githubusercontent.com/devlooped/TableStorage/main/assets/img/document.png)
 
 The code that persisted both entities is:
 
