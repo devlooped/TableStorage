@@ -74,8 +74,8 @@
 	weak
 [file ".github_changelog_generator"]
 	url = https://github.com/devlooped/oss/blob/main/.github_changelog_generator
-	sha = cf52375fd20c6df894f1518890693312d4c4c11c
-	etag = 115efcd056eaca2f1d2df510eb7632ac3558ace2734a4139b77536b8211dfe41
+	sha = a7ab5fe706fdfe1efb05d47d00ef4bb137088669
+	etag = 44dc852588ec508eaed9cefe260618eb162f0db50495188fc3c4e266b41944e2
 	weak
 [file ".gitignore"]
 	url = https://github.com/devlooped/oss/blob/main/.gitignore
