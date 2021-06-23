@@ -11,7 +11,7 @@ namespace Devlooped
     /// Can be applied at the class level instead with a fixed value to persist 
     /// entities with a fixed partition key value.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Class)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property | AttributeTargets.Parameter)]
     partial class PartitionKeyAttribute : TableStorageAttribute
     {
         /// <summary>

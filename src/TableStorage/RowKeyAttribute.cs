@@ -7,9 +7,10 @@ namespace Devlooped
 {
     /// <summary>
     /// Flags the property to use as the table storage row key 
-    /// when storing the annotated type using the <see cref="TableRepository{T}"/>.
+    /// when storing the annotated type using <see cref="TableRepository{T}"/> or 
+    /// <see cref="TablePartition{T}"/>.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Property)]
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Parameter)]
     partial class RowKeyAttribute : TableStorageAttribute
     {
         /// <summary>

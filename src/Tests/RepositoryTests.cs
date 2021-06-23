@@ -42,6 +42,39 @@ namespace Devlooped
         }
 
         [Fact]
+        public async Task TableRecordEndToEnd()
+        {
+            var repo = TableRepository.Create<AttributedRecordEntity>(CloudStorageAccount.DevelopmentStorageAccount);
+            var entity = await repo.PutAsync(new AttributedRecordEntity("Book", "1234"));
+
+            Assert.Equal("1234", entity.ID);
+            Assert.Null(entity.Status);
+
+            entity.Status = "Pending";
+
+            await repo.PutAsync(entity);
+
+            var saved = await repo.GetAsync("Book", "1234");
+
+            Assert.NotNull(saved);
+            Assert.Equal("Pending", saved!.Status);
+
+            var entities = new List<AttributedRecordEntity>();
+
+            await foreach (var e in repo.EnumerateAsync("Book"))
+                entities.Add(e);
+
+            Assert.Single(entities);
+
+            await repo.DeleteAsync(saved);
+
+            Assert.Null(await repo.GetAsync("Book", "1234"));
+
+            await foreach (var _ in repo.EnumerateAsync("Book"))
+                Assert.False(true, "Did not expect to find any entities");
+        }
+
+        [Fact]
         public async Task DoesNotDuplicateKeyProperties()
         {
             var repo = TableRepository.Create<RecordEntity>(CloudStorageAccount.DevelopmentStorageAccount,
@@ -247,6 +280,12 @@ namespace Devlooped
         }
 
         record RecordEntity(string Kind, string ID)
+        {
+            public string? Status { get; set; }
+        }
+
+        [Table("Record")]
+        record AttributedRecordEntity([PartitionKey] string Kind, [RowKey] string ID)
         {
             public string? Status { get; set; }
         }
