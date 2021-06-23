@@ -196,6 +196,24 @@ entity type to modify the default values used:
 
 Values passed to the factory methods override declarative attributes.
 
+For the products example above, your record entity could be:
+
+```csharp
+[Table("Products")]
+public record Product([PartitionKey] string Category, [RowKey] string Id) 
+{
+  public string? Title { get; init; }
+  public double Price { get; init; }
+}
+```
+
+And creating the repository wouldn't require any arguments besides the storage account:
+
+```csharp
+var repo = TableRepository.Create<Product>(CloudStorageAccount.DevelopmentStorageAccount);
+```
+
+
 ### TableEntity Support
 
 Since these repository APIs are quite a bit more intuitive than working directly against a  
