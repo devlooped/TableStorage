@@ -1,5 +1,18 @@
 
 
+## [v2.0.2](https://github.com/devlooped/TableStorage/tree/v2.0.2) (2021-06-23)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v2.0.1...v2.0.2)
+
+:sparkles: Implemented enhancements:
+
+- Allow annotating record constructor parameters with PartitionKey/RowKey [\#43](https://github.com/devlooped/TableStorage/issues/43)
+- Allow persisting entities as documents [\#25](https://github.com/devlooped/TableStorage/pull/25) (@kzu)
+
+:twisted_rightwards_arrows: Merged:
+
+- Add support for record constructor parameter annotations [\#44](https://github.com/devlooped/TableStorage/pull/44) (@kzu)
+
 ## [v2.0.1](https://github.com/devlooped/TableStorage/tree/v2.0.1) (2021-06-17)
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/v2.0.0...v2.0.1)
@@ -29,7 +42,7 @@
 - Add support for querying with LINQ and expressions [\#34](https://github.com/devlooped/TableStorage/pull/34) (@kzu)
 - Switch default built-in serializer to System.Text.Json [\#31](https://github.com/devlooped/TableStorage/pull/31) (@kzu)
 - Make Document/Entity default table names plural [\#29](https://github.com/devlooped/TableStorage/pull/29) (@kzu)
-- Add SourceLink to get repo/pdb linking [\#3](https://github.com/devlooped/TableStorage/pull/3) (@kzu)
+- Don't duplicate PartitionKey/RowKey properties in storage [\#27](https://github.com/devlooped/TableStorage/pull/27) (@kzu)
 
 ## [v1.3.0](https://github.com/devlooped/TableStorage/tree/v1.3.0) (2021-05-31)
 
@@ -41,7 +54,6 @@
 - Avoid creating a separate Task for lazily initialization of CloudTable [\#23](https://github.com/devlooped/TableStorage/issues/23)
 - No need to use DynamicTableEntity when deleting [\#21](https://github.com/devlooped/TableStorage/issues/21)
 - When doing a PutAsync, use InsertOrMerge instead of InsertOrReplace [\#20](https://github.com/devlooped/TableStorage/issues/20)
-- Allow persisting entities as documents [\#25](https://github.com/devlooped/TableStorage/pull/25) (@kzu)
 
 :bug: Fixed bugs:
 
@@ -95,6 +107,10 @@
 ## [v1.0.2](https://github.com/devlooped/TableStorage/tree/v1.0.2) (2021-05-10)
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/cf1b7f069ac6d68482b498555c8dbdda8e1ae5b4...v1.0.2)
+
+:twisted_rightwards_arrows: Merged:
+
+- Add SourceLink to get repo/pdb linking [\#3](https://github.com/devlooped/TableStorage/pull/3) (@kzu)
 
 
 
