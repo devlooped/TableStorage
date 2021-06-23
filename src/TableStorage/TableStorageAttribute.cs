@@ -33,10 +33,23 @@ namespace Devlooped
             var keyProp = typeof(TEntity).GetProperties()
                 .FirstOrDefault(prop => prop.GetCustomAttribute<TAttribute>() != null);
 
+            // See if the attribute is applied to a constructor argument with the same name 
+            // as a prop, like it would in a record type
+            if (keyProp == null)
+            {
+                var keyParam = typeof(TEntity).GetConstructors().SelectMany(ctor => ctor.GetParameters())
+                    .Where(prm => prm.GetCustomAttribute<TAttribute>() != null)
+                    .FirstOrDefault();
+
+                if (keyParam != null)
+                    keyProp = typeof(TEntity).GetProperties().FirstOrDefault(prop => prop.Name == keyParam.Name);
+            }
+
             if (keyProp == null)
             {
                 if (typeof(TAttribute) == typeof(PartitionKeyAttribute))
                 {
+                    // See if the attribute is applied at the class level with a fixed value
                     var partitionKey = typeof(TEntity).GetCustomAttribute<PartitionKeyAttribute>()?.PartitionKey;
                     if (partitionKey == null)
                     {
