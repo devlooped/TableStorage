@@ -213,6 +213,9 @@ And creating the repository wouldn't require any arguments besides the storage a
 var repo = TableRepository.Create<Product>(CloudStorageAccount.DevelopmentStorageAccount);
 ```
 
+In addition, if you want to omit a particular property from persistence, you can annotate 
+it with `[Browsable(false)]` and it will be skipped when persisting and reading the entity.
+
 
 ### TableEntity Support
 
