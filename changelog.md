@@ -1,5 +1,13 @@
 
 
+## [v3.0.2](https://github.com/devlooped/TableStorage/tree/v3.0.2) (2021-07-01)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v3.0.1...v3.0.2)
+
+:bug: Fixed bugs:
+
+- ContinuationToken not properly used for enumerating all entities [\#53](https://github.com/devlooped/TableStorage/issues/53)
+
 ## [v3.0.1](https://github.com/devlooped/TableStorage/tree/v3.0.1) (2021-07-01)
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/v3.0.0...v3.0.1)
@@ -78,7 +86,6 @@
 - Avoid creating a separate Task for lazily initialization of CloudTable [\#23](https://github.com/devlooped/TableStorage/issues/23)
 - No need to use DynamicTableEntity when deleting [\#21](https://github.com/devlooped/TableStorage/issues/21)
 - When doing a PutAsync, use InsertOrMerge instead of InsertOrReplace [\#20](https://github.com/devlooped/TableStorage/issues/20)
-- Allow persisting entities as documents [\#25](https://github.com/devlooped/TableStorage/pull/25) (@kzu)
 
 :bug: Fixed bugs:
 
@@ -132,6 +139,10 @@
 ## [v1.0.2](https://github.com/devlooped/TableStorage/tree/v1.0.2) (2021-05-10)
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/cf1b7f069ac6d68482b498555c8dbdda8e1ae5b4...v1.0.2)
+
+:sparkles: Implemented enhancements:
+
+- Allow persisting entities as documents [\#25](https://github.com/devlooped/TableStorage/pull/25) (@kzu)
 
 :twisted_rightwards_arrows: Merged:
 
