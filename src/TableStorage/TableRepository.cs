@@ -17,15 +17,17 @@ namespace Devlooped
         static readonly ConcurrentDictionary<Type, string> defaultTableNames = new();
 
         /// <summary>
-        /// Creates an <see cref="ITableRepository{TableEntity}"/> repository.
+        /// Creates an <see cref="ITableRepository{ITableEntity}"/> repository.
         /// </summary>
         /// <param name="storageAccount">The storage account to use.</param>
         /// <param name="tableName">Table name to use.</param>
-        /// <returns>The new <see cref="ITableRepository{TableEntity}"/>.</returns>
-        public static ITableRepository<TableEntity> Create(
+        /// <param name="updateStrategy">Strategy to apply when updating an existing entity. Defaults to <see cref="UpdateStrategy.Replace"/>.</param>
+        /// <returns>The new <see cref="ITableRepository{ITableEntity}"/>.</returns>
+        public static ITableRepository<ITableEntity> Create(
             CloudStorageAccount storageAccount,
-            string tableName)
-            => new TableEntityRepository(storageAccount, tableName);
+            string tableName,
+            UpdateStrategy? updateStrategy = default)
+            => new TableEntityRepository(storageAccount, tableName) { UpdateStrategy = updateStrategy ?? UpdateStrategy.Replace };
 
         /// <summary>
         /// Creates an <see cref="ITableRepository{T}"/> for the given entity type 
