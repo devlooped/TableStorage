@@ -38,14 +38,12 @@ namespace Devlooped
         /// <param name="storageAccount">The storage account to use.</param>
         /// <param name="partitionKey">Function to retrieve the partition key for a given entity.</param>
         /// <param name="rowKey">Function to retrieve the row key for a given entity.</param>
-        /// <param name="updateStrategy">Strategy to apply when updating an existing entity. Defaults to <see cref="UpdateStrategy.Replace"/>.</param>
         /// <returns>The new <see cref="ITableRepository{T}"/>.</returns>
         public static ITableRepository<T> Create<T>(
             CloudStorageAccount storageAccount,
             Expression<Func<T, string>> partitionKey,
-            Expression<Func<T, string>> rowKey,
-            UpdateStrategy? updateStrategy = default) where T : class
-            => Create<T>(storageAccount, typeof(T).Name, partitionKey, rowKey, updateStrategy);
+            Expression<Func<T, string>> rowKey) where T : class
+            => Create<T>(storageAccount, typeof(T).Name, partitionKey, rowKey);
 
         /// <summary>
         /// Creates an <see cref="ITableRepository{T}"/> for the given entity type 

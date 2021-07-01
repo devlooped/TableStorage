@@ -41,13 +41,11 @@ namespace Devlooped
         /// <typeparam name="T">The type of entity that the repository will manage.</typeparam>
         /// <param name="storageAccount">The storage account to use.</param>
         /// <param name="rowKey">Function to retrieve the row key for a given entity.</param>
-        /// <param name="updateStrategy">Strategy to apply when updating an existing entity. Defaults to <see cref="UpdateStrategy.Replace"/>.</param>
         /// <returns>The new <see cref="ITablePartition{T}"/>.</returns>
         public static ITablePartition<T> Create<T>(
             CloudStorageAccount storageAccount,
-            Expression<Func<T, string>> rowKey,
-            UpdateStrategy? updateStrategy = default) where T : class
-            => Create<T>(storageAccount, DefaultTableName, default, rowKey, updateStrategy);
+            Expression<Func<T, string>> rowKey) where T : class
+            => Create<T>(storageAccount, DefaultTableName, default, rowKey);
 
         /// <summary>
         /// Creates an <see cref="ITablePartition{T}"/> for the given entity type 
@@ -58,14 +56,12 @@ namespace Devlooped
         /// <param name="storageAccount">The storage account to use.</param>
         /// <param name="tableName">Table name to use.</param>
         /// <param name="rowKey">Function to retrieve the row key for a given entity.</param>
-        /// <param name="updateStrategy">Strategy to apply when updating an existing entity. Defaults to <see cref="UpdateStrategy.Replace"/>.</param>
         /// <returns>The new <see cref="ITablePartition{T}"/>.</returns>
         public static ITablePartition<T> Create<T>(
             CloudStorageAccount storageAccount,
             string tableName,
-            Expression<Func<T, string>> rowKey,
-            UpdateStrategy? updateStrategy = default) where T : class
-            => Create<T>(storageAccount, tableName, default, rowKey, updateStrategy);
+            Expression<Func<T, string>> rowKey) where T : class
+            => Create<T>(storageAccount, tableName, default, rowKey);
 
         /// <summary>
         /// Creates an <see cref="ITablePartition{T}"/> for the given entity type 
