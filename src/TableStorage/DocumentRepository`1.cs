@@ -138,6 +138,8 @@ namespace Devlooped
                 var segment = await table.ExecuteQuerySegmentedAsync(query, continuation, cancellation)
                     .ConfigureAwait(false);
 
+                continuation = segment.ContinuationToken;
+
                 foreach (var entity in segment)
                 {
                     if (entity != null && entity.Document != null)
@@ -213,6 +215,8 @@ namespace Devlooped
             {
                 var segment = await table.ExecuteQuerySegmentedAsync(query, continuation, cancellation)
                     .ConfigureAwait(false);
+
+                continuation = segment.ContinuationToken;
 
                 foreach (var entity in segment)
                 {
