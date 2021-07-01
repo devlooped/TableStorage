@@ -10,10 +10,10 @@ using System.Threading;
 namespace Devlooped
 {
     /// <summary>
-    /// Usability overloads for <see cref="ITableRepository{T}"/>.
+    /// Various usability overloads.
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    static partial class ITableRepositoryExtensions
+    static partial class TableStorageExtensions
     {
         /// <summary>
         /// Queries the repository for items that match the given <paramref name="predicate"/>.
