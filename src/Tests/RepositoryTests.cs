@@ -255,6 +255,30 @@ namespace Devlooped
             }
         }
 
+        [Fact]
+        public async Task CanMergeEntity()
+        {
+            await CloudStorageAccount.DevelopmentStorageAccount.CreateCloudTableClient().GetTableReference(nameof(CanMergeEntity))
+                .DeleteIfExistsAsync();
+
+            var repo = TableRepository.Create<AttributedRecordEntity>(CloudStorageAccount.DevelopmentStorageAccount, nameof(CanMergeEntity), updateStrategy: UpdateStrategy.Merge);
+
+            await repo.PutAsync(new AttributedRecordEntity("Book", "1234") { Status = "OK" });
+            var record = await repo.PutAsync(new AttributedRecordEntity("Book", "1234") { Reason = "Done" });
+
+            Assert.Equal("OK", record.Status);
+
+            await CloudStorageAccount.DevelopmentStorageAccount.CreateCloudTableClient().GetTableReference(nameof(CanMergeEntity))
+                .DeleteIfExistsAsync();
+
+            var partition = TablePartition.Create<AttributedRecordEntity>(CloudStorageAccount.DevelopmentStorageAccount, nameof(CanMergeEntity), updateStrategy: UpdateStrategy.Merge);
+
+            await partition.PutAsync(new AttributedRecordEntity("Book", "1234") { Status = "OK" });
+            record = await partition.PutAsync(new AttributedRecordEntity("Book", "1234") { Reason = "Done" });
+
+            Assert.Equal("OK", record.Status);
+        }
+
         class MyEntity
         {
             public MyEntity(string id) => Id = id;
@@ -288,6 +312,7 @@ namespace Devlooped
         record AttributedRecordEntity([PartitionKey] string Kind, [RowKey] string ID)
         {
             public string? Status { get; set; }
+            public string? Reason { get; set; }
         }
     }
 }

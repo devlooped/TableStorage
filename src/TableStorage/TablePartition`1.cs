@@ -40,6 +40,15 @@ namespace Devlooped
         /// <inheritdoc />
         public string PartitionKey { get; }
 
+        /// <summary>
+        /// The strategy to use when updating an existing entity.
+        /// </summary>
+        public UpdateStrategy UpdateStrategy 
+        {
+            get => repository.UpdateStrategy;
+            set => repository.UpdateStrategy = value; 
+        }
+
         /// <inheritdoc />
         public IQueryable<T> CreateQuery()
         {

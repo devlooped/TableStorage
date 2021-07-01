@@ -36,12 +36,14 @@ namespace Devlooped
         /// <param name="storageAccount">The storage account to use.</param>
         /// <param name="partitionKey">Function to retrieve the partition key for a given entity.</param>
         /// <param name="rowKey">Function to retrieve the row key for a given entity.</param>
+        /// <param name="updateStrategy">Strategy to apply when updating an existing entity. Defaults to <see cref="UpdateStrategy.Replace"/>.</param>
         /// <returns>The new <see cref="ITableRepository{T}"/>.</returns>
         public static ITableRepository<T> Create<T>(
             CloudStorageAccount storageAccount,
             Expression<Func<T, string>> partitionKey,
-            Expression<Func<T, string>> rowKey) where T : class
-            => Create<T>(storageAccount, typeof(T).Name, partitionKey, rowKey);
+            Expression<Func<T, string>> rowKey,
+            UpdateStrategy? updateStrategy = default) where T : class
+            => Create<T>(storageAccount, typeof(T).Name, partitionKey, rowKey, updateStrategy);
 
         /// <summary>
         /// Creates an <see cref="ITableRepository{T}"/> for the given entity type 
@@ -55,18 +57,23 @@ namespace Devlooped
         /// If not provided, the class will need a property annotated with <see cref="PartitionKeyAttribute"/>.</param>
         /// <param name="rowKey">Optional function to retrieve the row key for a given entity. 
         /// If not provided, the class will need a property annotated with <see cref="RowKeyAttribute"/>.</param>
+        /// <param name="updateStrategy">Strategy to apply when updating an existing entity. Defaults to <see cref="UpdateStrategy.Replace"/>.</param>
         /// <returns>The new <see cref="ITableRepository{T}"/>.</returns>
         public static ITableRepository<T> Create<T>(
             CloudStorageAccount storageAccount,
             string? tableName = default,
             Expression<Func<T, string>>? partitionKey = null,
-            Expression<Func<T, string>>? rowKey = null) where T : class
+            Expression<Func<T, string>>? rowKey = null,
+            UpdateStrategy? updateStrategy = default) where T : class
         {
             tableName ??= GetDefaultTableName<T>();
             partitionKey ??= PartitionKeyAttribute.CreateAccessor<T>();
             rowKey ??= RowKeyAttribute.CreateAccessor<T>();
 
-            return new TableRepository<T>(storageAccount, tableName, partitionKey, rowKey);
+            return new TableRepository<T>(storageAccount, tableName, partitionKey, rowKey)
+            {
+                UpdateStrategy = updateStrategy ?? UpdateStrategy.Replace,
+            };
         }
 
         /// <summary>

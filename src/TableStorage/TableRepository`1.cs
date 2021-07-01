@@ -60,6 +60,11 @@ namespace Devlooped
         /// <inheritdoc />
         public string TableName { get; }
 
+        /// <summary>
+        /// The strategy to use when updating an existing entity.
+        /// </summary>
+        public UpdateStrategy UpdateStrategy { get; set; } = UpdateStrategy.Replace;
+
         /// <inheritdoc />
         public IQueryable<T> CreateQuery() => new TableRepositoryQuery<T>(storageAccount, serializer, TableName, partitionKeyProperty, rowKeyProperty);
 
@@ -138,11 +143,19 @@ namespace Devlooped
 
             var table = await this.table.ConfigureAwait(false);
             var values = properties
-                .ToDictionary(prop => prop.Name, prop => EntityProperty.CreateEntityPropertyFromObject(prop.GetValue(entity)));
+                .Select(prop => new { Name = prop.Name, Value = prop.GetValue(entity) })
+                .Where(pair => pair.Value != null)
+                .ToDictionary(pair => pair.Name, pair => EntityProperty.CreateEntityPropertyFromObject(pair.Value));
 
-            var result = await table.ExecuteAsync(TableOperation.InsertOrReplace(
+            var result = await table.ExecuteAsync(UpdateStrategy.CreateOperation(
                 new DynamicTableEntity(partitionKey, rowKey, "*", values)), cancellation)
                 .ConfigureAwait(false);
+
+            // For merging, we need to actually retrieve the entity again, since the previous operation 
+            // will just return the same entity we persisted, we may have fewer properties/values than 
+            // the ones in storage.
+            if (UpdateStrategy == UpdateStrategy.Merge)
+                return (await GetAsync(partitionKey, rowKey, cancellation))!;
 
             return ToEntity((DynamicTableEntity)result.Result);
         }

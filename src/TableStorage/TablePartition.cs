@@ -40,11 +40,13 @@ namespace Devlooped
         /// <typeparam name="T">The type of entity that the repository will manage.</typeparam>
         /// <param name="storageAccount">The storage account to use.</param>
         /// <param name="rowKey">Function to retrieve the row key for a given entity.</param>
+        /// <param name="updateStrategy">Strategy to apply when updating an existing entity. Defaults to <see cref="UpdateStrategy.Replace"/>.</param>
         /// <returns>The new <see cref="ITablePartition{T}"/>.</returns>
         public static ITablePartition<T> Create<T>(
             CloudStorageAccount storageAccount,
-            Expression<Func<T, string>> rowKey) where T : class
-            => Create<T>(storageAccount, DefaultTableName, default, rowKey);
+            Expression<Func<T, string>> rowKey,
+            UpdateStrategy? updateStrategy = default) where T : class
+            => Create<T>(storageAccount, DefaultTableName, default, rowKey, updateStrategy);
 
         /// <summary>
         /// Creates an <see cref="ITablePartition{T}"/> for the given entity type 
@@ -55,12 +57,14 @@ namespace Devlooped
         /// <param name="storageAccount">The storage account to use.</param>
         /// <param name="tableName">Table name to use.</param>
         /// <param name="rowKey">Function to retrieve the row key for a given entity.</param>
+        /// <param name="updateStrategy">Strategy to apply when updating an existing entity. Defaults to <see cref="UpdateStrategy.Replace"/>.</param>
         /// <returns>The new <see cref="ITablePartition{T}"/>.</returns>
         public static ITablePartition<T> Create<T>(
             CloudStorageAccount storageAccount,
             string tableName,
-            Expression<Func<T, string>> rowKey) where T : class
-            => Create<T>(storageAccount, tableName, default, rowKey);
+            Expression<Func<T, string>> rowKey,
+            UpdateStrategy? updateStrategy = default) where T : class
+            => Create<T>(storageAccount, tableName, default, rowKey, updateStrategy);
 
         /// <summary>
         /// Creates an <see cref="ITablePartition{T}"/> for the given entity type 
@@ -74,18 +78,23 @@ namespace Devlooped
         /// If not provided, the <typeparamref name="T"/> <c>Name</c> will be used.</param>
         /// <param name="rowKey">Optional function to retrieve the row key for a given entity. 
         /// If not provided, the class will need a property annotated with <see cref="RowKeyAttribute"/>.</param>
+        /// <param name="updateStrategy">Strategy to apply when updating an existing entity. Defaults to <see cref="UpdateStrategy.Replace"/>.</param>
         /// <returns>The new <see cref="ITablePartition{T}"/>.</returns>
         public static ITablePartition<T> Create<T>(
             CloudStorageAccount storageAccount,
             string? tableName = default,
             string? partitionKey = null,
-            Expression<Func<T, string>>? rowKey = null) where T : class
+            Expression<Func<T, string>>? rowKey = null,
+            UpdateStrategy? updateStrategy = default) where T : class
         {
             tableName ??= GetDefaultTableName<T>();
             partitionKey ??= GetDefaultPartitionKey<T>();
             rowKey ??= RowKeyAttribute.CreateAccessor<T>();
 
-            return new TablePartition<T>(storageAccount, tableName, partitionKey, rowKey);
+            return new TablePartition<T>(storageAccount, tableName, partitionKey, rowKey)
+            {
+                UpdateStrategy = updateStrategy ?? UpdateStrategy.Replace
+            };
         }
 
         /// <summary>

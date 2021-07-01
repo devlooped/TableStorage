@@ -23,7 +23,9 @@ namespace Devlooped
     public partial class TablePartition { }
     public partial class TablePartition<T> { }
     public partial class DocumentPartition { }
+    public partial class UpdateStrategy { }
 
+    public partial class TableStorageExtensions { }
     public partial class IAsyncEnumerableExtensions { }
     public partial class IQueryableExtensions { }
 
