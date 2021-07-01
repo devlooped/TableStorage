@@ -178,7 +178,7 @@ namespace Devlooped
             Assert.NotNull(saved);
             Assert.Equal(entity.RowKey, saved!.RowKey);
 
-            var entities = new List<TableEntity>();
+            var entities = new List<ITableEntity>();
 
             await foreach (var e in repo.EnumerateAsync("123"))
                 entities.Add(e);
@@ -212,7 +212,7 @@ namespace Devlooped
             Assert.NotNull(saved);
             Assert.Equal(entity.RowKey, saved!.RowKey);
 
-            var entities = new List<TableEntity>();
+            var entities = new List<ITableEntity>();
 
             await foreach (var e in partition.EnumerateAsync())
                 entities.Add(e);
@@ -267,6 +267,7 @@ namespace Devlooped
             var record = await repo.PutAsync(new AttributedRecordEntity("Book", "1234") { Reason = "Done" });
 
             Assert.Equal("OK", record.Status);
+            Assert.Equal("Done", record.Reason);
 
             await CloudStorageAccount.DevelopmentStorageAccount.CreateCloudTableClient().GetTableReference(nameof(CanMergeEntity))
                 .DeleteIfExistsAsync();
@@ -277,7 +278,49 @@ namespace Devlooped
             record = await partition.PutAsync(new AttributedRecordEntity("Book", "1234") { Reason = "Done" });
 
             Assert.Equal("OK", record.Status);
+            Assert.Equal("Done", record.Reason);
         }
+
+        [Fact]
+        public async Task CanMergeDynamicEntity()
+        {
+            await CloudStorageAccount.DevelopmentStorageAccount.CreateCloudTableClient().GetTableReference(nameof(CanMergeDynamicEntity))
+                .DeleteIfExistsAsync();
+
+            var repo = TableRepository.Create(CloudStorageAccount.DevelopmentStorageAccount, nameof(CanMergeDynamicEntity), updateStrategy: UpdateStrategy.Merge);
+
+            await repo.PutAsync(new DynamicTableEntity("Book", "1234", "*", new Dictionary<string, EntityProperty>
+            {
+                { "Status", EntityProperty.GeneratePropertyForString("OK") },
+            }));
+
+            var entity = (DynamicTableEntity)await repo.PutAsync(new DynamicTableEntity("Book", "1234", "*", new Dictionary<string, EntityProperty>
+            {
+                { "Reason", EntityProperty.GeneratePropertyForString("Done") },
+            }));
+
+            Assert.Equal("OK", entity.Properties["Status"].StringValue);
+            Assert.Equal("Done", entity.Properties["Reason"].StringValue);
+
+            await CloudStorageAccount.DevelopmentStorageAccount.CreateCloudTableClient().GetTableReference(nameof(CanMergeDynamicEntity))
+                .DeleteIfExistsAsync();
+
+            var partition = TablePartition.Create(CloudStorageAccount.DevelopmentStorageAccount, nameof(CanMergeDynamicEntity), "Dynamic", updateStrategy: UpdateStrategy.Merge);
+
+            await repo.PutAsync(new DynamicTableEntity("Book", "1234", "*", new Dictionary<string, EntityProperty>
+            {
+                { "Status", EntityProperty.GeneratePropertyForString("OK") },
+            }));
+
+            entity = (DynamicTableEntity)await repo.PutAsync(new DynamicTableEntity("Book", "1234", "*", new Dictionary<string, EntityProperty>
+            {
+                { "Reason", EntityProperty.GeneratePropertyForString("Done") },
+            }));
+
+            Assert.Equal("OK", entity.Properties["Status"].StringValue);
+            Assert.Equal("Done", entity.Properties["Reason"].StringValue);
+        }
+
 
         class MyEntity
         {

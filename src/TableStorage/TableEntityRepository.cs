@@ -10,7 +10,7 @@ using Microsoft.Azure.Cosmos.Table;
 namespace Devlooped
 {
     /// <inheritdoc />
-    partial class TableEntityRepository : ITableRepository<TableEntity>
+    partial class TableEntityRepository : ITableRepository<ITableEntity>
     {
         readonly CloudStorageAccount storageAccount;
         readonly Task<CloudTable> table;
@@ -30,9 +30,14 @@ namespace Devlooped
         /// <inheritdoc />
         public string TableName { get; }
 
+        /// <summary>
+        /// The strategy to use when updating an existing entity.
+        /// </summary>
+        public UpdateStrategy UpdateStrategy { get; set; } = UpdateStrategy.Replace;
+
         /// <inheritdoc />
-        public IQueryable<TableEntity> CreateQuery() 
-            => storageAccount.CreateCloudTableClient().GetTableReference(TableName).CreateQuery<TableEntity>();
+        public IQueryable<ITableEntity> CreateQuery() 
+            => storageAccount.CreateCloudTableClient().GetTableReference(TableName).CreateQuery<DynamicTableEntity>();
 
         /// <inheritdoc />
         public async Task DeleteAsync(string partitionKey, string rowKey, CancellationToken cancellation = default)
@@ -45,7 +50,7 @@ namespace Devlooped
         }
 
         /// <inheritdoc />
-        public async Task DeleteAsync(TableEntity entity, CancellationToken cancellation = default)
+        public async Task DeleteAsync(ITableEntity entity, CancellationToken cancellation = default)
         {
             var table = await this.table.ConfigureAwait(false);
             entity.ETag = "*";
@@ -54,10 +59,10 @@ namespace Devlooped
         }
 
         /// <inheritdoc />
-        public async IAsyncEnumerable<TableEntity> EnumerateAsync(string? partitionKey = default, [EnumeratorCancellation] CancellationToken cancellation = default)
+        public async IAsyncEnumerable<ITableEntity> EnumerateAsync(string? partitionKey = default, [EnumeratorCancellation] CancellationToken cancellation = default)
         {
             var table = await this.table;
-            var query = new TableQuery<TableEntity>();
+            var query = new TableQuery<DynamicTableEntity>();
             if (partitionKey != null)
                 query = query.Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));
 
@@ -75,27 +80,27 @@ namespace Devlooped
         }
 
         /// <inheritdoc />
-        public async Task<TableEntity?> GetAsync(string partitionKey, string rowKey, CancellationToken cancellation = default)
+        public async Task<ITableEntity?> GetAsync(string partitionKey, string rowKey, CancellationToken cancellation = default)
         {
             var table = await this.table.ConfigureAwait(false);
-            var result = await table.ExecuteAsync(TableOperation.Retrieve(
-                partitionKey, rowKey,
-                (partitionKey, rowKey, timestamp, properties, etag) => new TableEntity(partitionKey, rowKey) { Timestamp = timestamp, ETag = etag }), 
-                cancellation)
+            var result = await table.ExecuteAsync(TableOperation.Retrieve(partitionKey, rowKey), cancellation)
                 .ConfigureAwait(false);
 
-            return (TableEntity?)result.Result;
+            return (ITableEntity?)result.Result;
         }
 
         /// <inheritdoc />
-        public async Task<TableEntity> PutAsync(TableEntity entity, CancellationToken cancellation = default)
+        public async Task<ITableEntity> PutAsync(ITableEntity entity, CancellationToken cancellation = default)
         {
             var table = await this.table.ConfigureAwait(false);
             entity.ETag = "*";
-            var result = await table.ExecuteAsync(TableOperation.InsertOrReplace(entity), cancellation)
+            var result = await table.ExecuteAsync(UpdateStrategy.CreateOperation(entity), cancellation)
                 .ConfigureAwait(false);
 
-            return (TableEntity)result.Result;
+            if (UpdateStrategy == UpdateStrategy.Merge)
+                return (await GetAsync(entity.PartitionKey, entity.RowKey, cancellation).ConfigureAwait(false))!;
+
+            return (ITableEntity)result.Result;
         }
 
         async Task<CloudTable> GetTableAsync(string tableName)

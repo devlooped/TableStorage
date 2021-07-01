@@ -10,7 +10,7 @@ using Microsoft.Azure.Cosmos.Table;
 namespace Devlooped
 {
     /// <inheritdoc />
-    partial class TableEntityPartition : ITablePartition<TableEntity>
+    partial class TableEntityPartition : ITablePartition<ITableEntity>
     {
         readonly TableEntityRepository repository;
 
@@ -33,16 +33,25 @@ namespace Devlooped
         /// <inheritdoc />
         public string PartitionKey { get; }
 
-        /// <inheritdoc />
-        public IQueryable<TableEntity> CreateQuery() => repository.CreateQuery().Where(x => x.PartitionKey == PartitionKey);
+        /// <summary>
+        /// The strategy to use when updating an existing entity.
+        /// </summary>
+        public UpdateStrategy UpdateStrategy
+        {
+            get => repository.UpdateStrategy;
+            set => repository.UpdateStrategy = value;
+        }
 
         /// <inheritdoc />
-        public async Task DeleteAsync(TableEntity entity, CancellationToken cancellation = default)
+        public IQueryable<ITableEntity> CreateQuery() => repository.CreateQuery().Where(x => x.PartitionKey == PartitionKey);
+
+        /// <inheritdoc />
+        public Task DeleteAsync(ITableEntity entity, CancellationToken cancellation = default)
         {
             if (!PartitionKey.Equals(entity.PartitionKey, StringComparison.Ordinal))
                 throw new ArgumentException("Entity does not belong to the partition.");
 
-            await repository.DeleteAsync(entity, cancellation);
+            return repository.DeleteAsync(entity, cancellation);
         }
 
         /// <inheritdoc />
@@ -50,20 +59,20 @@ namespace Devlooped
             => repository.DeleteAsync(PartitionKey, rowKey, cancellation);
 
         /// <inheritdoc />
-        public IAsyncEnumerable<TableEntity> EnumerateAsync(CancellationToken cancellation = default) 
+        public IAsyncEnumerable<ITableEntity> EnumerateAsync(CancellationToken cancellation = default) 
             => repository.EnumerateAsync(PartitionKey, cancellation);
 
         /// <inheritdoc />
-        public Task<TableEntity?> GetAsync(string rowKey, CancellationToken cancellation = default)
+        public Task<ITableEntity?> GetAsync(string rowKey, CancellationToken cancellation = default)
             => repository.GetAsync(PartitionKey, rowKey, cancellation);
 
         /// <inheritdoc />
-        public async Task<TableEntity> PutAsync(TableEntity entity, CancellationToken cancellation = default)
+        public Task<ITableEntity> PutAsync(ITableEntity entity, CancellationToken cancellation = default)
         {
             if (!PartitionKey.Equals(entity.PartitionKey, StringComparison.Ordinal))
                 throw new ArgumentException("Entity does not belong to the partition.");
 
-            return await repository.PutAsync(entity, cancellation);
+            return repository.PutAsync(entity, cancellation);
         }
     }
 }
