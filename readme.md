@@ -222,7 +222,7 @@ it with `[Browsable(false)]` and it will be skipped when persisting and reading 
 Since these repository APIs are quite a bit more intuitive than working directly against a  
 `TableClient`, you might want to retrieve/enumerate entities just by their built-in `ITableEntity` 
 properties, like `PartitionKey`, `RowKey`, `Timestamp` and `ETag`. For this scenario, we 
-also support creating `ITableRepository<TableEntity>` and `ITablePartition<TableEntity>` 
+also support creating `ITableRepository<ITableEntity>` and `ITablePartition<ITableEntity>` 
 by using the factory methods `TableRepository.Create(...)` and `TablePartition.Create(...)` 
 without a (generic) entity type argument.
 
@@ -236,10 +236,26 @@ var repo = TablePartition.Create(storageAccount,
   partitionKey: "Region");
 
 // Enumerate all regions within the partition as plain TableEntities
-await foreach (TableEntity region in repo.EnumerateAsync())
+await foreach (ITableEntity region in repo.EnumerateAsync())
    Console.WriteLine(region.RowKey);
 ```
 
+Moverover, the returned `ITableEntity` is actually an instance of `DynamicTableEntity`, so 
+you can downcast and access any additional stored properties, which you can persist by 
+passing a `DynamicTableEntity` to `PutAsync`:
+
+```csharp
+await repo.PutAsync(new DynamicTableEntity("Book", "9781473217386", "*", new Dictionary<string, EntityProperty>
+{
+    { "Title", EntityProperty.GeneratePropertyForString("Neuromancer") },
+    { "Price", EntityProperty.GeneratePropertyForDouble(7.32) },
+}));
+
+var entity = (DynamicTableEntity)await repo.GetAsync("Book", "9781473217386");
+
+Assert.Equal("Title", entity.Properties["Neuromancer"].StringValue);
+Assert.Equal(7.32, entity.Properties["Price"].DoubleValue);
+```
 
 ## Installation
 

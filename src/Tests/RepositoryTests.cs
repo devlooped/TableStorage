@@ -317,6 +317,7 @@ namespace Devlooped
             await repo.PutAsync(new DynamicTableEntity("Book", "1234", "*", new Dictionary<string, EntityProperty>
             {
                 { "Status", EntityProperty.GeneratePropertyForString("OK") },
+                { "Price", EntityProperty.GeneratePropertyForDouble(7.32) },
             }));
 
             var entity = (DynamicTableEntity)await repo.PutAsync(new DynamicTableEntity("Book", "1234", "*", new Dictionary<string, EntityProperty>
@@ -326,6 +327,7 @@ namespace Devlooped
 
             Assert.Equal("OK", entity.Properties["Status"].StringValue);
             Assert.Equal("Done", entity.Properties["Reason"].StringValue);
+            Assert.Equal(7.32, entity.Properties["Price"].DoubleValue);
 
             await CloudStorageAccount.DevelopmentStorageAccount.CreateCloudTableClient().GetTableReference(nameof(CanMergeDynamicEntity))
                 .DeleteIfExistsAsync();
