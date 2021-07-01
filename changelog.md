@@ -1,5 +1,13 @@
 
 
+## [v3.0.1](https://github.com/devlooped/TableStorage/tree/v3.0.1) (2021-07-01)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v3.0.0...v3.0.1)
+
+:bug: Fixed bugs:
+
+- Remove Create factory methods that cause ambiguous matches [\#52](https://github.com/devlooped/TableStorage/issues/52)
+
 ## [v3.0.0](https://github.com/devlooped/TableStorage/tree/v3.0.0) (2021-07-01)
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/v2.0.2...v3.0.0)
@@ -96,10 +104,6 @@
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/v1.1.0...v1.1.1)
 
-:sparkles: Implemented enhancements:
-
-- Force factory method usage for default implementations [\#14](https://github.com/devlooped/TableStorage/issues/14)
-
 :bug: Fixed bugs:
 
 - Fix usage in package description [\#15](https://github.com/devlooped/TableStorage/issues/15)
@@ -110,6 +114,7 @@
 
 :sparkles: Implemented enhancements:
 
+- Force factory method usage for default implementations [\#14](https://github.com/devlooped/TableStorage/issues/14)
 - Apply factory method defaults to TableRepository/TablePartition constructors [\#13](https://github.com/devlooped/TableStorage/issues/13)
 
 ## [v1.0.4](https://github.com/devlooped/TableStorage/tree/v1.0.4) (2021-05-16)
