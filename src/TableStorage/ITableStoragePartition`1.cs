@@ -49,13 +49,13 @@ namespace Devlooped
         /// </summary>
         /// <param name="entity">The entity to delete.</param>
         /// <param name="cancellation">Optional <see cref="CancellationToken"/>.</param>
-        Task DeleteAsync(T entity, CancellationToken cancellation = default);
+        Task<bool> DeleteAsync(T entity, CancellationToken cancellation = default);
 
         /// <summary>
         /// Deletes an entity from the partition given its <paramref name="rowKey"/>.
         /// </summary>
         /// <param name="rowKey">The entity row key.</param>
         /// <param name="cancellation">Optional <see cref="CancellationToken"/>.</param>
-        Task DeleteAsync(string rowKey, CancellationToken cancellation = default);
+        Task<bool> DeleteAsync(string rowKey, CancellationToken cancellation = default);
     }
 }

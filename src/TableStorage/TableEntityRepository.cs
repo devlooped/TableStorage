@@ -2,6 +2,7 @@
 #nullable enable
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -40,23 +41,27 @@ namespace Devlooped
             => storageAccount.CreateCloudTableClient().GetTableReference(TableName).CreateQuery<DynamicTableEntity>();
 
         /// <inheritdoc />
-        public async Task DeleteAsync(string partitionKey, string rowKey, CancellationToken cancellation = default)
+        public async Task<bool> DeleteAsync(string partitionKey, string rowKey, CancellationToken cancellation = default)
         {
             var table = await this.table.ConfigureAwait(false);
 
-            await table.ExecuteAsync(TableOperation.Delete(
-                new TableEntity(partitionKey, rowKey) { ETag = "*" }), cancellation)
-                .ConfigureAwait(false);
+            try
+            {
+                var result = await table.ExecuteAsync(TableOperation.Delete(
+                    new TableEntity(partitionKey, rowKey) { ETag = "*" }), cancellation)
+                    .ConfigureAwait(false);
+
+                return result.HttpStatusCode >= 200 && result.HttpStatusCode <= 299;
+            }
+            catch (StorageException)
+            {
+                return false;
+            }
         }
 
         /// <inheritdoc />
-        public async Task DeleteAsync(ITableEntity entity, CancellationToken cancellation = default)
-        {
-            var table = await this.table.ConfigureAwait(false);
-            entity.ETag = "*";
-            await table.ExecuteAsync(TableOperation.Delete(entity), cancellation)
-                .ConfigureAwait(false);
-        }
+        public Task<bool> DeleteAsync(ITableEntity entity, CancellationToken cancellation = default)
+            => DeleteAsync(entity.PartitionKey, entity.RowKey, cancellation);
 
         /// <inheritdoc />
         public async IAsyncEnumerable<ITableEntity> EnumerateAsync(string? partitionKey = default, [EnumeratorCancellation] CancellationToken cancellation = default)

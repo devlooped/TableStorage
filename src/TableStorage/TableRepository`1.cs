@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Net;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
@@ -73,26 +74,27 @@ namespace Devlooped
             => (IAsyncEnumerable<T>)CreateQuery().Where(predicate);
 
         /// <inheritdoc />
-        public async Task DeleteAsync(string partitionKey, string rowKey, CancellationToken cancellation = default)
+        public async Task<bool> DeleteAsync(string partitionKey, string rowKey, CancellationToken cancellation = default)
         {
             var table = await this.table.ConfigureAwait(false);
 
-            await table.ExecuteAsync(TableOperation.Delete(
-                new TableEntity(partitionKey, rowKey) { ETag = "*" }), cancellation)
-                .ConfigureAwait(false);
+            try
+            {
+                var result = await table.ExecuteAsync(TableOperation.Delete(
+                    new TableEntity(partitionKey, rowKey) { ETag = "*" }), cancellation)
+                    .ConfigureAwait(false);
+
+                return result.HttpStatusCode >= 200 && result.HttpStatusCode <= 299;
+            }
+            catch (StorageException)
+            {
+                return false;
+            }
         }
 
         /// <inheritdoc />
-        public async Task DeleteAsync(T entity, CancellationToken cancellation = default)
-        {
-            var partitionKey = this.partitionKey.Invoke(entity);
-            var rowKey = this.rowKey.Invoke(entity);
-            var table = await this.table.ConfigureAwait(false);
-
-            await table.ExecuteAsync(TableOperation.Delete(
-                new TableEntity(partitionKey, rowKey) { ETag = "*" }), cancellation)
-                .ConfigureAwait(false);
-        }
+        public Task<bool> DeleteAsync(T entity, CancellationToken cancellation = default)
+            => DeleteAsync(partitionKey(entity), rowKey(entity), cancellation);
 
         /// <inheritdoc />
         public async IAsyncEnumerable<T> EnumerateAsync(string? partitionKey = default, [EnumeratorCancellation] CancellationToken cancellation = default)

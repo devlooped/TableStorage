@@ -33,7 +33,7 @@ namespace Devlooped
 
             Assert.Single(entities);
 
-            await repo.DeleteAsync(saved);
+            Assert.True(await repo.DeleteAsync(saved));
 
             Assert.Null(await repo.GetAsync("My", "asdf"));
 
@@ -66,7 +66,7 @@ namespace Devlooped
 
             Assert.Single(entities);
 
-            await repo.DeleteAsync(saved);
+            Assert.True(await repo.DeleteAsync(saved));
 
             Assert.Null(await repo.GetAsync("Book", "1234"));
 
@@ -129,7 +129,7 @@ namespace Devlooped
 
             Assert.Single(entities);
 
-            await repo.DeleteAsync(saved);
+            Assert.True(await repo.DeleteAsync(saved));
 
             Assert.Null(await repo.GetAsync("asdf"));
 
@@ -185,7 +185,7 @@ namespace Devlooped
 
             Assert.Single(entities);
 
-            await repo.DeleteAsync(saved);
+            Assert.True(await repo.DeleteAsync(saved));
 
             Assert.Null(await repo.GetAsync("123", "Foo"));
 
@@ -219,7 +219,7 @@ namespace Devlooped
 
             Assert.Single(entities);
 
-            await partition.DeleteAsync(saved);
+            Assert.True(await partition.DeleteAsync(saved));
 
             Assert.Null(await partition.GetAsync("123"));
 
@@ -253,6 +253,31 @@ namespace Devlooped
                 Assert.Equal("Watched", entity.PartitionKey);
                 Assert.NotNull(entity.RowKey);
             }
+        }
+
+        [Fact]
+        public async Task CanDeleteNonExistentEntity()
+        {
+            await CloudStorageAccount.DevelopmentStorageAccount.CreateCloudTableClient().GetTableReference(nameof(CanEnumerateEntities))
+                .DeleteIfExistsAsync();
+
+            Assert.False(await TableRepository.Create<MyEntity>(CloudStorageAccount.DevelopmentStorageAccount, nameof(CanEnumerateEntities))
+                .DeleteAsync("foo", "bar"));
+
+            Assert.False(await TablePartition.Create<MyEntity>(CloudStorageAccount.DevelopmentStorageAccount, nameof(CanEnumerateEntities), "Watched")
+                .DeleteAsync("foo"));
+
+            Assert.False(await DocumentRepository.Create<MyEntity>(CloudStorageAccount.DevelopmentStorageAccount, nameof(CanEnumerateEntities))
+                .DeleteAsync("foo", "bar"));
+
+            Assert.False(await DocumentPartition.Create<MyEntity>(CloudStorageAccount.DevelopmentStorageAccount, nameof(CanEnumerateEntities), "Watched")
+                .DeleteAsync("foo"));
+
+            Assert.False(await TableRepository.Create(CloudStorageAccount.DevelopmentStorageAccount, nameof(CanEnumerateEntities))
+                .DeleteAsync("foo", "bar"));
+
+            Assert.False(await TablePartition.Create(CloudStorageAccount.DevelopmentStorageAccount, nameof(CanEnumerateEntities), "Watched")
+                .DeleteAsync("foo"));
         }
 
         [Fact]

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Net;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -81,26 +82,26 @@ namespace Devlooped
         public string TableName { get; }
 
         /// <inheritdoc />
-        public async Task DeleteAsync(string partitionKey, string rowKey, CancellationToken cancellation = default)
+        public async Task<bool> DeleteAsync(string partitionKey, string rowKey, CancellationToken cancellation = default)
         {
             var table = await this.table.ConfigureAwait(false);
 
-            await table.ExecuteAsync(TableOperation.Delete(
-                new TableEntity(partitionKey, rowKey) { ETag = "*" }), cancellation)
-                .ConfigureAwait(false);
+            try
+            {
+                var result = await table.ExecuteAsync(TableOperation.Delete(
+                    new TableEntity(partitionKey, rowKey) { ETag = "*" }), cancellation);
+
+                return result.HttpStatusCode >= 200 && result.HttpStatusCode <= 299;
+            }
+            catch (StorageException)
+            {
+                return false;
+            }
         }
 
         /// <inheritdoc />
-        public async Task DeleteAsync(T entity, CancellationToken cancellation = default)
-        {
-            var partitionKey = this.partitionKey.Invoke(entity);
-            var rowKey = this.rowKey.Invoke(entity);
-            var table = await this.table.ConfigureAwait(false);
-
-            await table.ExecuteAsync(TableOperation.Delete(
-                new TableEntity(partitionKey, rowKey) { ETag = "*" }), cancellation)
-                .ConfigureAwait(false);
-        }
+        public Task<bool> DeleteAsync(T entity, CancellationToken cancellation = default)
+            => DeleteAsync(partitionKey(entity), rowKey(entity), cancellation);
 
         /// <inheritdoc />
         public IAsyncEnumerable<T> EnumerateAsync(string? partitionKey = default, CancellationToken cancellation = default)

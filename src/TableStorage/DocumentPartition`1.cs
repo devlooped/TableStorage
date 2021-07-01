@@ -40,11 +40,11 @@ namespace Devlooped
         public string PartitionKey { get; }
 
         /// <inheritdoc />
-        public Task DeleteAsync(T entity, CancellationToken cancellation = default)
+        public Task<bool> DeleteAsync(T entity, CancellationToken cancellation = default)
             => repository.DeleteAsync(entity, cancellation);
 
         /// <inheritdoc />
-        public Task DeleteAsync(string rowKey, CancellationToken cancellation = default)
+        public Task<bool> DeleteAsync(string rowKey, CancellationToken cancellation = default)
             => repository.DeleteAsync(PartitionKey, rowKey, cancellation);
         
         /// <inheritdoc />
