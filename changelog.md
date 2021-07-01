@@ -1,5 +1,22 @@
 
 
+## [v3.0.0](https://github.com/devlooped/TableStorage/tree/v3.0.0) (2021-07-01)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v2.0.2...v3.0.0)
+
+:sparkles: Implemented enhancements:
+
+- Don't fail if deleting non-existent entity, return false instead [\#50](https://github.com/devlooped/TableStorage/issues/50)
+- Switch from TableEntity to ITableEntity in the non-generic repository for flexibility [\#48](https://github.com/devlooped/TableStorage/issues/48)
+- For PutAsync, allow selecting Replace vs Merge behavior [\#46](https://github.com/devlooped/TableStorage/issues/46)
+- When deleting entities, return boolean status for success/failure [\#51](https://github.com/devlooped/TableStorage/pull/51) (@kzu)
+- Allow additional properties in table entity repository [\#49](https://github.com/devlooped/TableStorage/pull/49) (@kzu)
+- Support merge strategy when updating entities [\#47](https://github.com/devlooped/TableStorage/pull/47) (@kzu)
+
+:hammer: Other:
+
+- Document usage of \[Browsable\(false\)\] to skip persistence [\#45](https://github.com/devlooped/TableStorage/issues/45)
+
 ## [v2.0.2](https://github.com/devlooped/TableStorage/tree/v2.0.2) (2021-06-23)
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/v2.0.1...v2.0.2)
@@ -7,7 +24,6 @@
 :sparkles: Implemented enhancements:
 
 - Allow annotating record constructor parameters with PartitionKey/RowKey [\#43](https://github.com/devlooped/TableStorage/issues/43)
-- Allow persisting entities as documents [\#25](https://github.com/devlooped/TableStorage/pull/25) (@kzu)
 
 :twisted_rightwards_arrows: Merged:
 
@@ -54,6 +70,7 @@
 - Avoid creating a separate Task for lazily initialization of CloudTable [\#23](https://github.com/devlooped/TableStorage/issues/23)
 - No need to use DynamicTableEntity when deleting [\#21](https://github.com/devlooped/TableStorage/issues/21)
 - When doing a PutAsync, use InsertOrMerge instead of InsertOrReplace [\#20](https://github.com/devlooped/TableStorage/issues/20)
+- Allow persisting entities as documents [\#25](https://github.com/devlooped/TableStorage/pull/25) (@kzu)
 
 :bug: Fixed bugs:
 
@@ -79,6 +96,10 @@
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/v1.1.0...v1.1.1)
 
+:sparkles: Implemented enhancements:
+
+- Force factory method usage for default implementations [\#14](https://github.com/devlooped/TableStorage/issues/14)
+
 :bug: Fixed bugs:
 
 - Fix usage in package description [\#15](https://github.com/devlooped/TableStorage/issues/15)
@@ -89,7 +110,6 @@
 
 :sparkles: Implemented enhancements:
 
-- Force factory method usage for default implementations [\#14](https://github.com/devlooped/TableStorage/issues/14)
 - Apply factory method defaults to TableRepository/TablePartition constructors [\#13](https://github.com/devlooped/TableStorage/issues/13)
 
 ## [v1.0.4](https://github.com/devlooped/TableStorage/tree/v1.0.4) (2021-05-16)
