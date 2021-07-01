@@ -256,42 +256,7 @@ All packages also come in source-only versions, if you want to avoid an addition
 The source-only packages includes all types with the default visibility (internal), so you can decide 
 what types to make public by declaring a partial class with the desired visibility. To make them all 
 public, for example, you can include the same [Visibility.cs](https://github.com/devlooped/TableStorage/blob/main/src/TableStorage/Visibility.cs) 
-that the compiled version uses, like:
-
-```csharp
-namespace Devlooped
-
-    public partial interface ITableStoragePartition<T> { }
-    public partial interface ITableRepository<T> { }
-    public partial interface ITableRepository<T> { }
-    public partial interface ITablePartition<T> { }
-    public partial interface IDocumentRepository<T> { }
-    public partial interface IDocumentPartition<T> { }
-    public partial interface IDocumentSerializer { }
-    public partial interface IBinaryDocumentSerializer { }
-    public partial interface IStringDocumentSerializer { }
-    public partial interface IDocumentEntity { }
-
-    public partial class TableRepository { }
-    public partial class TableRepository<T> { }
-    public partial class AttributedTableRepository<T> { }
-    public partial class DocumentRepository { }
-    public partial class DocumentRepository<T> { }
-    public partial class AttributedDocumentRepository<T> { }
-    public partial class TablePartition { }
-    public partial class TablePartition<T> { }
-    public partial class DocumentPartition { }
-
-    public partial class IAsyncEnumerableExtensions { }
-    public partial class IQueryableExtensions { }
-
-    // Perhaps make the attributes visible too if you use them?
-    public partial class PartitionKeyAttribute { }
-    public partial class RowKeyAttribute { }
-    public partial class TableAttribute { }
-    public partial class TableStorageAttribute { }
-}
-```
+that the compiled version uses.
 
 
 ## Dogfooding
