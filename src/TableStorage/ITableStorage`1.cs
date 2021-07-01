@@ -22,7 +22,8 @@ namespace Devlooped
         /// </summary>
         /// <param name="entity">The entity to delete.</param>
         /// <param name="cancellation">Optional <see cref="CancellationToken"/>.</param>
-        Task DeleteAsync(T entity, CancellationToken cancellation = default);
+        /// <returns><see langword="true"/> if an existing record was deleted, <see langword="true"/> otherwise.</returns>
+        Task<bool> DeleteAsync(T entity, CancellationToken cancellation = default);
 
         /// <summary>
         /// Deletes an entity from the repository given its <paramref name="partitionKey"/> and <paramref name="rowKey"/>.
@@ -30,7 +31,8 @@ namespace Devlooped
         /// <param name="partitionKey">The entity partition key.</param>
         /// <param name="rowKey">The entity row key.</param>
         /// <param name="cancellation">Optional <see cref="CancellationToken"/>.</param>
-        Task DeleteAsync(string partitionKey, string rowKey, CancellationToken cancellation = default);
+        /// <returns><see langword="true"/> if an existing record was deleted, <see langword="true"/> otherwise.</returns>
+        Task<bool> DeleteAsync(string partitionKey, string rowKey, CancellationToken cancellation = default);
 
         /// <summary>
         /// Enumerates asynchronously all entities, optionally within the given <paramref name="partitionKey"/>.

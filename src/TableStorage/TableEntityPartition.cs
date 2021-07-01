@@ -46,7 +46,7 @@ namespace Devlooped
         public IQueryable<ITableEntity> CreateQuery() => repository.CreateQuery().Where(x => x.PartitionKey == PartitionKey);
 
         /// <inheritdoc />
-        public Task DeleteAsync(ITableEntity entity, CancellationToken cancellation = default)
+        public Task<bool> DeleteAsync(ITableEntity entity, CancellationToken cancellation = default)
         {
             if (!PartitionKey.Equals(entity.PartitionKey, StringComparison.Ordinal))
                 throw new ArgumentException("Entity does not belong to the partition.");
@@ -55,7 +55,7 @@ namespace Devlooped
         }
 
         /// <inheritdoc />
-        public Task DeleteAsync(string rowKey, CancellationToken cancellation = default)
+        public Task<bool> DeleteAsync(string rowKey, CancellationToken cancellation = default)
             => repository.DeleteAsync(PartitionKey, rowKey, cancellation);
 
         /// <inheritdoc />
