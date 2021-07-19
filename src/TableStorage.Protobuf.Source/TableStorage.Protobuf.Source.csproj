@@ -15,7 +15,7 @@ Usage:
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NuGetizer" Version="0.7.1" />
+    <PackageReference Include="NuGetizer" Version="0.7.3" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="all" />
     <PackageReference Include="protobuf-net" Version="3.0.101" />
   </ItemGroup>
