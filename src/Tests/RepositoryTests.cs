@@ -335,12 +335,12 @@ namespace Devlooped
 
             var partition = TablePartition.Create(CloudStorageAccount.DevelopmentStorageAccount, nameof(CanMergeDynamicEntity), "Dynamic", updateStrategy: UpdateStrategy.Merge);
 
-            await repo.PutAsync(new DynamicTableEntity("Book", "1234", "*", new Dictionary<string, EntityProperty>
+            await partition.PutAsync(new DynamicTableEntity("Dynamic", "1234", "*", new Dictionary<string, EntityProperty>
             {
                 { "Status", EntityProperty.GeneratePropertyForString("OK") },
             }));
 
-            entity = (DynamicTableEntity)await repo.PutAsync(new DynamicTableEntity("Book", "1234", "*", new Dictionary<string, EntityProperty>
+            entity = (DynamicTableEntity)await partition.PutAsync(new DynamicTableEntity("Dynamic", "1234", "*", new Dictionary<string, EntityProperty>
             {
                 { "Reason", EntityProperty.GeneratePropertyForString("Done") },
             }));
