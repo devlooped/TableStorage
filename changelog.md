@@ -1,5 +1,13 @@
 
 
+## [v3.0.3](https://github.com/devlooped/TableStorage/tree/v3.0.3) (2021-07-28)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v3.0.2...v3.0.3)
+
+:bug: Fixed bugs:
+
+- Azure Functions fails with SocketException sometimes when accessing table [\#58](https://github.com/devlooped/TableStorage/issues/58)
+
 ## [v3.0.2](https://github.com/devlooped/TableStorage/tree/v3.0.2) (2021-07-01)
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/v3.0.1...v3.0.2)
@@ -71,7 +79,6 @@
 
 - Add support for enhanced filtering for document-based repo [\#38](https://github.com/devlooped/TableStorage/pull/38) (@kzu)
 - Add support for filtering by enum property types [\#36](https://github.com/devlooped/TableStorage/pull/36) (@kzu)
-- Add support for querying with LINQ and expressions [\#34](https://github.com/devlooped/TableStorage/pull/34) (@kzu)
 - Switch default built-in serializer to System.Text.Json [\#31](https://github.com/devlooped/TableStorage/pull/31) (@kzu)
 - Make Document/Entity default table names plural [\#29](https://github.com/devlooped/TableStorage/pull/29) (@kzu)
 - Don't duplicate PartitionKey/RowKey properties in storage [\#27](https://github.com/devlooped/TableStorage/pull/27) (@kzu)
@@ -86,6 +93,7 @@
 - Avoid creating a separate Task for lazily initialization of CloudTable [\#23](https://github.com/devlooped/TableStorage/issues/23)
 - No need to use DynamicTableEntity when deleting [\#21](https://github.com/devlooped/TableStorage/issues/21)
 - When doing a PutAsync, use InsertOrMerge instead of InsertOrReplace [\#20](https://github.com/devlooped/TableStorage/issues/20)
+- Allow persisting entities as documents [\#25](https://github.com/devlooped/TableStorage/pull/25) (@kzu)
 
 :bug: Fixed bugs:
 
@@ -139,10 +147,6 @@
 ## [v1.0.2](https://github.com/devlooped/TableStorage/tree/v1.0.2) (2021-05-10)
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/cf1b7f069ac6d68482b498555c8dbdda8e1ae5b4...v1.0.2)
-
-:sparkles: Implemented enhancements:
-
-- Allow persisting entities as documents [\#25](https://github.com/devlooped/TableStorage/pull/25) (@kzu)
 
 :twisted_rightwards_arrows: Merged:
 
