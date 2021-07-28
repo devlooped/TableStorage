@@ -110,12 +110,12 @@ namespace Devlooped
             return (ITableEntity)result.Result;
         }
 
-        async Task<CloudTable> GetTableAsync(string tableName)
+        Task<CloudTable> GetTableAsync(string tableName) => Task.Run(async () =>
         {
             var tableClient = storageAccount.CreateCloudTableClient();
             var table = tableClient.GetTableReference(tableName);
             await table.CreateIfNotExistsAsync();
             return table;
-        }
+        });
     }
 }
