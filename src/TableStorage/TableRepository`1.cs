@@ -192,6 +192,8 @@ namespace Devlooped
             if (rowKeyProperty != null)
                 writer.WriteString(rowKeyProperty, entity.RowKey);
 
+            writer.WriteString(nameof(ITableEntity.Timestamp), entity.Timestamp);
+
             foreach (var property in entity.Properties)
             {
                 switch (property.Value.PropertyType)
