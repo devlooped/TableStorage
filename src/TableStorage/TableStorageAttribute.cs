@@ -21,7 +21,8 @@ namespace Devlooped
         });
 
         protected static Expression<Func<TEntity, string>> CreateGetter<TEntity, TAttribute>() where TAttribute : Attribute
-            => (Expression<Func<TEntity, string>>)getters.GetOrAdd((typeof(TEntity), typeof(TAttribute)), _ => CreateGetterCore<TEntity, TAttribute>());
+            => (Expression<Func<TEntity, string>>)getters.GetOrAdd((typeof(TEntity), typeof(TAttribute)), 
+                (Func<(Type, Type), Expression<Func<TEntity, string>>>)(_ => CreateGetterCore<TEntity, TAttribute>()));
 
         protected static Func<TEntity, string> CreateCompiledGetter<TEntity, TAttribute>() where TAttribute : Attribute
             => (Func<TEntity, string>)compiledGetters.GetOrAdd((typeof(TEntity), typeof(TAttribute)), _ => CreateGetter<TEntity, TAttribute>().Compile());
