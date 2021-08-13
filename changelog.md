@@ -1,5 +1,17 @@
 
 
+## [v3.1.0](https://github.com/devlooped/TableStorage/tree/v3.1.0) (2021-08-13)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v3.0.3...v3.1.0)
+
+:sparkles: Implemented enhancements:
+
+- Support Timestamp property in POCO entities [\#60](https://github.com/devlooped/TableStorage/issues/60)
+
+:twisted_rightwards_arrows: Merged:
+
+- Support Timestamp property in POCO entities [\#61](https://github.com/devlooped/TableStorage/pull/61) (@kzu)
+
 ## [v3.0.3](https://github.com/devlooped/TableStorage/tree/v3.0.3) (2021-07-28)
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/v3.0.2...v3.0.3)
@@ -79,6 +91,7 @@
 
 - Add support for enhanced filtering for document-based repo [\#38](https://github.com/devlooped/TableStorage/pull/38) (@kzu)
 - Add support for filtering by enum property types [\#36](https://github.com/devlooped/TableStorage/pull/36) (@kzu)
+- Add support for querying with LINQ and expressions [\#34](https://github.com/devlooped/TableStorage/pull/34) (@kzu)
 - Switch default built-in serializer to System.Text.Json [\#31](https://github.com/devlooped/TableStorage/pull/31) (@kzu)
 - Make Document/Entity default table names plural [\#29](https://github.com/devlooped/TableStorage/pull/29) (@kzu)
 - Don't duplicate PartitionKey/RowKey properties in storage [\#27](https://github.com/devlooped/TableStorage/pull/27) (@kzu)
