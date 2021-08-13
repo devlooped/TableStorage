@@ -185,6 +185,9 @@ var repo = TableRepository.Create<Product>(...,
 > NOTE: when using alternative serializers, entities might need to be annotated with whatever 
 > attributes are required by the underlying libraries.
 
+> NOTE: if access to the `Timestamp` managed by Table Storage for the entity is needed, just declare a property 
+> with that name with either `DateTimeOffset`, `DateTime` or `string` type.
+
 ### Attributes
 
 If you want to avoid using strings with the factory methods, you can also annotate the 

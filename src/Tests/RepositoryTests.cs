@@ -160,6 +160,35 @@ namespace Devlooped
         }
 
         [Fact]
+        public async Task CanReadTimestamp()
+        {
+            await TablePartition
+                .Create<TimestampedEntity>(
+                    CloudStorageAccount.DevelopmentStorageAccount,
+                    "Timestamped", "Timestamped", e => e.ID)
+                .PutAsync(
+                    new TimestampedEntity("Foo"));
+
+            Assert.NotNull((await TablePartition
+                .Create<TimestampedEntity>(
+                    CloudStorageAccount.DevelopmentStorageAccount,
+                    "Timestamped", "Timestamped", e => e.ID)
+                .GetAsync("Foo"))!.Timestamp);
+
+            Assert.NotNull((await TablePartition
+                .Create<StringTimestampedEntity>(
+                    CloudStorageAccount.DevelopmentStorageAccount,
+                    "Timestamped", "Timestamped", e => e.ID)
+                .GetAsync("Foo"))!.Timestamp);
+
+            Assert.NotNull((await TablePartition
+                .Create<TimestampedDateTimeEntity>(
+                    CloudStorageAccount.DevelopmentStorageAccount,
+                    "Timestamped", "Timestamped", e => e.ID)
+                .GetAsync("Foo"))!.Timestamp);
+        }
+
+        [Fact]
         public void DefaultTableNameUsesAttribute()
         {
             Assert.Equal("Entities", TableRepository.Create<MyTableEntity>(CloudStorageAccount.DevelopmentStorageAccount).TableName);
@@ -384,6 +413,21 @@ namespace Devlooped
         {
             public string? Status { get; set; }
             public string? Reason { get; set; }
+        }
+
+        record TimestampedEntity(string ID)
+        {
+            public DateTimeOffset? Timestamp { get; set; }
+        }
+
+        record StringTimestampedEntity(string ID)
+        {
+            public string? Timestamp { get; set; }
+        }
+
+        record TimestampedDateTimeEntity(string ID)
+        {
+            public DateTime? Timestamp { get; set; }
         }
     }
 }
