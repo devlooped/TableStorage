@@ -1,5 +1,19 @@
 
 
+## [v3.1.1](https://github.com/devlooped/TableStorage/tree/v3.1.1) (2021-08-29)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v3.1.0...v3.1.1)
+
+:sparkles: Implemented enhancements:
+
+- Add API docs for all packages [\#64](https://github.com/devlooped/TableStorage/issues/64)
+
+:twisted_rightwards_arrows: Merged:
+
+- Add missing API docs and fix all docs warnings [\#65](https://github.com/devlooped/TableStorage/pull/65) (@kzu)
+- Bump files with dotnet-file sync [\#63](https://github.com/devlooped/TableStorage/pull/63) (@kzu)
+- Bump Microsoft.NET.Test.Sdk from 16.10.0 to 16.11.0 [\#62](https://github.com/devlooped/TableStorage/pull/62) (@dependabot[bot])
+
 ## [v3.1.0](https://github.com/devlooped/TableStorage/tree/v3.1.0) (2021-08-13)
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/v3.0.3...v3.1.0)
@@ -11,6 +25,10 @@
 :twisted_rightwards_arrows: Merged:
 
 - Support Timestamp property in POCO entities [\#61](https://github.com/devlooped/TableStorage/pull/61) (@kzu)
+- Bump MessagePack from 2.2.113 to 2.3.75 [\#59](https://github.com/devlooped/TableStorage/pull/59) (@dependabot[bot])
+- Bump NuGetizer from 0.7.1 to 0.7.4 [\#57](https://github.com/devlooped/TableStorage/pull/57) (@dependabot[bot])
+- Bump files with dotnet-file sync [\#56](https://github.com/devlooped/TableStorage/pull/56) (@kzu)
+- Bump MessagePack from 2.2.85 to 2.2.113 [\#55](https://github.com/devlooped/TableStorage/pull/55) (@dependabot[bot])
 
 ## [v3.0.3](https://github.com/devlooped/TableStorage/tree/v3.0.3) (2021-07-28)
 
@@ -64,6 +82,7 @@
 :twisted_rightwards_arrows: Merged:
 
 - Add support for record constructor parameter annotations [\#44](https://github.com/devlooped/TableStorage/pull/44) (@kzu)
+- Bump files with dotnet-file sync [\#40](https://github.com/devlooped/TableStorage/pull/40) (@kzu)
 
 ## [v2.0.1](https://github.com/devlooped/TableStorage/tree/v2.0.1) (2021-06-17)
 
@@ -95,6 +114,7 @@
 - Switch default built-in serializer to System.Text.Json [\#31](https://github.com/devlooped/TableStorage/pull/31) (@kzu)
 - Make Document/Entity default table names plural [\#29](https://github.com/devlooped/TableStorage/pull/29) (@kzu)
 - Don't duplicate PartitionKey/RowKey properties in storage [\#27](https://github.com/devlooped/TableStorage/pull/27) (@kzu)
+- Bump Microsoft.NET.Test.Sdk from 16.9.4 to 16.10.0 [\#19](https://github.com/devlooped/TableStorage/pull/19) (@dependabot[bot])
 
 ## [v1.3.0](https://github.com/devlooped/TableStorage/tree/v1.3.0) (2021-05-31)
 
@@ -145,6 +165,11 @@
 - Force factory method usage for default implementations [\#14](https://github.com/devlooped/TableStorage/issues/14)
 - Apply factory method defaults to TableRepository/TablePartition constructors [\#13](https://github.com/devlooped/TableStorage/issues/13)
 
+:twisted_rightwards_arrows: Merged:
+
+- Bump files with dotnet-file sync [\#12](https://github.com/devlooped/TableStorage/pull/12) (@kzu)
+- Bump NuGetizer from 0.6.2 to 0.7.0 [\#11](https://github.com/devlooped/TableStorage/pull/11) (@dependabot[bot])
+
 ## [v1.0.4](https://github.com/devlooped/TableStorage/tree/v1.0.4) (2021-05-16)
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/v1.0.3...v1.0.4)
@@ -157,12 +182,19 @@
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/v1.0.2...v1.0.3)
 
+:twisted_rightwards_arrows: Merged:
+
+- Bump files with dotnet-file sync [\#9](https://github.com/devlooped/TableStorage/pull/9) (@kzu)
+
 ## [v1.0.2](https://github.com/devlooped/TableStorage/tree/v1.0.2) (2021-05-10)
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/cf1b7f069ac6d68482b498555c8dbdda8e1ae5b4...v1.0.2)
 
 :twisted_rightwards_arrows: Merged:
 
+- Bump files with dotnet-file sync [\#8](https://github.com/devlooped/TableStorage/pull/8) (@kzu)
+- Bump files with dotnet-file sync [\#5](https://github.com/devlooped/TableStorage/pull/5) (@kzu)
+- Bump files with dotnet-file sync [\#4](https://github.com/devlooped/TableStorage/pull/4) (@kzu)
 - Add SourceLink to get repo/pdb linking [\#3](https://github.com/devlooped/TableStorage/pull/3) (@kzu)
 
 
