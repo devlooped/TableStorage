@@ -19,8 +19,8 @@ namespace Devlooped
         /// <example>
         /// var books = DocumentPartition.Create&lt;Book&gt;();
         /// await foreach (var book in books.EnumerateAsync(x => 
-        ///     x.PartitionKey == "Rick Riordan" && 
-        ///     x.RowKey.CompareTo("Percy Jackson") >= 0 && 
+        ///     x.PartitionKey == "Rick Riordan" &amp;&amp; 
+        ///     x.RowKey.CompareTo("Percy Jackson") >= 0 &amp;&amp; 
         ///     x.Version == "1.0"))
         /// {
         ///    Console.WriteLine(book.ISBN);

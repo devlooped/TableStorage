@@ -23,6 +23,7 @@ namespace Devlooped
         /// If not provided, the class will need a property annotated with <see cref="PartitionKeyAttribute"/>.</param>
         /// <param name="rowKey">Optional function to retrieve the row key for a given entity. 
         /// If not provided, the class will need a property annotated with <see cref="RowKeyAttribute"/>.</param>
+        /// <param name="serializer">Optional serializer to use instead of the default <see cref="DocumentSerializer.Default"/>.</param>
         /// <returns>The new <see cref="ITableRepository{T}"/>.</returns>
         public static IDocumentRepository<T> Create<T>(
             CloudStorageAccount storageAccount,

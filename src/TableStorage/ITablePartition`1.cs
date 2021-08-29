@@ -28,7 +28,7 @@ namespace Devlooped
         /// <example>
         /// var books = TablePartition.Create&lt;Book&gt;("Bestsellers");
         /// await foreach (var published in from book in books.CreateQuery()
-        ///                                 where book.IsPublished && book.Pages > 1000
+        ///                                 where book.IsPublished &amp;&amp; book.Pages > 1000
         ///                                 select book)
         /// {
         ///    Console.WriteLine(published.ISBN);
