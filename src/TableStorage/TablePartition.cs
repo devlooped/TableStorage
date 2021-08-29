@@ -23,11 +23,11 @@ namespace Devlooped
         public const string DefaultTableName = "Entities";
 
         /// <summary>
-        /// Creates an <see cref="ITablePartition{ITableEntity}"/>, using 
-        /// <see cref="DefaultTableName"/> as the table name and the 
-        /// <typeparamref name="T"/> <c>Name</c> as the partition key.
+        /// Creates an <see cref="ITablePartition{ITableEntity}"/>.
         /// </summary>
         /// <param name="storageAccount">The storage account to use.</param>
+        /// <param name="tableName">Table name to use.</param>
+        /// <param name="partitionKey">Fixed partition key to scope entity persistence.</param>
         /// <param name="updateStrategy">Strategy to apply when updating an existing entity. Defaults to <see cref="UpdateStrategy.Replace"/>.</param>
         /// <returns>The new <see cref="ITablePartition{TEntity}"/>.</returns>
         public static ITablePartition<ITableEntity> Create(CloudStorageAccount storageAccount, string tableName, string partitionKey, UpdateStrategy? updateStrategy = default)

@@ -47,6 +47,7 @@ namespace Devlooped
         /// <param name="tableName">The table that backs this repository.</param>
         /// <param name="partitionKey">A function to determine the partition key for an entity of type <typeparamref name="T"/>.</param>
         /// <param name="rowKey">A function to determine the row key for an entity of type <typeparamref name="T"/>.</param>
+        /// <param name="serializer">Optional serializer to use instead of the default <see cref="DocumentSerializer.Default"/>.</param>
         protected internal DocumentRepository(CloudStorageAccount storageAccount, string tableName, Func<T, string> partitionKey, Func<T, string> rowKey, IDocumentSerializer serializer)
         {
             this.storageAccount = storageAccount;

@@ -29,6 +29,7 @@ namespace Devlooped
         /// <typeparam name="T">The type of entity that the repository will manage.</typeparam>
         /// <param name="storageAccount">The storage account to use.</param>
         /// <param name="rowKey">Function to retrieve the row key for a given entity.</param>
+        /// <param name="serializer">Optional serializer to use instead of the default <see cref="DocumentSerializer.Default"/>.</param>
         /// <returns>The new <see cref="ITablePartition{T}"/>.</returns>
         public static IDocumentPartition<T> Create<T>(
             CloudStorageAccount storageAccount,
@@ -45,6 +46,7 @@ namespace Devlooped
         /// <param name="storageAccount">The storage account to use.</param>
         /// <param name="tableName">Table name to use.</param>
         /// <param name="rowKey">Function to retrieve the row key for a given entity.</param>
+        /// <param name="serializer">Optional serializer to use instead of the default <see cref="DocumentSerializer.Default"/>.</param>
         /// <returns>The new <see cref="ITablePartition{T}"/>.</returns>
         public static IDocumentPartition<T> Create<T>(
             CloudStorageAccount storageAccount,
@@ -65,6 +67,7 @@ namespace Devlooped
         /// If not provided, the <typeparamref name="T"/> <c>Name</c> will be used.</param>
         /// <param name="rowKey">Optional function to retrieve the row key for a given entity. 
         /// If not provided, the class will need a property annotated with <see cref="RowKeyAttribute"/>.</param>
+        /// <param name="serializer">Optional serializer to use instead of the default <see cref="DocumentSerializer.Default"/>.</param>
         /// <returns>The new <see cref="ITablePartition{T}"/>.</returns>
         public static IDocumentPartition<T> Create<T>(
             CloudStorageAccount storageAccount,

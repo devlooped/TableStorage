@@ -5,7 +5,7 @@ using Microsoft.Azure.Cosmos.Table;
 namespace Devlooped
 {
     /// <summary>
-    /// An <see cref="IDocumentRepository{T}{T}"/> implementation which relies on the entity type <typeparamref name="T"/>
+    /// An <see cref="IDocumentRepository{T}"/> implementation which relies on the entity type <typeparamref name="T"/>
     /// being annotated with <see cref="PartitionKeyAttribute"/> and <see cref="RowKeyAttribute"/>, and 
     /// optionally <see cref="TableAttribute"/> (defaults to type name).
     /// </summary>
@@ -22,6 +22,7 @@ namespace Devlooped
         /// Initializes the repository using the given storage account.
         /// </summary>
         /// <param name="storageAccount">Storage account to connect to.</param>
+        /// <param name="serializer">Optional serializer to use instead of the default <see cref="DocumentSerializer.Default"/>.</param>
         public AttributedDocumentRepository(CloudStorageAccount storageAccount, IDocumentSerializer? serializer = default)
             : base(storageAccount,
                   TableRepository.GetDefaultTableName<T>(),

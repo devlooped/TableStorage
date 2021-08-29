@@ -19,7 +19,7 @@ namespace Devlooped
         /// </summary>
         /// <example>
         /// var books = DocumentRepository.Create&lt;Book&gt;();
-        /// await foreach (var book in books.EnumerateAsync(x => x.PartitionKey == "Rick Riordan" && x.DocumentType  ))
+        /// await foreach (var book in books.EnumerateAsync(x => x.PartitionKey == "Rick Riordan" &amp;&amp; x.DocumentType  ))
         /// {
         ///    Console.WriteLine(book.ISBN);
         /// }

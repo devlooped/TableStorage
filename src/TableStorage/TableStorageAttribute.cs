@@ -9,6 +9,10 @@ using System.Reflection;
 
 namespace Devlooped
 {
+    /// <summary>
+    /// Base class for <see cref="PartitionKeyAttribute"/> and <see cref="RowKeyAttribute"/> 
+    /// that defines common behavior.
+    /// </summary>
     abstract partial class TableStorageAttribute : Attribute
     {
         static readonly ConcurrentDictionary<(Type EntityType, Type AttributeType), Expression> getters = new();
@@ -20,10 +24,18 @@ namespace Devlooped
             ' ', '/', '\\', '#', '?', '\t', '\n', '\r', '+', '|', '[', ']', '{', '}', '<', '>', '$', '^', '&'
         });
 
+        /// <summary>
+        /// Creates an expression for retrieving the value for the given entity and attribute type.
+        /// </summary>
+        /// <typeparam name="TEntity">The entity type.</typeparam>
+        /// <typeparam name="TAttribute">The attribute type.</typeparam>
         protected static Expression<Func<TEntity, string>> CreateGetter<TEntity, TAttribute>() where TAttribute : Attribute
             => (Expression<Func<TEntity, string>>)getters.GetOrAdd((typeof(TEntity), typeof(TAttribute)), 
                 (Func<(Type, Type), Expression<Func<TEntity, string>>>)(_ => CreateGetterCore<TEntity, TAttribute>()));
 
+        /// <summary>
+        /// Same as <see cref="CreateGetter{TEntity, TAttribute}"/> but compiled to a delegate.
+        /// </summary>
         protected static Func<TEntity, string> CreateCompiledGetter<TEntity, TAttribute>() where TAttribute : Attribute
             => (Func<TEntity, string>)compiledGetters.GetOrAdd((typeof(TEntity), typeof(TAttribute)), _ => CreateGetter<TEntity, TAttribute>().Compile());
 

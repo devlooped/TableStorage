@@ -23,6 +23,11 @@ namespace Devlooped
         /// </summary>
         public static UpdateStrategy Replace { get; } = new ReplaceStrategy();
 
+        /// <summary>
+        /// Creates the operation to apply to the entity, which will be either an 
+        /// <see cref="TableOperation.InsertOrMerge(ITableEntity)"/> or 
+        /// <see cref="TableOperation.InsertOrReplace(ITableEntity)"/>.
+        /// </summary>
         protected internal abstract TableOperation CreateOperation(ITableEntity entity);
 
         class MergeStrategy : UpdateStrategy
