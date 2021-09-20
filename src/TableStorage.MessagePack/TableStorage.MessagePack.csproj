@@ -15,7 +15,7 @@ Usage:
   <ItemGroup>
     <PackageReference Include="NuGetizer" Version="0.7.4" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="all" />
-    <PackageReference Include="MessagePack" Version="2.3.75" />
+    <PackageReference Include="MessagePack" Version="2.3.85" />
   </ItemGroup>
 
   <ItemGroup>
