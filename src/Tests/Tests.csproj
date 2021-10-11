@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
-    <PackageReference Include="Microsoft.OData.Client" Version="7.9.1" />
+    <PackageReference Include="Microsoft.OData.Client" Version="7.9.3" />
     <PackageReference Include="protobuf-net.BuildTools" Version="3.0.101">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
