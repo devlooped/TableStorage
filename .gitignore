@@ -2,6 +2,7 @@ bin
 obj
 artifacts
 pack
+TestResults
 .vs
 .vscode
 
@@ -27,4 +28,3 @@ _site
 .jekyll-cache
 Gemfile.lock
 package-lock.json
-__azurite_db_table__.json
