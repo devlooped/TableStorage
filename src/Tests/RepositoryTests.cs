@@ -17,6 +17,7 @@ namespace Devlooped
 
             Assert.Equal("asdf", entity.Id);
             Assert.Null(entity.Name);
+            Assert.Equal(DateOnly.FromDateTime(DateTime.Today), entity.Date);
 
             entity.Name = "kzu";
 
@@ -387,6 +388,8 @@ namespace Devlooped
             public string Id { get; }
 
             public string? Name { get; set; }
+
+            public DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.Now);
         }
 
         [Table("Entities")]

@@ -19,13 +19,14 @@ public record Product(string Category, string Id)
 {
   public string? Title { get; init; }
   public double Price { get; init; }
+  public DateOnly Created { get; init; }
 }
 ```
 
 > NOTE: entity can have custom constructor, key properties can be read-only, 
 > and it doesn't need to inherit from anything, implement any interfaces or use 
 > any custom attributes (unless you want to). As shown above, it can even be 
-> a simple record type!
+> a simple record type, with support for .NET 6 DateOnly type to boot!
 
 The entity can be stored and retrieved with:
 

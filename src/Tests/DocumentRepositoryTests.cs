@@ -51,6 +51,7 @@ namespace Devlooped
 
                 Assert.NotNull(saved);
                 Assert.Equal("Bar", saved!.Title);
+                Assert.Equal(DateOnly.FromDateTime(DateTime.Today), saved.Date);
 
                 var entities = new List<DocumentEntity>();
 
@@ -185,6 +186,9 @@ namespace Devlooped
             [Key(2)]
             [ProtoMember(3)]
             public string? Title { get; set; }
+            [Key(3)]
+            [ProtoMember(4)]
+            public DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.Today);
         }
     }
 }

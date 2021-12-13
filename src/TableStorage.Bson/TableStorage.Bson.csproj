@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <AssemblyName>Devlooped.TableStorage.Bson</AssemblyName>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>netstandard2.0;net6.0</TargetFrameworks>
     <IsPackable>true</IsPackable>
     <Description>A BSON binary serializer for use with document-based repositories.
 
