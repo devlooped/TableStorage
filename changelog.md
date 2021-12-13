@@ -1,4 +1,12 @@
+# Changelog
 
+## [v3.2.0](https://github.com/devlooped/TableStorage/tree/v3.2.0) (2021-12-13)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v3.1.1...v3.2.0)
+
+:twisted_rightwards_arrows: Merged:
+
+- Add support for DateOnly [\#79](https://github.com/devlooped/TableStorage/pull/79) (@kzu)
 
 ## [v3.1.1](https://github.com/devlooped/TableStorage/tree/v3.1.1) (2021-08-29)
 
@@ -19,6 +27,10 @@
 :sparkles: Implemented enhancements:
 
 - Support Timestamp property in POCO entities [\#60](https://github.com/devlooped/TableStorage/issues/60)
+
+:twisted_rightwards_arrows: Merged:
+
+- Support Timestamp property in POCO entities [\#61](https://github.com/devlooped/TableStorage/pull/61) (@kzu)
 
 ## [v3.0.3](https://github.com/devlooped/TableStorage/tree/v3.0.3) (2021-07-28)
 
@@ -97,7 +109,6 @@
 
 :twisted_rightwards_arrows: Merged:
 
-- Support Timestamp property in POCO entities [\#61](https://github.com/devlooped/TableStorage/pull/61) (@kzu)
 - Add support for enhanced filtering for document-based repo [\#38](https://github.com/devlooped/TableStorage/pull/38) (@kzu)
 - Add support for filtering by enum property types [\#36](https://github.com/devlooped/TableStorage/pull/36) (@kzu)
 - Add support for querying with LINQ and expressions [\#34](https://github.com/devlooped/TableStorage/pull/34) (@kzu)
