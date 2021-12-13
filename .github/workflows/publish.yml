@@ -34,6 +34,11 @@ jobs:
           brew install grep
           echo 'export PATH="/usr/local/opt/grep/libexec/gnubin:$PATH"' >> .bash_profile
 
+      - name: ⚙ azurite
+        run: |
+          npm install azurite
+          npx azurite-table &
+
       - name: 🧪 test
         shell: bash --noprofile --norc {0}
         env:
