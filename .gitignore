@@ -16,6 +16,7 @@ TestResults
 *.cache
 *.binlog
 *.zip
+__azurite*.*
 
 .nuget
 *.lock.json

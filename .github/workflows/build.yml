@@ -31,7 +31,8 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
-      - uses: actions/setup-dotnet@v1
+      - name: ⚙ dotnet
+        uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '6.0.x'
 
@@ -46,7 +47,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-2022, macOS-latest]
+        os: [windows-2022, ubuntu-latest, macOS-latest]
     steps:
       - name: 🤘 checkout
         uses: actions/checkout@v2
@@ -54,7 +55,8 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
-      - uses: actions/setup-dotnet@v1
+      - name: ⚙ dotnet
+        uses: actions/setup-dotnet@v1
         if: matrix.os != 'windows-2022'
         with:
           dotnet-version: '6.0.x'
@@ -68,40 +70,8 @@ jobs:
           brew install grep
           echo 'export PATH="/usr/local/opt/grep/libexec/gnubin:$PATH"' >> .bash_profile
 
-      - name: ⚙ azurite
-        run: |
-          npm install azurite
-          npx azurite-table &
-
       - name: 🧪 test
-        shell: bash --noprofile --norc {0}
-        env:
-          LC_ALL: en_US.utf8
-        run: |
-          [ -f .bash_profile ] && source .bash_profile
-          counter=0
-          exitcode=0
-          reset="\e[0m"
-          warn="\e[0;33m"
-          while [ $counter -lt 6 ]
-          do
-              if [ $filter ]
-              then
-                  echo -e "${warn}Retry $counter for $filter ${reset}"
-              fi
-              # run test and forward output also to a file in addition to stdout (tee command)
-              dotnet test --no-build -m:1 --blame-hang --blame-hang-timeout 5m --filter=$filter | tee ./output.log
-              # capture dotnet test exit status, different from tee
-              exitcode=${PIPESTATUS[0]}
-              if [ $exitcode == 0 ]
-              then
-                  exit 0
-              fi
-              # cat output, get failed test names, join as DisplayName=TEST with |, remove trailing |.
-              filter=$(cat ./output.log | grep -o -P '(?<=\sFailed\s)\w*' | awk 'BEGIN { ORS="|" } { print("DisplayName=" $0) }' | grep -o -P '.*(?=\|$)')
-              ((counter++))
-          done
-          exit $exitcode
+        uses: ./.github/workflows/test
 
       - name: 📦 pack
         run: dotnet pack -m:1 -p:VersionLabel="$GITHUB_REF.$GITHUB_RUN_NUMBER"
