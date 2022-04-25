@@ -49,8 +49,8 @@
 	weak
 [file ".github/workflows/build.yml"]
 	url = https://github.com/devlooped/oss/blob/main/.github/workflows/build.yml
-	sha = 7ebebbdbab67d9d895a29b3d2b3f82a62a7d8c4e
-	etag = 22c14ba80c39988ffd19c9b8737f541774cb75994004d432225ba4ff007f1403
+	sha = bbf637b2a565073a89783c9eb4ebd9c460823fe4
+	etag = 6b9139f22428851c8d7329973f3d92802d25e70a5e0c1b24604c23db991ac8e2
 	weak
 [file ".github/workflows/changelog.yml"]
 	url = https://github.com/devlooped/oss/blob/main/.github/workflows/changelog.yml
@@ -74,8 +74,8 @@
 	weak
 [file ".gitignore"]
 	url = https://github.com/devlooped/oss/blob/main/.gitignore
-	sha = 829faad5e117383ed8eefad0e220530144ab4468
-	etag = 739f9cda1b43417a96b61941344e672098a853d6b365d8e96e351484288a78a0
+	sha = 978c71c6afd095eaba35097fd7deed44fa09aa91
+	etag = 2b49512f81b6cb44c4ee398975c0edf41bfa4137857b59770805fa7c5e49e94b
 	weak
 [file "Directory.Build.rsp"]
 	url = https://github.com/devlooped/oss/blob/main/Directory.Build.rsp
@@ -109,13 +109,13 @@
 	weak
 [file "src/Directory.Build.props"]
 	url = https://github.com/devlooped/oss/blob/main/src/Directory.Build.props
-	sha = cc6922f63e2bd520a75f46592cfb38cec02aaccd
-	etag = 743fd7845e40d9aef662f858a2d48dbfec9a10977e15394f45e331841a3c0dfd
+	sha = 2fea462dc563923800a7efad24a52aa0541a8864
+	etag = 819e24ed16c1257f3c6ea3c728e1507020bacf32aeb63f5dd56f9a5cb2652275
 	weak
 [file "src/Directory.Build.targets"]
 	url = https://github.com/devlooped/oss/blob/main/src/Directory.Build.targets
-	sha = 83d73781f82a05b805c98b70219c32a47c096fbe
-	etag = 7b62ae495bdfb2dcca473709323ab0d5cf2bb7637e7bff3250ae9267839069ef
+	sha = 024f73321ffe4e927151ff94666c52c2d425139a
+	etag = 816dff7cb821a885da46ad200f9b8bea3438d74da3172bc43716d5670abaee6c
 	weak
 [file "src/kzu.snk"]
 	url = https://github.com/devlooped/oss/blob/main/src/kzu.snk
@@ -154,8 +154,8 @@
 	weak
 [file ".github/workflows/test/action.yml"]
 	url = https://github.com/devlooped/oss/blob/main/.github/workflows/test/action.yml
-	sha = 3b9f317fc4f3edb926b26c4e4db9773a5f95ebca
-	etag = cf89aeff5c66fd3c0d0aaa655b527d66f5e823413c7a6788a62542e93d344576
+	sha = 2c82d7d80183eb619d48cddada414ff3c471303a
+	etag = 93a510692a6f4b5350ba486d1e944ea444612f137730f649ae6a2f96d7d970d0
 	weak
 [file "src/nuget.config"]
 	url = https://github.com/devlooped/oss/blob/main/src/nuget.config

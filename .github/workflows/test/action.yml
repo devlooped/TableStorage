@@ -28,7 +28,7 @@ runs:
                 exit 0
             fi
             # cat output, get failed test names, join as DisplayName=TEST with |, remove trailing |.
-            filter=$(cat ./output.log | grep -o -P '(?<=\sFailed\s)\w*' | awk 'BEGIN { ORS="|" } { print("DisplayName=" $0) }' | grep -o -P '.*(?=\|$)')
+            filter=$(cat ./output.log | grep -o -P '(?<=\sFailed\s)[^\s]*' | awk 'BEGIN { ORS="|" } { print("DisplayName=" $0) }' | grep -o -P '.*(?=\|$)')
             ((counter++))
         done
         exit $exitcode
