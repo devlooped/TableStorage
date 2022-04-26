@@ -171,7 +171,7 @@ namespace Devlooped
             var result = await table.UpsertEntityAsync(new BinaryDocumentEntity(partitionKey, rowKey)
             {
                 Document = binarySerializer!.Serialize(entity),
-                Type = typeof(T).FullName.Replace('+', '.'),
+                Type = typeof(T).FullName?.Replace('+', '.'),
                 Version = documentVersion,
                 MajorVersion = documentMajorVersion,
                 MinorVersion = documentMinorVersion,
@@ -236,7 +236,7 @@ namespace Devlooped
             var result = await table.UpsertEntityAsync(new DocumentEntity(partitionKey, rowKey)
             {
                 Document = stringSerializer!.Serialize(entity),
-                Type = typeof(T).FullName.Replace('+', '.'),
+                Type = typeof(T).FullName?.Replace('+', '.'),
                 Version = documentVersion,
                 MajorVersion = documentMajorVersion,
                 MinorVersion = documentMinorVersion,
