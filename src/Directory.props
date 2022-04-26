@@ -4,7 +4,7 @@
     <RootNamespace>Devlooped</RootNamespace>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
-    <RestoreSources>https://api.nuget.org/v3/index.json;https://pkg.kzu.io/index.json</RestoreSources>
+    <RestoreSources>https://api.nuget.org/v3/index.json;https://pkg.kzu.io/index.json;$(RestoreSources)</RestoreSources>
     
     <PackageProjectUrl>https://clarius.org/TableStorage</PackageProjectUrl>
   </PropertyGroup>

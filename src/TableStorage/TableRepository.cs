@@ -4,7 +4,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Linq.Expressions;
 using System.Reflection;
-using Microsoft.Azure.Cosmos.Table;
+using Azure.Data.Tables;
 
 namespace Devlooped
 {
@@ -21,13 +21,13 @@ namespace Devlooped
         /// </summary>
         /// <param name="storageAccount">The storage account to use.</param>
         /// <param name="tableName">Table name to use.</param>
-        /// <param name="updateStrategy">Strategy to apply when updating an existing entity. Defaults to <see cref="UpdateStrategy.Replace"/>.</param>
+        /// <param name="updateMode">Update mode for existing entities. Defaults to <see cref="TableUpdateMode.Merge"/>.</param>
         /// <returns>The new <see cref="ITableRepository{ITableEntity}"/>.</returns>
         public static ITableRepository<ITableEntity> Create(
             CloudStorageAccount storageAccount,
             string tableName,
-            UpdateStrategy? updateStrategy = default)
-            => new TableEntityRepository(storageAccount, tableName) { UpdateStrategy = updateStrategy ?? UpdateStrategy.Replace };
+            TableUpdateMode updateMode = TableUpdateMode.Merge)
+            => new TableEntityRepository(storageAccount, tableName) { UpdateMode = updateMode };
 
         /// <summary>
         /// Creates an <see cref="ITableRepository{T}"/> for the given entity type 
@@ -43,7 +43,7 @@ namespace Devlooped
             CloudStorageAccount storageAccount,
             Expression<Func<T, string>> partitionKey,
             Expression<Func<T, string>> rowKey) where T : class
-            => Create<T>(storageAccount, typeof(T).Name, partitionKey, rowKey);
+            => Create<T>(storageAccount, typeof(T).Name, partitionKey, rowKey, TableUpdateMode.Merge);
 
         /// <summary>
         /// Creates an <see cref="ITableRepository{T}"/> for the given entity type 
@@ -57,14 +57,14 @@ namespace Devlooped
         /// If not provided, the class will need a property annotated with <see cref="PartitionKeyAttribute"/>.</param>
         /// <param name="rowKey">Optional function to retrieve the row key for a given entity. 
         /// If not provided, the class will need a property annotated with <see cref="RowKeyAttribute"/>.</param>
-        /// <param name="updateStrategy">Strategy to apply when updating an existing entity. Defaults to <see cref="UpdateStrategy.Replace"/>.</param>
+        /// <param name="updateMode">Update mode for existing entities. Defaults to <see cref="TableUpdateMode.Merge"/>.</param>
         /// <returns>The new <see cref="ITableRepository{T}"/>.</returns>
         public static ITableRepository<T> Create<T>(
             CloudStorageAccount storageAccount,
             string? tableName = default,
             Expression<Func<T, string>>? partitionKey = null,
             Expression<Func<T, string>>? rowKey = null,
-            UpdateStrategy? updateStrategy = default) where T : class
+            TableUpdateMode updateMode = TableUpdateMode.Merge) where T : class
         {
             tableName ??= GetDefaultTableName<T>();
             partitionKey ??= PartitionKeyAttribute.CreateAccessor<T>();
@@ -72,7 +72,7 @@ namespace Devlooped
 
             return new TableRepository<T>(storageAccount, tableName, partitionKey, rowKey)
             {
-                UpdateStrategy = updateStrategy ?? UpdateStrategy.Replace,
+                UpdateMode = updateMode
             };
         }
 

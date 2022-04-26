@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Azure.Cosmos.Table;
+using Azure;
+using Azure.Data.Tables;
 using Xunit;
 
 namespace Devlooped
@@ -154,15 +155,17 @@ namespace Devlooped
         public async Task EnumFailsInTableClient()
         {
             var account = CloudStorageAccount.DevelopmentStorageAccount;
-            var table = account.CreateCloudTableClient().GetTableReference(nameof(EnumFailsInTableClient));
+            var table = account.CreateTableServiceClient().GetTableClient(nameof(EnumFailsInTableClient));
 
             await table.CreateIfNotExistsAsync();
 
-            Assert.Throws<StorageException>(() =>
-                (from book in table.CreateQuery<BookEntity>()
-                 where book.Format == BookFormat.Hardback && book.IsPublished
-                 select new { book.Title })
-                .ToList());
+            var books = table.QueryAsync<BookEntity>("Format eq 'Hardback'").ToHashSetAsync();
+
+            //Assert.Throws<StorageException>(() =>
+            //    (from book in table.CreateQuery<BookEntity>()
+            //     where book.Format == BookFormat.Hardback && book.IsPublished
+            //     select new { book.Title })
+            //    .ToList());
         }
 
         async Task LoadBooksAsync(ITableStorage<Book> books)
@@ -179,11 +182,16 @@ namespace Devlooped
 
         public record Book(string ISBN, string Title, string Author, BookFormat Format, int? Pages = null, bool IsPublished = true);
 
-        public class BookEntity : TableEntity
+        public class BookEntity : ITableEntity
         {
             public bool IsPublished { get; set; }
             public string? Title { get; set; }
             public BookFormat Format { get; set; }
+
+            public string PartitionKey { get; set; } = "";
+            public string RowKey { get; set; } = "";
+            public DateTimeOffset? Timestamp { get; set; }
+            public ETag ETag { get; set; } = ETag.All;
         }
     }
 }

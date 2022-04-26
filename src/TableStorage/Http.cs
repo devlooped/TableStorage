@@ -8,7 +8,6 @@ using System.Net.Http.Headers;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
-using Microsoft.Azure.Cosmos.Table;
 
 namespace Devlooped
 {

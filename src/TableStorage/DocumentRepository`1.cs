@@ -4,11 +4,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Net;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Azure.Cosmos.Table;
+using System.Web;
+using Azure;
+using Azure.Data.Tables;
+using Microsoft.OData.Client;
+using static Devlooped.DocumentRepository;
 
 namespace Devlooped
 {
@@ -26,9 +29,9 @@ namespace Devlooped
 
         readonly Func<T, string> partitionKey;
         readonly Func<T, string> rowKey;
-        readonly Task<CloudTable> table;
+        readonly Task<TableClient> table;
 
-        readonly Func<Expression<Func<IDocumentEntity, bool>>?, CancellationToken, IAsyncEnumerable<T>> enumerate;
+        readonly Func<Func<IQueryable<IDocumentEntity>, IQueryable<IDocumentEntity>>, CancellationToken, IAsyncEnumerable<T>> enumerate;
         readonly Func<string, string, CancellationToken, Task<T?>> get;
         readonly Func<T, CancellationToken, Task<T>> put;
 
@@ -87,17 +90,9 @@ namespace Devlooped
         {
             var table = await this.table.ConfigureAwait(false);
 
-            try
-            {
-                var result = await table.ExecuteAsync(TableOperation.Delete(
-                    new TableEntity(partitionKey, rowKey) { ETag = "*" }), cancellation);
+            var result = await table.DeleteEntityAsync(partitionKey, rowKey, cancellationToken: cancellation).ConfigureAwait(false);
 
-                return result.HttpStatusCode >= 200 && result.HttpStatusCode <= 299;
-            }
-            catch (StorageException)
-            {
-                return false;
-            }
+            return !result.IsError;
         }
 
         /// <inheritdoc />
@@ -106,11 +101,11 @@ namespace Devlooped
 
         /// <inheritdoc />
         public IAsyncEnumerable<T> EnumerateAsync(string? partitionKey = default, CancellationToken cancellation = default)
-            => enumerate(partitionKey == null ? null : e => e.PartitionKey == partitionKey, cancellation);
+            => enumerate(query => partitionKey == null ? query : query.Where(e => e.PartitionKey == partitionKey), cancellation);
 
         /// <inheritdoc />
         public IAsyncEnumerable<T> EnumerateAsync(Expression<Func<IDocumentEntity, bool>> predicate, CancellationToken cancellation = default)
-            => enumerate(predicate, cancellation);
+            => enumerate(query => query.Where(predicate), cancellation);
 
         /// <inheritdoc />
         public Task<T?> GetAsync(string partitionKey, string rowKey, CancellationToken cancellation = default)
@@ -122,51 +117,47 @@ namespace Devlooped
 
         #region Binary
 
-        async IAsyncEnumerable<T> EnumerateBinaryAsync(Expression<Func<IDocumentEntity, bool>>? predicate, [EnumeratorCancellation] CancellationToken cancellation = default)
+        async IAsyncEnumerable<T> EnumerateBinaryAsync(Func<IQueryable<IDocumentEntity>, IQueryable<IDocumentEntity>> filter, [EnumeratorCancellation] CancellationToken cancellation = default)
         {
-            var table = await this.table.ConfigureAwait(false);
-            var query = table.CreateQuery<BinaryDocumentEntity>();
+            var query = new TableRepositoryQuery<BinaryDocumentEntity>(
+                storageAccount,
+                DocumentSerializer.Default,
+                TableName,
+                nameof(IDocumentEntity.PartitionKey),
+                nameof(IDocumentEntity.RowKey));
 
-            if (predicate != null)
+            query = (TableRepositoryQuery<BinaryDocumentEntity>)filter(query);
+
+            await foreach (var entity in query.WithCancellation(cancellation))
             {
-                var expression = Expression.Lambda<Func<BinaryDocumentEntity, bool>>(predicate.Body, Expression.Parameter(typeof(BinaryDocumentEntity)));
-                query = (TableQuery<BinaryDocumentEntity>)((IQueryable<BinaryDocumentEntity>)query).Where(expression);
-            }
-
-            TableContinuationToken? continuation = null;
-            do
-            {
-                var segment = await table.ExecuteQuerySegmentedAsync(query, continuation, cancellation)
-                    .ConfigureAwait(false);
-
-                continuation = segment.ContinuationToken;
-
-                foreach (var entity in segment)
+                if (entity?.Document is byte[] document)
                 {
-                    if (entity != null && entity.Document != null)
-                    {
-                        var value = binarySerializer!.Deserialize<T>(entity.Document);
-                        if (value != null)
-                            yield return value;
-                    }
+                    var value = binarySerializer!.Deserialize<T>(document);
+                    if (value != null)
+                        yield return value;
                 }
-
-            } while (continuation != null && !cancellation.IsCancellationRequested);
+            }
         }
 
         async Task<T?> GetBinaryAsync(string partitionKey, string rowKey, CancellationToken cancellation = default)
         {
             var table = await this.table.ConfigureAwait(false);
-            var result = await table.ExecuteAsync(TableOperation.Retrieve<BinaryDocumentEntity>(
-                partitionKey, rowKey),
-                cancellation)
-                .ConfigureAwait(false);
 
-            var document = (BinaryDocumentEntity?)result.Result;
-            if (document?.Document == null)
+            try
+            {
+                var result = await table.GetEntityAsync<BinaryDocumentEntity>(partitionKey, rowKey, cancellationToken: cancellation).ConfigureAwait(false);
+
+                var document = result.Value.Document;
+                if (document == null)
+                    return default;
+
+                return binarySerializer!.Deserialize<T>(document);
+
+            }
+            catch (RequestFailedException ex) when (ex.Status == 404)
+            {
                 return default;
-
-            return binarySerializer!.Deserialize<T>(document.Document);
+            }
         }
 
         async Task<T> PutBinaryAsync(T entity, CancellationToken cancellation = default)
@@ -177,74 +168,61 @@ namespace Devlooped
 
             // We use Replace because all the existing entity data is in a single 
             // column, no point in merging since it can't be done at that level anyway.
-            var result = await table.ExecuteAsync(TableOperation.InsertOrReplace(
-                new BinaryDocumentEntity(partitionKey, rowKey)
-                {
-                    ETag = "*",
-                    Document = binarySerializer!.Serialize(entity),
-                    Type = typeof(T).FullName,
-                    Version = documentVersion,
-                    MajorVersion = documentMajorVersion,
-                    MinorVersion = documentMinorVersion,
-                }), cancellation)
-                .ConfigureAwait(false);
+            var result = await table.UpsertEntityAsync(new BinaryDocumentEntity(partitionKey, rowKey)
+            {
+                Document = binarySerializer!.Serialize(entity),
+                Type = typeof(T).FullName.Replace('+', '.'),
+                Version = documentVersion,
+                MajorVersion = documentMajorVersion,
+                MinorVersion = documentMinorVersion,
+            }, TableUpdateMode.Replace, cancellation).ConfigureAwait(false);
 
-            var document = (BinaryDocumentEntity)result.Result;
-            if (document.Document == null)
-                return entity;
-
-            return binarySerializer.Deserialize<T>(document.Document) ?? entity;
+            return await GetBinaryAsync(partitionKey, rowKey, cancellation).ConfigureAwait(false) ?? entity;
         }
 
         #endregion
 
         #region String
 
-        async IAsyncEnumerable<T> EnumerateStringAsync(Expression<Func<IDocumentEntity, bool>>? predicate, [EnumeratorCancellation] CancellationToken cancellation = default)
+        async IAsyncEnumerable<T> EnumerateStringAsync(Func<IQueryable<IDocumentEntity>, IQueryable<IDocumentEntity>> filter, [EnumeratorCancellation] CancellationToken cancellation = default)
         {
-            var table = await this.table.ConfigureAwait(false);
-            var query = table.CreateQuery<DocumentEntity>();
+            IQueryable<IDocumentEntity> query = new TableRepositoryQuery<DocumentEntity>(
+                storageAccount,
+                DocumentSerializer.Default,
+                TableName, null, null);
 
-            if (predicate != null)
+            var results = (IAsyncEnumerable<IDocumentEntity>)filter(query);
+
+            await foreach (var entity in results.WithCancellation(cancellation))
             {
-                var expression = Expression.Lambda<Func<DocumentEntity, bool>>(predicate.Body, Expression.Parameter(typeof(DocumentEntity)));
-                query = (TableQuery<DocumentEntity>)((IQueryable<DocumentEntity>)query).Where(expression);
-            }
-
-            TableContinuationToken? continuation = null;
-            do
-            {
-                var segment = await table.ExecuteQuerySegmentedAsync(query, continuation, cancellation)
-                    .ConfigureAwait(false);
-
-                continuation = segment.ContinuationToken;
-
-                foreach (var entity in segment)
+                if (entity is DocumentEntity document && 
+                    document.Document is string data)
                 {
-                    if (entity != null && entity.Document != null)
-                    {
-                        var value = stringSerializer!.Deserialize<T>(entity.Document);
-                        if (value != null)
-                            yield return value;
-                    }
+                    var value = stringSerializer!.Deserialize<T>(data);
+                    if (value != null)
+                        yield return value;
                 }
-
-            } while (continuation != null && !cancellation.IsCancellationRequested);
+            }
         }
 
         async Task<T?> GetStringAsync(string partitionKey, string rowKey, CancellationToken cancellation = default)
         {
             var table = await this.table.ConfigureAwait(false);
-            var result = await table.ExecuteAsync(TableOperation.Retrieve<DocumentEntity>(
-                partitionKey, rowKey),
-                cancellation)
-                .ConfigureAwait(false);
 
-            var document = (DocumentEntity?)result.Result;
-            if (document?.Document == null)
+            try
+            {
+                var result = await table.GetEntityAsync<DocumentEntity>(partitionKey, rowKey, cancellationToken: cancellation).ConfigureAwait(false);
+
+                var document = result.Value.Document;
+                if (document == null)
+                    return default;
+
+                return stringSerializer!.Deserialize<T>(document);
+            }
+            catch (RequestFailedException ex) when (ex.Status == 404)
+            {
                 return default;
-
-            return stringSerializer!.Deserialize<T>(document.Document);
+            }
         }
 
         async Task<T> PutStringAsync(T entity, CancellationToken cancellation = default)
@@ -255,55 +233,26 @@ namespace Devlooped
 
             // We use Replace because all the existing entity data is in a single 
             // column, no point in merging since it can't be done at that level anyway.
-            var result = await table.ExecuteAsync(TableOperation.InsertOrReplace(
-                new DocumentEntity(partitionKey, rowKey)
-                {
-                    ETag = "*",
-                    Document = stringSerializer!.Serialize(entity),
-                    Type = typeof(T).FullName,
-                    Version = documentVersion,
-                    MajorVersion = documentMajorVersion,
-                    MinorVersion = documentMinorVersion,
-                }), cancellation)
-                .ConfigureAwait(false);
+            var result = await table.UpsertEntityAsync(new DocumentEntity(partitionKey, rowKey)
+            {
+                Document = stringSerializer!.Serialize(entity),
+                Type = typeof(T).FullName.Replace('+', '.'),
+                Version = documentVersion,
+                MajorVersion = documentMajorVersion,
+                MinorVersion = documentMinorVersion,
+            }, TableUpdateMode.Replace, cancellation).ConfigureAwait(false);
 
-            var document = (DocumentEntity)result.Result;
-            if (document.Document == null)
-                return entity;
-
-            return stringSerializer.Deserialize<T>(document.Document) ?? entity;
+            return await GetStringAsync(partitionKey, rowKey, cancellation).ConfigureAwait(false) ?? entity;
         }
 
         #endregion
 
-        Task<CloudTable> GetTableAsync(string tableName) => Task.Run(async () =>
+        Task<TableClient> GetTableAsync(string tableName) => Task.Run(async () =>
         {
-            var tableClient = storageAccount.CreateCloudTableClient();
-            var table = tableClient.GetTableReference(tableName);
+            var tableClient = storageAccount.CreateTableServiceClient();
+            var table = tableClient.GetTableClient(tableName);
             await table.CreateIfNotExistsAsync();
             return table;
         });
-
-        class BinaryDocumentEntity : TableEntity, IDocumentEntity
-        {
-            public BinaryDocumentEntity() { }
-            public BinaryDocumentEntity(string partitionKey, string rowKey) : base(partitionKey, rowKey) { }
-            public byte[]? Document { get; set; }
-            public string? Type { get; set; }
-            public string? Version { get; set; }
-            public int? MajorVersion { get; set; }
-            public int? MinorVersion { get; set; }
-        }
-
-        class DocumentEntity : TableEntity, IDocumentEntity
-        {
-            public DocumentEntity() { }
-            public DocumentEntity(string partitionKey, string rowKey) : base(partitionKey, rowKey) { }
-            public string? Document { get; set; }
-            public string? Type { get; set; }
-            public string? Version { get; set; }
-            public int? MajorVersion { get; set; }
-            public int? MinorVersion { get; set; }
-        }
     }
 }

@@ -13,7 +13,7 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Web;
-using Microsoft.Azure.Cosmos.Table;
+using Azure.Data.Tables;
 using Microsoft.OData.Client;
 
 namespace Devlooped
@@ -35,7 +35,7 @@ namespace Devlooped
             this.tableName = tableName;
             this.partitionKeyProperty = partitionKeyProperty;
             this.rowKeyProperty = rowKeyProperty;
-            this.expression = expression ?? new DataServiceContext(account.TableStorageUri.PrimaryUri).CreateQuery<T>(tableName).Expression;
+            this.expression = expression ?? new DataServiceContext(account.TableEndpoint).CreateQuery<T>(tableName).Expression;
         }
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace Devlooped
 
         public async IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellation = default)
         {
-            var query = (DataServiceQuery)new DataServiceContext(account.TableStorageUri.PrimaryUri).CreateQuery<T>(tableName)
+            var query = (DataServiceQuery)new DataServiceContext(account.TableEndpoint).CreateQuery<T>(tableName)
                 .Provider.CreateQuery(expression);
 
             // OData will translate the enum value in a filter to TYPENAME.'ENUMVALUE'.
@@ -179,10 +179,15 @@ namespace Devlooped
         public IQueryable CreateQuery(Expression expression) => CreateQuery<T>(expression);
 
         public IQueryable<TElement> CreateQuery<TElement>(Expression expression)
-            => new TableRepositoryQuery<TElement>(account, serializer, tableName, partitionKeyProperty, rowKeyProperty, expression)
-            {
-                PartitionKey = PartitionKey
-            };
+            => typeof(TElement).IsAssignableFrom(typeof(T)) ?
+                (IQueryable<TElement>)new TableRepositoryQuery<T>(account, serializer, tableName, partitionKeyProperty, rowKeyProperty, expression)
+                {
+                    PartitionKey = PartitionKey
+                } :
+                new TableRepositoryQuery<TElement>(account, serializer, tableName, partitionKeyProperty, rowKeyProperty, expression)
+                {
+                    PartitionKey = PartitionKey
+                };
 
         public object Execute(Expression expression) => throw new NotSupportedException("Please use a asynchronous enumeration (i.e. 'async foreach') to execute the query.");
 

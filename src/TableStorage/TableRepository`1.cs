@@ -14,7 +14,8 @@ using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Azure.Cosmos.Table;
+using Azure;
+using Azure.Data.Tables;
 
 namespace Devlooped
 {
@@ -29,7 +30,7 @@ namespace Devlooped
         readonly string? partitionKeyProperty;
         readonly Func<T, string> rowKey;
         readonly string? rowKeyProperty;
-        readonly Task<CloudTable> table;
+        readonly Task<TableClient> table;
 
         /// <summary>
         /// Initializes the table repository.
@@ -63,9 +64,20 @@ namespace Devlooped
         public string TableName { get; }
 
         /// <summary>
+        /// The <see cref="TableUpdateMode"/> to use when updating an existing entity.
+        /// </summary>
+        public TableUpdateMode UpdateMode { get; set; }
+
+        /// <summary>
         /// The strategy to use when updating an existing entity.
         /// </summary>
-        public UpdateStrategy UpdateStrategy { get; set; } = UpdateStrategy.Replace;
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public UpdateStrategy UpdateStrategy
+        {
+            // Backs-compatible implementation
+            get => UpdateMode == TableUpdateMode.Replace ? UpdateStrategy.Replace : UpdateStrategy.Merge;
+            set => UpdateMode = value.UpdateMode;
+        }
 
         /// <inheritdoc />
         public IQueryable<T> CreateQuery() => new TableRepositoryQuery<T>(storageAccount, serializer, TableName, partitionKeyProperty, rowKeyProperty);
@@ -78,19 +90,10 @@ namespace Devlooped
         public async Task<bool> DeleteAsync(string partitionKey, string rowKey, CancellationToken cancellation = default)
         {
             var table = await this.table.ConfigureAwait(false);
+            var result = await table.DeleteEntityAsync(partitionKey, rowKey, cancellationToken: cancellation)
+                .ConfigureAwait(false);
 
-            try
-            {
-                var result = await table.ExecuteAsync(TableOperation.Delete(
-                    new TableEntity(partitionKey, rowKey) { ETag = "*" }), cancellation)
-                    .ConfigureAwait(false);
-
-                return result.HttpStatusCode >= 200 && result.HttpStatusCode <= 299;
-            }
-            catch (StorageException)
-            {
-                return false;
-            }
+            return !result.IsError;
         }
 
         /// <inheritdoc />
@@ -101,36 +104,32 @@ namespace Devlooped
         public async IAsyncEnumerable<T> EnumerateAsync(string? partitionKey = default, [EnumeratorCancellation] CancellationToken cancellation = default)
         {
             var table = await this.table;
-            var query = new TableQuery<DynamicTableEntity>();
+            var filter = default(string);
             if (partitionKey != null)
-                query = query.Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));
+                filter = "PartitionKey eq '" + partitionKey + "'";
 
-            TableContinuationToken? continuation = null;
-            do
+            await foreach (var entity in table.QueryAsync<TableEntity>(filter, cancellationToken: cancellation).WithCancellation(cancellation))
             {
-                var segment = await table.ExecuteQuerySegmentedAsync(query, continuation, cancellation)
-                    .ConfigureAwait(false);
-
-                continuation = segment.ContinuationToken;
-
-                foreach (var entity in segment)
-                    if (entity != null)
-                        yield return ToEntity(entity);
-
-            } while (continuation != null && !cancellation.IsCancellationRequested);
+                yield return ToEntity(entity);
+            }
         }
 
         /// <inheritdoc />
         public async Task<T?> GetAsync(string partitionKey, string rowKey, CancellationToken cancellation = default)
         {
             var table = await this.table.ConfigureAwait(false);
-            var result = await table.ExecuteAsync(TableOperation.Retrieve(partitionKey, rowKey), cancellation)
-                .ConfigureAwait(false);
 
-            if (result?.Result == null)
+            try
+            {
+                var result = await table.GetEntityAsync<TableEntity>(partitionKey, rowKey, cancellationToken: cancellation)
+                    .ConfigureAwait(false);
+
+                return ToEntity(result.Value);
+            }
+            catch (RequestFailedException ex) when (ex.Status == 404)
+            {
                 return default;
-
-            return ToEntity((DynamicTableEntity)result.Result);
+            }
         }
 
         /// <inheritdoc />
@@ -140,9 +139,9 @@ namespace Devlooped
             var rowKey = this.rowKey.Invoke(entity);
             var properties = entityProperties.GetOrAdd(entity.GetType(), type => type
                 .GetProperties()
-                .Where(prop => 
-                    prop.GetCustomAttribute<BrowsableAttribute>()?.Browsable != false && 
-                    prop.Name != partitionKeyProperty && 
+                .Where(prop =>
+                    prop.GetCustomAttribute<BrowsableAttribute>()?.Browsable != false &&
+                    prop.Name != partitionKeyProperty &&
                     prop.Name != rowKeyProperty)
                 .ToArray());
 
@@ -152,31 +151,30 @@ namespace Devlooped
                 .Where(pair => pair.Value != null)
                 .ToDictionary(
                     pair => pair.Name,
-                    pair => EntityProperty.CreateEntityPropertyFromObject(
+                    pair =>
 #if NET6_0_OR_GREATER
-                    pair.Value is DateOnly date ? date.ToString("O") : pair.Value
+                    pair.Value is DateOnly date ? 
+                        date.ToString("O") : 
+                        pair.Value.GetType().IsEnum ? 
+                        pair.Value.ToString() : pair.Value
 #else
-                    pair.Value
+                    pair.Value.GetType().IsEnum ? pair.Value.ToString() : pair.Value
 #endif
-                    ));
-            
-            var result = await table.ExecuteAsync(UpdateStrategy.CreateOperation(
-                new DynamicTableEntity(partitionKey, rowKey, "*", values)), cancellation)
+                    );
+
+            values[nameof(ITableEntity.PartitionKey)] = partitionKey;
+            values[nameof(ITableEntity.RowKey)] = rowKey;
+
+            var result = await table.UpsertEntityAsync(new TableEntity(values), UpdateMode, cancellation)
                 .ConfigureAwait(false);
-
-            // For merging, we need to actually retrieve the entity again, since the previous operation 
-            // will just return the same entity we persisted, we may have fewer properties/values than 
-            // the ones in storage.
-            if (UpdateStrategy == UpdateStrategy.Merge)
-                return (await GetAsync(partitionKey, rowKey, cancellation))!;
-
-            return ToEntity((DynamicTableEntity)result.Result);
+            
+            return (await GetAsync(partitionKey, rowKey, cancellation).ConfigureAwait(false))!;
         }
 
-        Task<CloudTable> GetTableAsync(string tableName) => Task.Run(async () =>
+        Task<TableClient> GetTableAsync(string tableName) => Task.Run(async () =>
         {
-            var tableClient = storageAccount.CreateCloudTableClient();
-            var table = tableClient.GetTableReference(tableName);
+            var tableService = storageAccount.CreateTableServiceClient();
+            var table = tableService.GetTableClient(tableName);
             await table.CreateIfNotExistsAsync();
             return table;
         });
@@ -186,11 +184,11 @@ namespace Devlooped
         /// to the entity type, so that the right constructor and property 
         /// setters can be invoked, even if they are internal/private.
         /// </summary>
-        T ToEntity(DynamicTableEntity entity)
+        T ToEntity(TableEntity entity)
         {
             using var mem = new MemoryStream();
             using var writer = new Utf8JsonWriter(mem);
-            
+
             // Write entity properties in json format so deserializer can 
             // perform its advanced ctor and conversion detection as usual.
             writer.WriteStartObject();
@@ -201,35 +199,39 @@ namespace Devlooped
             if (rowKeyProperty != null)
                 writer.WriteString(rowKeyProperty, entity.RowKey);
 
-            writer.WriteString(nameof(ITableEntity.Timestamp), entity.Timestamp);
+            if (entity.Timestamp != null)
+                writer.WriteString(nameof(ITableEntity.Timestamp), entity.Timestamp.Value.ToString("O"));
 
-            foreach (var property in entity.Properties)
+            foreach (var property in entity)
             {
-                switch (property.Value.PropertyType)
+                switch (property.Value)
                 {
-                    case EdmType.String:
-                        writer.WriteString(property.Key, property.Value.StringValue);
+                    case string value:
+                        writer.WriteString(property.Key, value);
                         break;
-                    case EdmType.Binary:
-                        writer.WriteBase64String(property.Key, property.Value.BinaryValue);
+                    case byte[] value:
+                        writer.WriteBase64String(property.Key, value);
                         break;
-                    case EdmType.Boolean when property.Value.BooleanValue != null:
-                        writer.WriteBoolean(property.Key, (bool)property.Value.BooleanValue);
+                    case bool value:
+                        writer.WriteBoolean(property.Key, value);
                         break;
-                    case EdmType.DateTime when property.Value.DateTime != null:
-                        writer.WriteString(property.Key, (DateTime)property.Value.DateTime);
+                    case DateTime value:
+                        writer.WriteString(property.Key, value);
                         break;
-                    case EdmType.Double when property.Value.DoubleValue != null:
-                        writer.WriteNumber(property.Key, (double)property.Value.DoubleValue);
+                    case DateTimeOffset value:
+                        writer.WriteString(property.Key, value);
                         break;
-                    case EdmType.Guid when property.Value.GuidValue != null:
-                        writer.WriteString(property.Key, (Guid)property.Value.GuidValue);
+                    case double value:
+                        writer.WriteNumber(property.Key, value);
                         break;
-                    case EdmType.Int32 when property.Value.Int32Value != null:
-                        writer.WriteNumber(property.Key, (int)property.Value.Int32Value);
+                    case int value:
+                        writer.WriteNumber(property.Key, value);
                         break;
-                    case EdmType.Int64 when property.Value.Int64Value != null:
-                        writer.WriteNumber(property.Key, (long)property.Value.Int64Value);
+                    case long value:
+                        writer.WriteNumber(property.Key, value);
+                        break;
+                    case Guid value:
+                        writer.WriteString(property.Key, value);
                         break;
                     default:
                         break;

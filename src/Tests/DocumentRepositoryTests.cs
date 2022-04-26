@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MessagePack;
-using Microsoft.Azure.Cosmos.Table;
 using ProtoBuf;
 using Xunit;
 
@@ -23,9 +22,11 @@ namespace Devlooped
         [MemberData(nameof(Serializers))]
         public async Task DocumentEndToEnd(IDocumentSerializer serializer)
         {
-            var table = CloudStorageAccount.DevelopmentStorageAccount.CreateCloudTableClient()
-                .GetTableReference(serializer.GetType().Name);
-            await table.DeleteIfExistsAsync();
+            var table = CloudStorageAccount.DevelopmentStorageAccount
+                .CreateTableServiceClient()
+                .GetTableClient(serializer.GetType().Name);
+
+            await table.DeleteAsync();
             await table.CreateAsync();
 
             try
@@ -69,7 +70,7 @@ namespace Devlooped
             }
             finally
             {
-                await table.DeleteIfExistsAsync();
+                await table.DeleteAsync();
             }
         }
 
@@ -77,9 +78,11 @@ namespace Devlooped
         [MemberData(nameof(Serializers))]
         public async Task DocumentPartitionEndToEnd(IDocumentSerializer serializer)
         {
-            var table = CloudStorageAccount.DevelopmentStorageAccount.CreateCloudTableClient()
-                .GetTableReference(serializer.GetType().Name);
-            await table.DeleteIfExistsAsync();
+            var table = CloudStorageAccount.DevelopmentStorageAccount
+                .CreateTableServiceClient()
+                .GetTableClient(serializer.GetType().Name);
+
+            await table.DeleteAsync();
             await table.CreateAsync();
 
             try
@@ -130,9 +133,11 @@ namespace Devlooped
         [MemberData(nameof(Serializers))]
         public async Task CanQueryDocument(IDocumentSerializer serializer)
         {
-            var table = CloudStorageAccount.DevelopmentStorageAccount.CreateCloudTableClient()
-                .GetTableReference(nameof(CanQueryDocument) + serializer.GetType().Name);
-            await table.DeleteIfExistsAsync();
+            var table = CloudStorageAccount.DevelopmentStorageAccount
+                .CreateTableServiceClient()
+                .GetTableClient(nameof(CanQueryDocument) + serializer.GetType().Name);
+
+            await table.DeleteAsync();
             await table.CreateAsync();
 
             try
@@ -140,7 +145,7 @@ namespace Devlooped
                 var repo = DocumentRepository.Create<DocumentEntity>(CloudStorageAccount.DevelopmentStorageAccount,
                     table.Name, serializer: serializer);
 
-                var partitionKey = "P" + Guid.NewGuid().ToString("N");
+                var partitionKey = "P5943C610208D4008BEC052272ED07214";
 
                 await repo.PutAsync(new DocumentEntity
                 {
@@ -156,18 +161,20 @@ namespace Devlooped
                     Title = "Foo",
                 });
 
+                var typeName = typeof(DocumentEntity).FullName!.Replace('+', '.');
+
                 var entities = await repo.EnumerateAsync(e =>
                     e.PartitionKey == partitionKey &&
                     e.RowKey.CompareTo("Foo") >= 0 && e.RowKey.CompareTo("Fop") < 0 &&
                     e.Version != "1.0" &&
-                    e.Type == typeof(DocumentEntity).FullName)
+                    e.Type == typeName)
                     .ToListAsync();
 
                 Assert.Single(entities);
             }
             finally
             {
-                await table.DeleteIfExistsAsync();
+                await table.DeleteAsync();
             }
         }
 
