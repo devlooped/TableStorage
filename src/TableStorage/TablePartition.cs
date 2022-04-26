@@ -4,7 +4,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Linq.Expressions;
 using System.Reflection;
-using Microsoft.Azure.Cosmos.Table;
+using Azure.Data.Tables;
 
 namespace Devlooped
 {
@@ -28,10 +28,10 @@ namespace Devlooped
         /// <param name="storageAccount">The storage account to use.</param>
         /// <param name="tableName">Table name to use.</param>
         /// <param name="partitionKey">Fixed partition key to scope entity persistence.</param>
-        /// <param name="updateStrategy">Strategy to apply when updating an existing entity. Defaults to <see cref="UpdateStrategy.Replace"/>.</param>
+        /// <param name="updateMode">Update mode for existing entities. Defaults to <see cref="TableUpdateMode.Merge"/>.</param>
         /// <returns>The new <see cref="ITablePartition{TEntity}"/>.</returns>
-        public static ITablePartition<ITableEntity> Create(CloudStorageAccount storageAccount, string tableName, string partitionKey, UpdateStrategy? updateStrategy = default)
-            => new TableEntityPartition(storageAccount, tableName, partitionKey) { UpdateStrategy = updateStrategy ?? UpdateStrategy.Replace };
+        public static ITablePartition<ITableEntity> Create(CloudStorageAccount storageAccount, string tableName, string partitionKey, TableUpdateMode updateMode = TableUpdateMode.Merge)
+            => new TableEntityPartition(storageAccount, tableName, partitionKey) { UpdateMode = updateMode };
 
         /// <summary>
         /// Creates an <see cref="ITablePartition{T}"/> for the given entity type 
@@ -45,7 +45,7 @@ namespace Devlooped
         public static ITablePartition<T> Create<T>(
             CloudStorageAccount storageAccount,
             Expression<Func<T, string>> rowKey) where T : class
-            => Create<T>(storageAccount, DefaultTableName, default, rowKey);
+            => Create<T>(storageAccount, DefaultTableName, default, rowKey, TableUpdateMode.Merge);
 
         /// <summary>
         /// Creates an <see cref="ITablePartition{T}"/> for the given entity type 
@@ -61,7 +61,7 @@ namespace Devlooped
             CloudStorageAccount storageAccount,
             string tableName,
             Expression<Func<T, string>> rowKey) where T : class
-            => Create<T>(storageAccount, tableName, default, rowKey);
+            => Create<T>(storageAccount, tableName, default, rowKey, TableUpdateMode.Merge);
 
         /// <summary>
         /// Creates an <see cref="ITablePartition{T}"/> for the given entity type 
@@ -75,14 +75,14 @@ namespace Devlooped
         /// If not provided, the <typeparamref name="T"/> <c>Name</c> will be used.</param>
         /// <param name="rowKey">Optional function to retrieve the row key for a given entity. 
         /// If not provided, the class will need a property annotated with <see cref="RowKeyAttribute"/>.</param>
-        /// <param name="updateStrategy">Strategy to apply when updating an existing entity. Defaults to <see cref="UpdateStrategy.Replace"/>.</param>
+        /// <param name="updateMode">Update mode for existing entities. Defaults to <see cref="TableUpdateMode.Merge"/>.</param>
         /// <returns>The new <see cref="ITablePartition{T}"/>.</returns>
         public static ITablePartition<T> Create<T>(
             CloudStorageAccount storageAccount,
             string? tableName = default,
             string? partitionKey = null,
             Expression<Func<T, string>>? rowKey = null,
-            UpdateStrategy? updateStrategy = default) where T : class
+            TableUpdateMode updateMode = TableUpdateMode.Merge) where T : class
         {
             tableName ??= GetDefaultTableName<T>();
             partitionKey ??= GetDefaultPartitionKey<T>();
@@ -90,7 +90,7 @@ namespace Devlooped
 
             return new TablePartition<T>(storageAccount, tableName, partitionKey, rowKey)
             {
-                UpdateStrategy = updateStrategy ?? UpdateStrategy.Replace
+                UpdateMode = updateMode
             };
         }
 

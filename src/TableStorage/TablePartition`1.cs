@@ -2,11 +2,12 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Azure.Cosmos.Table;
+using Azure.Data.Tables;
 
 namespace Devlooped
 {
@@ -41,12 +42,19 @@ namespace Devlooped
         public string PartitionKey { get; }
 
         /// <summary>
+        /// The <see cref="TableUpdateMode"/> to use when updating an existing entity.
+        /// </summary>
+        public TableUpdateMode UpdateMode { get; set; }
+
+        /// <summary>
         /// The strategy to use when updating an existing entity.
         /// </summary>
-        public UpdateStrategy UpdateStrategy 
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public UpdateStrategy UpdateStrategy
         {
-            get => repository.UpdateStrategy;
-            set => repository.UpdateStrategy = value; 
+            // Backs-compatible implementation
+            get => UpdateMode == TableUpdateMode.Replace ? UpdateStrategy.Replace : UpdateStrategy.Merge;
+            set => UpdateMode = value.UpdateMode;
         }
 
         /// <inheritdoc />
