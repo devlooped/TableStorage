@@ -36,13 +36,13 @@ namespace Devlooped
                 request.Headers.Add("x-ms-date", date);
             }
 
-            var resource = request.RequestUri.GetComponents(UriComponents.Path, UriFormat.Unescaped);
+            var resource = request.RequestUri?.GetComponents(UriComponents.Path, UriFormat.Unescaped);
             var toSign = string.Format("{0}\n/{1}/{2}",
                     request.Headers.GetValues("x-ms-date").First(),
                     account.Credentials.AccountName,
-                    resource.TrimStart('/'));
+                    resource?.TrimStart('/'));
 
-            var hasher = new HMACSHA256(Convert.FromBase64String(account.Credentials.Key));
+            var hasher = new HMACSHA256(Convert.FromBase64String(account.Credentials.Key ?? ""));
             var signature = hasher.ComputeHash(Encoding.UTF8.GetBytes(toSign));
             var authentication = new AuthenticationHeaderValue("SharedKeyLite", account.Credentials.AccountName + ":" + Convert.ToBase64String(signature));
 
