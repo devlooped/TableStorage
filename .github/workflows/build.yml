@@ -68,6 +68,12 @@ jobs:
           brew install grep
           echo 'export PATH="/usr/local/opt/grep/libexec/gnubin:$PATH"' >> .bash_profile
 
+      - name: ⚙ azurite
+        run: |
+          npm install azurite
+          npx azurite --version
+          npx azurite &
+
       - name: 🧪 test
         uses: ./.github/workflows/test
 
