@@ -15,7 +15,7 @@
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="all" />
     <PackageReference Include="Devlooped.CloudStorageAccount" Version="1.0.0" />
     <PackageReference Include="Azure.Data.Tables" Version="12.5.0" />
-    <PackageReference Include="Microsoft.OData.Client" Version="7.10.0" />
+    <PackageReference Include="Microsoft.OData.Client" Version="7.11.0" />
     <PackageReference Include="System.Text.Json" Version="6.0.3" />
     <PackageReference Include="Nullable" Version="1.3.0" PrivateAssets="all" />
   </ItemGroup>
