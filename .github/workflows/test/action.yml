@@ -27,8 +27,8 @@ runs:
             then
                 exit 0
             fi
-            # cat output, get failed test names, join as DisplayName=TEST with |, remove trailing |.
-            filter=$(cat ./output.log | grep -o -P '(?<=\sFailed\s)[^\s]*' | awk 'BEGIN { ORS="|" } { print("DisplayName=" $0) }' | grep -o -P '.*(?=\|$)')
+            # cat output, get failed test names, remove trailing whitespace, sort+dedupe, join as FQN~TEST with |, remove trailing |.
+            filter=$(cat ./output.log | grep -o -P '(?<=\sFailed\s)[\w\._]*' | sed 's/ *$//g' | sort -u | awk 'BEGIN { ORS="|" } { print("FullyQualifiedName~" $0) }' | grep -o -P '.*(?=\|$)')
             ((counter++))
         done
         exit $exitcode
