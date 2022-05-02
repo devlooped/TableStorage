@@ -154,8 +154,8 @@
 	weak
 [file ".github/workflows/test/action.yml"]
 	url = https://github.com/devlooped/oss/blob/main/.github/workflows/test/action.yml
-	sha = 2c82d7d80183eb619d48cddada414ff3c471303a
-	etag = 93a510692a6f4b5350ba486d1e944ea444612f137730f649ae6a2f96d7d970d0
+	sha = fca55bc0e439be202a4480a682415a92c09b7672
+	etag = e75412a4af8b83897504e754f9a95cd4ebcd95b358857047afeb3cd97b2497ba
 	weak
 [file "src/nuget.config"]
 	url = https://github.com/devlooped/oss/blob/main/src/nuget.config
