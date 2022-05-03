@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Azure;
 using Azure.Data.Tables;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Devlooped
 {
-    public class RepositoryTests
+    public record RepositoryTests(ITestOutputHelper Output)
     {
         [Fact]
         public async Task TableEndToEnd()
@@ -46,6 +48,8 @@ namespace Devlooped
         public async Task TableRecordEndToEnd()
         {
             var repo = TableRepository.Create<AttributedRecordEntity>(CloudStorageAccount.DevelopmentStorageAccount);
+            Output.WriteLine("Target table: " + repo.TableName);
+
             var entity = await repo.PutAsync(new AttributedRecordEntity("Book", "1234"));
 
             Assert.Equal("1234", entity.ID);
@@ -427,7 +431,7 @@ namespace Devlooped
             public string? Status { get; set; }
         }
 
-        [Table("Record")]
+        [Table("EntityRequest")]
         record AttributedRecordEntity([PartitionKey] string Kind, [RowKey] string ID)
         {
             public string? Status { get; set; }

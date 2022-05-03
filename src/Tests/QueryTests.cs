@@ -44,7 +44,14 @@ namespace Devlooped
         public async Task CanProject()
         {
             var account = CloudStorageAccount.DevelopmentStorageAccount;
-            var repo = TableRepository.Create<Book>(account, nameof(CanProject), x => x.Author, x => x.ISBN);
+            var repo = TableRepository.Create<Book>(account, $"{nameof(QueryTests)}{nameof(CanProject)}", x => x.Author, x => x.ISBN);
+
+            // For some reason, this test alone fails due to what looks like a timing issue in finishing creating the table
+            while ((await account.CreateTableServiceClient().GetTableClient(repo.TableName).CreateIfNotExistsAsync()) != null)
+            {
+                await Task.Delay(50);
+            }
+
             await LoadBooksAsync(repo);
 
             var hasResults = false;
