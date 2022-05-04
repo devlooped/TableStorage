@@ -1,10 +1,25 @@
 # Changelog
 
+## [v4.0.0-alpha](https://github.com/devlooped/TableStorage/tree/v4.0.0-alpha) (2022-05-04)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v3.2.0...v4.0.0-alpha)
+
+:hammer: Other:
+
+- Upgrade to latest Azure v12 SDK [\#88](https://github.com/devlooped/TableStorage/issues/88)
+- Add support for DateOnly [\#78](https://github.com/devlooped/TableStorage/issues/78)
+
+:twisted_rightwards_arrows: Merged:
+
+- Fix test filter for theory tests [\#91](https://github.com/devlooped/TableStorage/pull/91) (@kzu)
+- Address warnings [\#90](https://github.com/devlooped/TableStorage/pull/90) (@kzu)
+- Upgrade to latest Azure v12 SDK [\#89](https://github.com/devlooped/TableStorage/pull/89) (@kzu)
+
 ## [v3.2.0](https://github.com/devlooped/TableStorage/tree/v3.2.0) (2021-12-13)
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/v3.1.1...v3.2.0)
 
-:twisted_rightwards_arrows: Merged:
+:sparkles: Implemented enhancements:
 
 - Add support for DateOnly [\#79](https://github.com/devlooped/TableStorage/pull/79) (@kzu)
 
