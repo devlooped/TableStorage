@@ -17,23 +17,8 @@ namespace Devlooped
                 member.Member is PropertyInfo property)
                 return property.Name;
 
-            var visitor = new FindPropertyVisitor();
-            visitor.Visit(expression);
-
-            return visitor.Property?.Name;
-        }
-
-        class FindPropertyVisitor : ExpressionVisitor
-        {
-            public PropertyInfo? Property { get; set; }
-
-            protected override Expression VisitMember(MemberExpression node)
-            {
-                if (node.Member is PropertyInfo property)
-                    Property = property;
-
-                return base.VisitMember(node);
-            }
+            // We do not support anything except a straight property getter expression.
+            return null;
         }
     }
 }
