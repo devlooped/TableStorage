@@ -1,5 +1,17 @@
 # Changelog
 
+## [v4.0.0-beta](https://github.com/devlooped/TableStorage/tree/v4.0.0-beta) (2022-05-17)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v4.0.0-alpha...v4.0.0-beta)
+
+:bug: Fixed bugs:
+
+- If partition or row key expressions have complex lambda, property name should be null [\#100](https://github.com/devlooped/TableStorage/issues/100)
+
+:twisted_rightwards_arrows: Merged:
+
+- Reduce scope of key property lookup to direct property lambda [\#101](https://github.com/devlooped/TableStorage/pull/101) (@kzu)
+
 ## [v4.0.0-alpha](https://github.com/devlooped/TableStorage/tree/v4.0.0-alpha) (2022-05-04)
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/v3.2.0...v4.0.0-alpha)
