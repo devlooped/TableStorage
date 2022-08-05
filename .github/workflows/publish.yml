@@ -37,8 +37,8 @@ jobs:
 
       - name: ⚙ azurite
         run: |
-          npm install azurite
-          npx azurite-table &
+          npm install azurite@3.17.1
+          npx azurite &
 
       - name: 🧪 test
         uses: ./.github/workflows/test
