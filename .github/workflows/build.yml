@@ -11,6 +11,7 @@ on:
       - code-of-conduct.md
       - security.md
       - support.md
+      - readme.md
   pull_request:
     types: [opened, synchronize, reopened]
 
@@ -67,11 +68,6 @@ jobs:
         run: |
           brew install grep
           echo 'export PATH="/usr/local/opt/grep/libexec/gnubin:$PATH"' >> .bash_profile
-
-      - name: ⚙ azurite
-        run: |
-          npm install azurite@3.17.1
-          npx azurite &
 
       - name: 🧪 test
         uses: ./.github/workflows/test
