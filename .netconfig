@@ -157,11 +157,6 @@
 	sha = 5406d907e0bf87dd1b4375f2ae2279dd775ed672
 	etag = 75f05e99fab00c735305d85ad2dc599aff6fd72d5b38536e8c80df8e73b43de2
 	weak
-[file "docs/sponsors.md"]
-	url = https://github.com/devlooped/sponsors/blob/main/sponsors.md
-	sha = 4722856ec9385044e9a553aa6b85f2f3728098dc
-	etag = 32d12ff9caf2320f57c78120d69c95798c8aca6ef8b946bff7ad678c0c40a656
-	weak
 [file ".github/workflows/sponsor.yml"]
 	url = https://github.com/devlooped/.github/blob/main/.github/workflows/sponsor.yml
 	sha = 4108ce6017b20ceb8d024f6675c1ea2573b317e0
