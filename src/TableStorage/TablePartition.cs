@@ -30,7 +30,7 @@ namespace Devlooped
         /// <param name="partitionKey">Fixed partition key to scope entity persistence.</param>
         /// <param name="updateMode">Update mode for existing entities. Defaults to <see cref="TableUpdateMode.Merge"/>.</param>
         /// <returns>The new <see cref="ITablePartition{TEntity}"/>.</returns>
-        public static ITablePartition<ITableEntity> Create(CloudStorageAccount storageAccount, string tableName, string partitionKey, TableUpdateMode updateMode = TableUpdateMode.Merge)
+        public static ITablePartition<TableEntity> Create(CloudStorageAccount storageAccount, string tableName, string partitionKey, TableUpdateMode updateMode = TableUpdateMode.Merge)
             => new TableEntityPartition(storageAccount, tableName, partitionKey) { UpdateMode = updateMode };
 
         /// <summary>
