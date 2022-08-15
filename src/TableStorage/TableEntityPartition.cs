@@ -11,7 +11,7 @@ using Azure.Data.Tables;
 namespace Devlooped
 {
     /// <inheritdoc />
-    partial class TableEntityPartition : ITablePartition<ITableEntity>
+    partial class TableEntityPartition : ITablePartition<TableEntity>
     {
         readonly TableEntityRepository repository;
 
@@ -51,10 +51,10 @@ namespace Devlooped
         }
 
         /// <inheritdoc />
-        public IQueryable<ITableEntity> CreateQuery() => repository.CreateQuery().Where(x => x.PartitionKey == PartitionKey);
+        public IQueryable<TableEntity> CreateQuery() => repository.CreateQuery().Where(x => x.PartitionKey == PartitionKey);
 
         /// <inheritdoc />
-        public Task<bool> DeleteAsync(ITableEntity entity, CancellationToken cancellation = default)
+        public Task<bool> DeleteAsync(TableEntity entity, CancellationToken cancellation = default)
         {
             if (!PartitionKey.Equals(entity.PartitionKey, StringComparison.Ordinal))
                 throw new ArgumentException("Entity does not belong to the partition.");
@@ -67,15 +67,15 @@ namespace Devlooped
             => repository.DeleteAsync(PartitionKey, rowKey, cancellation);
 
         /// <inheritdoc />
-        public IAsyncEnumerable<ITableEntity> EnumerateAsync(CancellationToken cancellation = default) 
+        public IAsyncEnumerable<TableEntity> EnumerateAsync(CancellationToken cancellation = default) 
             => repository.EnumerateAsync(PartitionKey, cancellation);
 
         /// <inheritdoc />
-        public Task<ITableEntity?> GetAsync(string rowKey, CancellationToken cancellation = default)
+        public Task<TableEntity?> GetAsync(string rowKey, CancellationToken cancellation = default)
             => repository.GetAsync(PartitionKey, rowKey, cancellation);
 
         /// <inheritdoc />
-        public Task<ITableEntity> PutAsync(ITableEntity entity, CancellationToken cancellation = default)
+        public Task<TableEntity> PutAsync(TableEntity entity, CancellationToken cancellation = default)
         {
             if (!PartitionKey.Equals(entity.PartitionKey, StringComparison.Ordinal))
                 throw new ArgumentException("Entity does not belong to the partition.");
