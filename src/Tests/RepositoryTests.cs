@@ -200,10 +200,14 @@ namespace Devlooped
         public async Task TableEntityEndToEnd()
         {
             var repo = TableRepository.Create(CloudStorageAccount.DevelopmentStorageAccount, "Entities");
-            var entity = await repo.PutAsync(new TableEntity("123", "Foo"));
+            var entity = await repo.PutAsync(new TableEntity("123", "Foo")
+            {
+                { "Bar", "Baz" }
+            });
 
             Assert.Equal("123", entity.PartitionKey);
             Assert.Equal("Foo", entity.RowKey);
+            Assert.Equal("Baz", entity["Bar"]);
 
             var saved = await repo.GetAsync("123", "Foo");
 

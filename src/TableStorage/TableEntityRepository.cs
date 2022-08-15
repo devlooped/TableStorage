@@ -13,7 +13,7 @@ using Azure.Data.Tables;
 namespace Devlooped
 {
     /// <inheritdoc />
-    partial class TableEntityRepository : ITableRepository<ITableEntity>
+    partial class TableEntityRepository : ITableRepository<TableEntity>
     {
         readonly CloudStorageAccount storageAccount;
         readonly Task<TableClient> table;
@@ -50,7 +50,7 @@ namespace Devlooped
         }
 
         /// <inheritdoc />
-        public IQueryable<ITableEntity> CreateQuery()
+        public IQueryable<TableEntity> CreateQuery()
             => throw new NotImplementedException();
         //=> storageAccount.CreateCloudTableClient().GetTableReference(TableName).CreateQuery<DynamicTableEntity>();
 
@@ -65,11 +65,11 @@ namespace Devlooped
         }
 
         /// <inheritdoc />
-        public Task<bool> DeleteAsync(ITableEntity entity, CancellationToken cancellation = default)
+        public Task<bool> DeleteAsync(TableEntity entity, CancellationToken cancellation = default)
             => DeleteAsync(entity.PartitionKey, entity.RowKey, cancellation);
 
         /// <inheritdoc />
-        public async IAsyncEnumerable<ITableEntity> EnumerateAsync(string? partitionKey = default, [EnumeratorCancellation] CancellationToken cancellation = default)
+        public async IAsyncEnumerable<TableEntity> EnumerateAsync(string? partitionKey = default, [EnumeratorCancellation] CancellationToken cancellation = default)
         {
             var table = await this.table;
             var filter = default(string);
@@ -83,7 +83,7 @@ namespace Devlooped
         }
 
         /// <inheritdoc />
-        public async Task<ITableEntity?> GetAsync(string partitionKey, string rowKey, CancellationToken cancellation = default)
+        public async Task<TableEntity?> GetAsync(string partitionKey, string rowKey, CancellationToken cancellation = default)
         {
             var table = await this.table.ConfigureAwait(false);
 
@@ -101,7 +101,7 @@ namespace Devlooped
         }
 
         /// <inheritdoc />
-        public async Task<ITableEntity> PutAsync(ITableEntity entity, CancellationToken cancellation = default)
+        public async Task<TableEntity> PutAsync(TableEntity entity, CancellationToken cancellation = default)
         {
             var table = await this.table.ConfigureAwait(false);
 
