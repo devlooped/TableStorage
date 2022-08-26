@@ -1,5 +1,19 @@
 # Changelog
 
+## [v4.0.0-rc.1](https://github.com/devlooped/TableStorage/tree/v4.0.0-rc.1) (2022-08-15)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v4.0.0-rc...v4.0.0-rc.1)
+
+## [v4.0.0-rc](https://github.com/devlooped/TableStorage/tree/v4.0.0-rc) (2022-08-15)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v4.0.0-beta...v4.0.0-rc)
+
+:twisted_rightwards_arrows: Merged:
+
+- Improve dynamic entity support by exposing TableEntity directly [\#128](https://github.com/devlooped/TableStorage/pull/128) (@kzu)
+- +M▼ includes [\#123](https://github.com/devlooped/TableStorage/pull/123) (@github-actions[bot])
+- +M▼ includes [\#117](https://github.com/devlooped/TableStorage/pull/117) (@github-actions[bot])
+
 ## [v4.0.0-beta](https://github.com/devlooped/TableStorage/tree/v4.0.0-beta) (2022-05-17)
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/v4.0.0-alpha...v4.0.0-beta)
