@@ -25,12 +25,11 @@ namespace Devlooped
         static readonly ConcurrentDictionary<Type, PropertyInfo[]> entityProperties = new();
         static readonly IStringDocumentSerializer serializer = DocumentSerializer.Default;
 
-        readonly CloudStorageAccount storageAccount;
+        readonly TableConnection tableConnection;
         readonly Func<T, string> partitionKey;
         readonly string? partitionKeyProperty;
         readonly Func<T, string> rowKey;
         readonly string? rowKeyProperty;
-        readonly Task<TableClient> table;
 
         /// <summary>
         /// Initializes the table repository.
@@ -39,11 +38,20 @@ namespace Devlooped
         /// <param name="tableName">The table that backs this repository.</param>
         /// <param name="partitionKey">A function to determine the partition key for an entity of type <typeparamref name="T"/>.</param>
         /// <param name="rowKey">A function to determine the row key for an entity of type <typeparamref name="T"/>.</param>
-        protected internal TableRepository(CloudStorageAccount storageAccount, string tableName, Expression<Func<T, string>> partitionKey, Expression<Func<T, string>> rowKey)
+        protected internal TableRepository(CloudStorageAccount storageAccount, string tableName, Expression<Func<T, string>>? partitionKey, Expression<Func<T, string>>? rowKey)
+            : this(new TableConnection(storageAccount, tableName ?? TableRepository.GetDefaultTableName<T>()), partitionKey, rowKey)
         {
-            this.storageAccount = storageAccount;
-            TableName = tableName ?? TableRepository.GetDefaultTableName<T>();
+        }
 
+        /// <summary>
+        /// Initializes the table repository.
+        /// </summary>
+        /// <param name="tableConnection">The <see cref="TableConnection"/> to use to connect to the table.</param>
+        /// <param name="partitionKey">A function to determine the partition key for an entity of type <typeparamref name="T"/>.</param>
+        /// <param name="rowKey">A function to determine the row key for an entity of type <typeparamref name="T"/>.</param>
+        protected internal TableRepository(TableConnection tableConnection, Expression<Func<T, string>>? partitionKey, Expression<Func<T, string>>? rowKey)
+        {
+            this.tableConnection = tableConnection; 
             this.partitionKey = partitionKey == null ?
                 PartitionKeyAttribute.CreateCompiledAccessor<T>() :
                 partitionKey.Compile();
@@ -55,13 +63,10 @@ namespace Devlooped
                 rowKey.Compile();
 
             rowKeyProperty = rowKey.GetPropertyName();
-
-            table = GetTableAsync(TableName);
-
         }
 
         /// <inheritdoc />
-        public string TableName { get; }
+        public string TableName => tableConnection.TableName;
 
         /// <summary>
         /// The <see cref="TableUpdateMode"/> to use when updating an existing entity.
@@ -80,7 +85,7 @@ namespace Devlooped
         }
 
         /// <inheritdoc />
-        public IQueryable<T> CreateQuery() => new TableRepositoryQuery<T>(storageAccount, serializer, TableName, partitionKeyProperty, rowKeyProperty);
+        public IQueryable<T> CreateQuery() => new TableRepositoryQuery<T>(tableConnection.StorageAccount, serializer, tableConnection.TableName, partitionKeyProperty, rowKeyProperty);
 
         /// <inheritdoc />
         public IAsyncEnumerable<T> QueryAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellation = default)
@@ -89,7 +94,7 @@ namespace Devlooped
         /// <inheritdoc />
         public async Task<bool> DeleteAsync(string partitionKey, string rowKey, CancellationToken cancellation = default)
         {
-            var table = await this.table.ConfigureAwait(false);
+            var table = await this.tableConnection.GetTableAsync().ConfigureAwait(false);
             var result = await table.DeleteEntityAsync(partitionKey, rowKey, cancellationToken: cancellation)
                 .ConfigureAwait(false);
 
@@ -103,7 +108,7 @@ namespace Devlooped
         /// <inheritdoc />
         public async IAsyncEnumerable<T> EnumerateAsync(string? partitionKey = default, [EnumeratorCancellation] CancellationToken cancellation = default)
         {
-            var table = await this.table;
+            var table = await this.tableConnection.GetTableAsync().ConfigureAwait(false);
             var filter = default(string);
             if (partitionKey != null)
                 filter = "PartitionKey eq '" + partitionKey + "'";
@@ -117,7 +122,7 @@ namespace Devlooped
         /// <inheritdoc />
         public async Task<T?> GetAsync(string partitionKey, string rowKey, CancellationToken cancellation = default)
         {
-            var table = await this.table.ConfigureAwait(false);
+            var table = await this.tableConnection.GetTableAsync().ConfigureAwait(false);
 
             try
             {
@@ -145,7 +150,7 @@ namespace Devlooped
                     prop.Name != rowKeyProperty)
                 .ToArray());
 
-            var table = await this.table.ConfigureAwait(false);
+            var table = await this.tableConnection.GetTableAsync().ConfigureAwait(false);
             var values = properties
                 .Select(prop => new { Name = prop.Name, Value = prop.GetValue(entity) })
                 .Where(pair => pair.Value != null)
@@ -170,14 +175,6 @@ namespace Devlooped
             
             return (await GetAsync(partitionKey, rowKey, cancellation).ConfigureAwait(false))!;
         }
-
-        Task<TableClient> GetTableAsync(string tableName) => Task.Run(async () =>
-        {
-            var tableService = storageAccount.CreateTableServiceClient();
-            var table = tableService.GetTableClient(tableName);
-            await table.CreateIfNotExistsAsync();
-            return table;
-        });
 
         /// <summary>
         /// Uses JSON deserialization to convert from the persisted entity data 

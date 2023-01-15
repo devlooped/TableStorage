@@ -15,8 +15,7 @@ namespace Devlooped
     /// <inheritdoc />
     partial class TableEntityRepository : ITableRepository<TableEntity>
     {
-        readonly CloudStorageAccount storageAccount;
-        readonly Task<TableClient> table;
+        TableConnection tableConnection;
 
         /// <summary>
         /// Initializes the table repository.
@@ -24,14 +23,16 @@ namespace Devlooped
         /// <param name="storageAccount">The <see cref="CloudStorageAccount"/> to use to connect to the table.</param>
         /// <param name="tableName">The table that backs this repository.</param>
         protected internal TableEntityRepository(CloudStorageAccount storageAccount, string tableName)
-        {
-            this.storageAccount = storageAccount;
-            TableName = tableName;
-            table = GetTableAsync(TableName);
-        }
+            => tableConnection = new TableConnection(storageAccount, tableName);
+
+        /// <summary>
+        /// Initializes the table repository.
+        /// </summary>
+        /// <param name="tableConnection">The table connection to use.</param>
+        protected internal TableEntityRepository(TableConnection tableConnection) => this.tableConnection = tableConnection;
 
         /// <inheritdoc />
-        public string TableName { get; }
+        public string TableName => tableConnection.TableName;
 
         /// <summary>
         /// The <see cref="TableUpdateMode"/> to use when updating an existing entity.
@@ -52,12 +53,12 @@ namespace Devlooped
         /// <inheritdoc />
         public IQueryable<TableEntity> CreateQuery()
             => throw new NotImplementedException();
-        //=> storageAccount.CreateCloudTableClient().GetTableReference(TableName).CreateQuery<DynamicTableEntity>();
+            //=> storageAccount.CreateCloudstorage.GetTableAsync()().GetTableReference(TableName).CreateQuery<DynamicTableEntity>();
 
         /// <inheritdoc />
         public async Task<bool> DeleteAsync(string partitionKey, string rowKey, CancellationToken cancellation = default)
         {
-            var table = await this.table.ConfigureAwait(false);
+            var table = await this.tableConnection.GetTableAsync().ConfigureAwait(false);
 
             var result = await table.DeleteEntityAsync(partitionKey, rowKey, cancellationToken: cancellation).ConfigureAwait(false);
 
@@ -71,7 +72,7 @@ namespace Devlooped
         /// <inheritdoc />
         public async IAsyncEnumerable<TableEntity> EnumerateAsync(string? partitionKey = default, [EnumeratorCancellation] CancellationToken cancellation = default)
         {
-            var table = await this.table;
+            var table = await this.tableConnection.GetTableAsync().ConfigureAwait(false);
             var filter = default(string);
             if (partitionKey != null)
                 filter = "PartitionKey eq '" + partitionKey + "'";
@@ -85,7 +86,7 @@ namespace Devlooped
         /// <inheritdoc />
         public async Task<TableEntity?> GetAsync(string partitionKey, string rowKey, CancellationToken cancellation = default)
         {
-            var table = await this.table.ConfigureAwait(false);
+            var table = await this.tableConnection.GetTableAsync().ConfigureAwait(false);
 
             try
             {
@@ -103,20 +104,12 @@ namespace Devlooped
         /// <inheritdoc />
         public async Task<TableEntity> PutAsync(TableEntity entity, CancellationToken cancellation = default)
         {
-            var table = await this.table.ConfigureAwait(false);
+            var table = await this.tableConnection.GetTableAsync().ConfigureAwait(false);
 
             var result = await table.UpsertEntityAsync(entity, UpdateMode, cancellation)
                 .ConfigureAwait(false);
 
             return (await GetAsync(entity.PartitionKey, entity.RowKey, cancellation).ConfigureAwait(false))!;
         }
-
-        Task<TableClient> GetTableAsync(string tableName) => Task.Run(async () =>
-        {
-            var tableClient = storageAccount.CreateTableServiceClient();
-            var table = tableClient.GetTableClient(tableName);
-            await table.CreateIfNotExistsAsync();
-            return table;
-        });
     }
 }
