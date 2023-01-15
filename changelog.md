@@ -1,5 +1,30 @@
 # Changelog
 
+## [v3.2.0-relnotes](https://github.com/devlooped/TableStorage/tree/v3.2.0-relnotes) (2023-01-15)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v4.1.0...v3.2.0-relnotes)
+
+## [v4.1.0](https://github.com/devlooped/TableStorage/tree/v4.1.0) (2023-01-15)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v4.0.0...v4.1.0)
+
+:sparkles: Implemented enhancements:
+
+- Allow reusing/caching the combination of CloudStorageAccount and TableClient [\#155](https://github.com/devlooped/TableStorage/issues/155)
+- Allow creating partitions from the same table connection [\#156](https://github.com/devlooped/TableStorage/pull/156) (@kzu)
+
+:twisted_rightwards_arrows: Merged:
+
+- ⛙ ⬆️ Bump dependencies [\#158](https://github.com/devlooped/TableStorage/pull/158) (@github-actions[bot])
+
+## [v4.0.0](https://github.com/devlooped/TableStorage/tree/v4.0.0) (2022-08-26)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v4.0.0-rc.1...v4.0.0)
+
+:sparkles: Implemented enhancements:
+
+- Improve dynamic entity support by exposing TableEntity directly [\#127](https://github.com/devlooped/TableStorage/issues/127)
+
 ## [v4.0.0-rc.1](https://github.com/devlooped/TableStorage/tree/v4.0.0-rc.1) (2022-08-15)
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/v4.0.0-rc...v4.0.0-rc.1)
@@ -8,9 +33,12 @@
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/v4.0.0-beta...v4.0.0-rc)
 
-:twisted_rightwards_arrows: Merged:
+:sparkles: Implemented enhancements:
 
 - Improve dynamic entity support by exposing TableEntity directly [\#128](https://github.com/devlooped/TableStorage/pull/128) (@kzu)
+
+:twisted_rightwards_arrows: Merged:
+
 - +M▼ includes [\#123](https://github.com/devlooped/TableStorage/pull/123) (@github-actions[bot])
 - +M▼ includes [\#117](https://github.com/devlooped/TableStorage/pull/117) (@github-actions[bot])
 
@@ -30,6 +58,10 @@
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/v3.2.0...v4.0.0-alpha)
 
+:sparkles: Implemented enhancements:
+
+- Upgrade to latest Azure v12 SDK [\#89](https://github.com/devlooped/TableStorage/pull/89) (@kzu)
+
 :hammer: Other:
 
 - Upgrade to latest Azure v12 SDK [\#88](https://github.com/devlooped/TableStorage/issues/88)
@@ -39,7 +71,6 @@
 
 - Fix test filter for theory tests [\#91](https://github.com/devlooped/TableStorage/pull/91) (@kzu)
 - Address warnings [\#90](https://github.com/devlooped/TableStorage/pull/90) (@kzu)
-- Upgrade to latest Azure v12 SDK [\#89](https://github.com/devlooped/TableStorage/pull/89) (@kzu)
 
 ## [v3.2.0](https://github.com/devlooped/TableStorage/tree/v3.2.0) (2021-12-13)
 
@@ -128,7 +159,15 @@
 
 ## [v2.0.1](https://github.com/devlooped/TableStorage/tree/v2.0.1) (2021-06-17)
 
-[Full Changelog](https://github.com/devlooped/TableStorage/compare/v2.0.0...v2.0.1)
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v2.0.1-rc...v2.0.1)
+
+## [v2.0.1-rc](https://github.com/devlooped/TableStorage/tree/v2.0.1-rc) (2021-06-17)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v2.0.1-beta...v2.0.1-rc)
+
+## [v2.0.1-beta](https://github.com/devlooped/TableStorage/tree/v2.0.1-beta) (2021-06-17)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v2.0.0...v2.0.1-beta)
 
 :sparkles: Implemented enhancements:
 
@@ -220,11 +259,31 @@
 
 ## [v1.0.2](https://github.com/devlooped/TableStorage/tree/v1.0.2) (2021-05-10)
 
-[Full Changelog](https://github.com/devlooped/TableStorage/compare/cf1b7f069ac6d68482b498555c8dbdda8e1ae5b4...v1.0.2)
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v1.0.1...v1.0.2)
+
+## [v1.0.1](https://github.com/devlooped/TableStorage/tree/v1.0.1) (2021-05-07)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v1.0.0...v1.0.1)
+
+## [v1.0.0](https://github.com/devlooped/TableStorage/tree/v1.0.0) (2021-05-07)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v1.0.0-rc...v1.0.0)
+
+## [v1.0.0-rc](https://github.com/devlooped/TableStorage/tree/v1.0.0-rc) (2021-05-07)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v1.0.0-beta...v1.0.0-rc)
 
 :twisted_rightwards_arrows: Merged:
 
 - Add SourceLink to get repo/pdb linking [\#3](https://github.com/devlooped/TableStorage/pull/3) (@kzu)
+
+## [v1.0.0-beta](https://github.com/devlooped/TableStorage/tree/v1.0.0-beta) (2021-05-05)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v1.0.0-alpha...v1.0.0-beta)
+
+## [v1.0.0-alpha](https://github.com/devlooped/TableStorage/tree/v1.0.0-alpha) (2021-05-05)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/cf1b7f069ac6d68482b498555c8dbdda8e1ae5b4...v1.0.0-alpha)
 
 
 
