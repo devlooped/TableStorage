@@ -1,9 +1,5 @@
 # Changelog
 
-## [v3.2.0-relnotes](https://github.com/devlooped/TableStorage/tree/v3.2.0-relnotes) (2023-01-15)
-
-[Full Changelog](https://github.com/devlooped/TableStorage/compare/v4.1.0...v3.2.0-relnotes)
-
 ## [v4.1.0](https://github.com/devlooped/TableStorage/tree/v4.1.0) (2023-01-15)
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/v4.0.0...v4.1.0)
