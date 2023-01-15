@@ -403,6 +403,32 @@ namespace Devlooped
             Assert.Equal("Done", entity["Reason"]);
         }
 
+        [Fact]
+        public async Task CanMergeDifferentEntities()
+        {
+            await CloudStorageAccount.DevelopmentStorageAccount
+                .CreateTableServiceClient()
+                .GetTableClient(nameof(CanMergeDifferentEntities))
+                .DeleteAsync();
+
+            var connection = new TableConnection(CloudStorageAccount.DevelopmentStorageAccount, nameof(CanMergeDifferentEntities));
+
+            await TablePartition
+                .Create<MyEntity>(connection, "Entity", updateMode: TableUpdateMode.Merge)
+                .PutAsync(new MyEntity("1234") { Name = "kzu" });
+
+            await TablePartition
+                .Create<MyTableEntity>(connection, "Entity", updateMode: TableUpdateMode.Merge)
+                .PutAsync(new MyTableEntity("1234") { Notes = "rocks" });
+
+            var entity = await TablePartition
+                .Create(connection, "Entity")
+                .GetAsync("1234");
+
+            Assert.NotNull(entity);
+            Assert.Equal("kzu", entity["Name"]);
+            Assert.Equal("rocks", entity["Notes"]);
+        }
 
         class MyEntity
         {
@@ -423,6 +449,8 @@ namespace Devlooped
 
             [RowKey]
             public string Id { get; }
+
+            public string? Notes { get; set; }
         }
 
         class EntityNoRowKey
