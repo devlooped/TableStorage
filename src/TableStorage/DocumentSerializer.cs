@@ -9,7 +9,7 @@ namespace Devlooped
 {
     /// <summary>
     /// Default implementation of <see cref="IStringDocumentSerializer"/> which 
-    /// uses Newtonsoft.Json for serialization.
+    /// uses System.Text.Json for serialization.
     /// </summary>
     partial class DocumentSerializer : IStringDocumentSerializer
     {

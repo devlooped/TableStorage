@@ -7,11 +7,8 @@ using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Web;
 using Azure;
 using Azure.Data.Tables;
-using Microsoft.OData.Client;
-using static Devlooped.DocumentRepository;
 
 namespace Devlooped
 {
@@ -22,14 +19,13 @@ namespace Devlooped
         static readonly int documentMajorVersion;
         static readonly int documentMinorVersion;
 
-        readonly CloudStorageAccount storageAccount;
+        readonly TableConnection tableConnection;
 
         readonly IStringDocumentSerializer? stringSerializer;
         readonly IBinaryDocumentSerializer? binarySerializer;
 
         readonly Func<T, string> partitionKey;
         readonly Func<T, string> rowKey;
-        readonly Task<TableClient> table;
 
         readonly Func<Func<IQueryable<IDocumentEntity>, IQueryable<IDocumentEntity>>, CancellationToken, IAsyncEnumerable<T>> enumerate;
         readonly Func<string, string, CancellationToken, Task<T?>> get;
@@ -52,10 +48,20 @@ namespace Devlooped
         /// <param name="rowKey">A function to determine the row key for an entity of type <typeparamref name="T"/>.</param>
         /// <param name="serializer">Optional serializer to use instead of the default <see cref="DocumentSerializer.Default"/>.</param>
         protected internal DocumentRepository(CloudStorageAccount storageAccount, string tableName, Func<T, string> partitionKey, Func<T, string> rowKey, IDocumentSerializer serializer)
+            : this(new TableConnection(storageAccount, tableName ?? TableRepository.GetDefaultTableName<T>()), partitionKey, rowKey, serializer)
         {
-            this.storageAccount = storageAccount;
-            TableName = tableName ?? TableRepository.GetDefaultTableName<T>();
-
+        }
+        
+        /// <summary>
+        /// Initializes the table repository.
+        /// </summary>
+        /// <param name="tableConnection">The table to connect to.</param>
+        /// <param name="partitionKey">A function to determine the partition key for an entity of type <typeparamref name="T"/>.</param>
+        /// <param name="rowKey">A function to determine the row key for an entity of type <typeparamref name="T"/>.</param>
+        /// <param name="serializer">Optional serializer to use instead of the default <see cref="DocumentSerializer.Default"/>.</param>
+        protected internal DocumentRepository(TableConnection tableConnection, Func<T, string> partitionKey, Func<T, string> rowKey, IDocumentSerializer serializer)
+        {
+            this.tableConnection = tableConnection;
             this.partitionKey = partitionKey ?? PartitionKeyAttribute.CreateCompiledAccessor<T>();
             this.rowKey = rowKey ?? RowKeyAttribute.CreateCompiledAccessor<T>();
 
@@ -78,17 +84,15 @@ namespace Devlooped
                 get = GetBinaryAsync;
                 put = PutBinaryAsync;
             }
-
-            table = GetTableAsync(TableName);
         }
 
         /// <inheritdoc />
-        public string TableName { get; }
+        public string TableName => tableConnection.TableName;
 
         /// <inheritdoc />
         public async Task<bool> DeleteAsync(string partitionKey, string rowKey, CancellationToken cancellation = default)
         {
-            var table = await this.table.ConfigureAwait(false);
+            var table = await this.tableConnection.GetTableAsync().ConfigureAwait(false);
 
             var result = await table.DeleteEntityAsync(partitionKey, rowKey, cancellationToken: cancellation).ConfigureAwait(false);
 
@@ -120,7 +124,7 @@ namespace Devlooped
         async IAsyncEnumerable<T> EnumerateBinaryAsync(Func<IQueryable<IDocumentEntity>, IQueryable<IDocumentEntity>> filter, [EnumeratorCancellation] CancellationToken cancellation = default)
         {
             var query = new TableRepositoryQuery<BinaryDocumentEntity>(
-                storageAccount,
+                tableConnection.StorageAccount,
                 DocumentSerializer.Default,
                 TableName,
                 nameof(IDocumentEntity.PartitionKey),
@@ -141,7 +145,7 @@ namespace Devlooped
 
         async Task<T?> GetBinaryAsync(string partitionKey, string rowKey, CancellationToken cancellation = default)
         {
-            var table = await this.table.ConfigureAwait(false);
+            var table = await this.tableConnection.GetTableAsync().ConfigureAwait(false);
 
             try
             {
@@ -164,7 +168,7 @@ namespace Devlooped
         {
             var partitionKey = this.partitionKey.Invoke(entity);
             var rowKey = this.rowKey.Invoke(entity);
-            var table = await this.table.ConfigureAwait(false);
+            var table = await this.tableConnection.GetTableAsync().ConfigureAwait(false);
 
             // We use Replace because all the existing entity data is in a single 
             // column, no point in merging since it can't be done at that level anyway.
@@ -187,7 +191,7 @@ namespace Devlooped
         async IAsyncEnumerable<T> EnumerateStringAsync(Func<IQueryable<IDocumentEntity>, IQueryable<IDocumentEntity>> filter, [EnumeratorCancellation] CancellationToken cancellation = default)
         {
             IQueryable<IDocumentEntity> query = new TableRepositoryQuery<DocumentEntity>(
-                storageAccount,
+                tableConnection.StorageAccount,
                 DocumentSerializer.Default,
                 TableName, null, null);
 
@@ -207,7 +211,7 @@ namespace Devlooped
 
         async Task<T?> GetStringAsync(string partitionKey, string rowKey, CancellationToken cancellation = default)
         {
-            var table = await this.table.ConfigureAwait(false);
+            var table = await this.tableConnection.GetTableAsync().ConfigureAwait(false);
 
             try
             {
@@ -229,7 +233,7 @@ namespace Devlooped
         {
             var partitionKey = this.partitionKey.Invoke(entity);
             var rowKey = this.rowKey.Invoke(entity);
-            var table = await this.table.ConfigureAwait(false);
+            var table = await this.tableConnection.GetTableAsync().ConfigureAwait(false);
 
             // We use Replace because all the existing entity data is in a single 
             // column, no point in merging since it can't be done at that level anyway.
@@ -246,13 +250,5 @@ namespace Devlooped
         }
 
         #endregion
-
-        Task<TableClient> GetTableAsync(string tableName) => Task.Run(async () =>
-        {
-            var tableClient = storageAccount.CreateTableServiceClient();
-            var table = tableClient.GetTableClient(tableName);
-            await table.CreateIfNotExistsAsync();
-            return table;
-        });
-    }
+   }
 }

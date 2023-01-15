@@ -24,19 +24,27 @@ namespace Devlooped
         /// <param name="partitionKey">The fixed partition key that backs this table partition.</param>
         /// <param name="rowKey">A function to determine the row key for an entity of type <typeparamref name="T"/> within the partition.</param>
         protected internal TablePartition(CloudStorageAccount storageAccount, string tableName, string partitionKey, Expression<Func<T, string>> rowKey)
+            : this(new TableConnection(storageAccount, tableName ?? TablePartition.GetDefaultTableName<T>()), partitionKey, rowKey)
         {
-            TableName = tableName ?? TablePartition.GetDefaultTableName<T>();
+        }
+
+        /// <summary>
+        /// Initializes the repository with the given storage account and optional table name.
+        /// </summary>
+        /// <param name="tableStorage">The storage account and table to use.</param>
+        /// <param name="partitionKey">The fixed partition key that backs this table partition.</param>
+        /// <param name="rowKey">A function to determine the row key for an entity of type <typeparamref name="T"/> within the partition.</param>
+        protected internal TablePartition(TableConnection tableStorage, string partitionKey, Expression<Func<T, string>> rowKey)
+        {
             partitionKey ??= TablePartition.GetDefaultPartitionKey<T>();
             PartitionKey = partitionKey;
 
-            repository = new TableRepository<T>(storageAccount,
-                TableName,
-                _ => partitionKey,
+            repository = new TableRepository<T>(tableStorage, _ => partitionKey,
                 rowKey ?? RowKeyAttribute.CreateAccessor<T>());
         }
 
         /// <inheritdoc />
-        public string TableName { get; }
+        public string TableName => repository.TableName;
 
         /// <inheritdoc />
         public string PartitionKey { get; }

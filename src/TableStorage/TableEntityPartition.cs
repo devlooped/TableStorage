@@ -22,14 +22,23 @@ namespace Devlooped
         /// <param name="tableName">The table that backs this table partition.</param>
         /// <param name="partitionKey">The fixed partition key that backs this table partition.</param>
         protected internal TableEntityPartition(CloudStorageAccount storageAccount, string tableName, string partitionKey)
+            : this(new TableConnection(storageAccount, tableName), partitionKey)
         {
-            TableName = tableName;
+        }
+
+        /// <summary>
+        /// Initializes the repository with the given storage account and optional table name.
+        /// </summary>
+        /// <param name="tableConnection">The <see cref="TableConnection"/> to use to connect to the table.</param>
+        /// <param name="partitionKey">The fixed partition key that backs this table partition.</param>
+        protected internal TableEntityPartition(TableConnection tableConnection, string partitionKey)
+        {
             PartitionKey = partitionKey;
-            repository = new TableEntityRepository(storageAccount, TableName);
+            repository = new TableEntityRepository(tableConnection);
         }
 
         /// <inheritdoc />
-        public string TableName { get; }
+        public string TableName => repository.TableName;
 
         /// <inheritdoc />
         public string PartitionKey { get; }

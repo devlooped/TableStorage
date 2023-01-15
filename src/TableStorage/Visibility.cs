@@ -14,6 +14,7 @@ public partial interface IBinaryDocumentSerializer { }
 public partial interface IStringDocumentSerializer { }
 public partial interface IDocumentEntity { }
 
+public partial class TableConnection { }
 public partial class TableRepository { }
 public partial class TableRepository<T> { }
 public partial class AttributedTableRepository<T> { }

@@ -22,18 +22,29 @@ namespace Devlooped
         /// <param name="rowKey">A function to determine the row key for an entity of type <typeparamref name="T"/> within the partition.</param>
         /// <param name="serializer">The serializer to use.</param>
         protected internal DocumentPartition(CloudStorageAccount storageAccount, string tableName, string partitionKey, Func<T, string> rowKey, IDocumentSerializer serializer)
+            : this(new TableConnection(storageAccount, tableName ?? DocumentPartition.GetDefaultTableName<T>()), partitionKey, rowKey, serializer)
         {
-            TableName = tableName ?? DocumentPartition.GetDefaultTableName<T>();
+        }
+
+        /// <summary>
+        /// Initializes the repository with the given storage account and optional table name.
+        /// </summary>
+        /// <param name="tableConnection">The table to connect to.</param>
+        /// <param name="partitionKey">The fixed partition key that backs this table partition.</param>
+        /// <param name="rowKey">A function to determine the row key for an entity of type <typeparamref name="T"/> within the partition.</param>
+        /// <param name="serializer">The serializer to use.</param>
+        protected internal DocumentPartition(TableConnection tableConnection, string partitionKey, Func<T, string> rowKey, IDocumentSerializer serializer)
+        {
             PartitionKey = partitionKey ?? TablePartition.GetDefaultPartitionKey<T>();
-            repository = new DocumentRepository<T>(storageAccount,
-                TableName,
+            repository = new DocumentRepository<T>(
+                tableConnection,
                 _ => PartitionKey,
                 rowKey ?? RowKeyAttribute.CreateCompiledAccessor<T>(),
                 serializer);
         }
 
         /// <inheritdoc />
-        public string TableName { get; }
+        public string TableName => repository.TableName;
 
         /// <inheritdoc />
         public string PartitionKey { get; }

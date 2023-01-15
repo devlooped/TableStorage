@@ -33,7 +33,7 @@ namespace Devlooped
         public static IDocumentPartition<T> Create<T>(
             CloudStorageAccount storageAccount,
             Func<T, string> rowKey,
-            IBinaryDocumentSerializer? serializer = default) where T : class
+            IDocumentSerializer? serializer = default) where T : class
             => Create<T>(storageAccount, DefaultTableName, typeof(T).Name, rowKey);
 
         /// <summary>
@@ -56,6 +56,21 @@ namespace Devlooped
 
         /// <summary>
         /// Creates an <see cref="ITablePartition{T}"/> for the given entity type 
+        /// <typeparamref name="T"/>, using <typeparamref name="T"/> <c>Name</c> as the partition key.
+        /// </summary>
+        /// <typeparam name="T">The type of entity that the repository will manage.</typeparam>
+        /// <param name="tableConnection">The table to connect to.</param>
+        /// <param name="rowKey">Function to retrieve the row key for a given entity.</param>
+        /// <param name="serializer">Optional serializer to use instead of the default <see cref="DocumentSerializer.Default"/>.</param>
+        /// <returns>The new <see cref="ITablePartition{T}"/>.</returns>
+        public static IDocumentPartition<T> Create<T>(
+            TableConnection tableConnection,
+            Func<T, string> rowKey,
+            IDocumentSerializer? serializer = default) where T : class
+            => Create<T>(tableConnection, default, rowKey, serializer);
+
+        /// <summary>
+        /// Creates an <see cref="ITablePartition{T}"/> for the given entity type 
         /// <typeparamref name="T"/>.
         /// </summary>
         /// <typeparam name="T">The type of entity that the repository will manage.</typeparam>
@@ -74,13 +89,31 @@ namespace Devlooped
             string? partitionKey = null,
             Func<T, string>? rowKey = null,
             IDocumentSerializer? serializer = default) where T : class
+            => Create<T>(new TableConnection(storageAccount, tableName ?? GetDefaultTableName<T>()), partitionKey, rowKey, serializer);
+
+        /// <summary>
+        /// Creates an <see cref="ITablePartition{T}"/> for the given entity type 
+        /// <typeparamref name="T"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of entity that the repository will manage.</typeparam>
+        /// <param name="tableConnection">The table to connect to.</param>
+        /// <param name="partitionKey">Optional fixed partition key to scope entity persistence. 
+        /// If not provided, the <typeparamref name="T"/> <c>Name</c> will be used.</param>
+        /// <param name="rowKey">Optional function to retrieve the row key for a given entity. 
+        /// If not provided, the class will need a property annotated with <see cref="RowKeyAttribute"/>.</param>
+        /// <param name="serializer">Optional serializer to use instead of the default <see cref="DocumentSerializer.Default"/>.</param>
+        /// <returns>The new <see cref="ITablePartition{T}"/>.</returns>
+        public static IDocumentPartition<T> Create<T>(
+            TableConnection tableConnection,
+            string? partitionKey = null,
+            Func<T, string>? rowKey = null,
+            IDocumentSerializer? serializer = default) where T : class
         {
-            tableName ??= GetDefaultTableName<T>();
             partitionKey ??= TablePartition.GetDefaultPartitionKey<T>();
             rowKey ??= RowKeyAttribute.CreateCompiledAccessor<T>();
             serializer ??= DocumentSerializer.Default;
 
-            return new DocumentPartition<T>(storageAccount, tableName, partitionKey, rowKey, serializer);
+            return new DocumentPartition<T>(tableConnection, partitionKey, rowKey, serializer);
         }
 
         /// <summary>

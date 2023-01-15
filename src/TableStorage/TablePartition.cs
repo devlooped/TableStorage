@@ -18,7 +18,7 @@ namespace Devlooped
 
         /// <summary>
         /// Default table name to use when a value is not not provided 
-        /// (or overriden via <see cref="TableAttribute"/>), which is <c>Entity</c>.
+        /// (or overriden via <see cref="TableAttribute"/>), which is <c>Entities</c>.
         /// </summary>
         public const string DefaultTableName = "Entities";
 
@@ -34,6 +34,16 @@ namespace Devlooped
             => new TableEntityPartition(storageAccount, tableName, partitionKey) { UpdateMode = updateMode };
 
         /// <summary>
+        /// Creates an <see cref="ITablePartition{ITableEntity}"/>.
+        /// </summary>
+        /// <param name="tableConnection">The storage account and table to use.</param>
+        /// <param name="partitionKey">Fixed partition key to scope entity persistence.</param>
+        /// <param name="updateMode">Update mode for existing entities. Defaults to <see cref="TableUpdateMode.Merge"/>.</param>
+        /// <returns>The new <see cref="ITablePartition{TEntity}"/>.</returns>
+        public static ITablePartition<TableEntity> Create(TableConnection tableConnection, string partitionKey, TableUpdateMode updateMode = TableUpdateMode.Merge)
+            => new TableEntityPartition(tableConnection, partitionKey) { UpdateMode = updateMode };
+
+        /// <summary>
         /// Creates an <see cref="ITablePartition{T}"/> for the given entity type 
         /// <typeparamref name="T"/>, using <see cref="DefaultTableName"/> as the table name and the 
         /// <typeparamref name="T"/> <c>Name</c> as the partition key.
@@ -46,6 +56,18 @@ namespace Devlooped
             CloudStorageAccount storageAccount,
             Expression<Func<T, string>> rowKey) where T : class
             => Create<T>(storageAccount, DefaultTableName, default, rowKey, TableUpdateMode.Merge);
+
+        /// <summary>
+        /// Creates an <see cref="ITablePartition{T}"/> for the given entity type 
+        /// <typeparamref name="T"/>, using <typeparamref name="T"/> <c>Name</c> as the partition key.
+        /// </summary>
+        /// <typeparam name="T">The type of entity that the repository will manage.</typeparam>
+        /// <param name="tableConnection">The storage account and table to use.</param>
+        /// <param name="rowKey">Function to retrieve the row key for a given entity.</param>
+        /// <returns>The new <see cref="ITablePartition{T}"/>.</returns>
+        public static ITablePartition<T> Create<T>(
+            TableConnection tableConnection, Expression<Func<T, string>> rowKey) where T : class
+            => Create<T>(tableConnection, default, rowKey, TableUpdateMode.Merge);
 
         /// <summary>
         /// Creates an <see cref="ITablePartition{T}"/> for the given entity type 
@@ -83,12 +105,30 @@ namespace Devlooped
             string? partitionKey = null,
             Expression<Func<T, string>>? rowKey = null,
             TableUpdateMode updateMode = TableUpdateMode.Merge) where T : class
+            => Create<T>(new TableConnection(storageAccount, tableName ?? GetDefaultTableName<T>()), partitionKey, rowKey, updateMode);
+
+        /// <summary>
+        /// Creates an <see cref="ITablePartition{T}"/> for the given entity type 
+        /// <typeparamref name="T"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of entity that the repository will manage.</typeparam>
+        /// <param name="tableConnection">The storage account and table to use.</param>
+        /// <param name="partitionKey">Optional fixed partition key to scope entity persistence. 
+        /// If not provided, the <typeparamref name="T"/> <c>Name</c> will be used.</param>
+        /// <param name="rowKey">Optional function to retrieve the row key for a given entity. 
+        /// If not provided, the class will need a property annotated with <see cref="RowKeyAttribute"/>.</param>
+        /// <param name="updateMode">Update mode for existing entities. Defaults to <see cref="TableUpdateMode.Merge"/>.</param>
+        /// <returns>The new <see cref="ITablePartition{T}"/>.</returns>
+        public static ITablePartition<T> Create<T>(
+            TableConnection tableConnection,
+            string? partitionKey = null,
+            Expression<Func<T, string>>? rowKey = null,
+            TableUpdateMode updateMode = TableUpdateMode.Merge) where T : class
         {
-            tableName ??= GetDefaultTableName<T>();
             partitionKey ??= GetDefaultPartitionKey<T>();
             rowKey ??= RowKeyAttribute.CreateAccessor<T>();
 
-            return new TablePartition<T>(storageAccount, tableName, partitionKey, rowKey)
+            return new TablePartition<T>(tableConnection, partitionKey, rowKey)
             {
                 UpdateMode = updateMode
             };
