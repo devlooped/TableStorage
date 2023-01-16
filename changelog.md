@@ -1,5 +1,15 @@
 # Changelog
 
+## [v4.1.1](https://github.com/devlooped/TableStorage/tree/v4.1.1) (2023-01-16)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v4.1.0...v4.1.1)
+
+:sparkles: Implemented enhancements:
+
+- Add TableConnection overloads for TableRepository factory methods [\#161](https://github.com/devlooped/TableStorage/issues/161)
+- Provide comprehensive readmes for all packages [\#164](https://github.com/devlooped/TableStorage/pull/164) (@kzu)
+- Add TableConnection overloads for TableRepository factory methods [\#162](https://github.com/devlooped/TableStorage/pull/162) (@kzu)
+
 ## [v4.1.0](https://github.com/devlooped/TableStorage/tree/v4.1.0) (2023-01-15)
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/v4.0.0...v4.1.0)
