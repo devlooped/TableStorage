@@ -34,9 +34,9 @@ namespace Devlooped
         public string TableName { get; }
 
         /// <summary>
-        /// Gets table client, creating the table if it doesn't exist.
+        /// Gets table client for this connection, creating the table if it doesn't exist.
         /// </summary>
-        internal async Task<TableClient> GetTableAsync() => table ??= await CreateTableClientAsync();
+        public async Task<TableClient> GetTableAsync() => table ??= await CreateTableClientAsync();
 
         async Task<TableClient> CreateTableClientAsync()
         {
