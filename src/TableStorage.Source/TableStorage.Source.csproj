@@ -6,10 +6,6 @@
     <IsPackable>true</IsPackable>
     <PackBuildOutput>false</PackBuildOutput>
     <PackCompile>true</PackCompile>
-    <Description>
-      Repository pattern with POCO object (including C# 9 records!) support for storing to Azure/Cosmos DB Table Storage.
-    </Description>
-    <PackageReadmeFile>readme.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -25,7 +21,6 @@
   <ItemGroup>
     <Compile Include="..\TableStorage\**\*.cs" Exclude="..\TableStorage\Visibility.cs;..\TableStorage\obj\**\*.cs;" />
     <None Update="Devlooped.TableStorage.Source.targets" PackFolder="build" />
-    <None Include="..\..\readme.md" PackagePath="readme.md" />
   </ItemGroup>
 
   <ItemGroup>

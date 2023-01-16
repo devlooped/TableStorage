@@ -4,10 +4,6 @@
     <AssemblyName>Devlooped.TableStorage</AssemblyName>
     <TargetFrameworks>netstandard2.0;netstandard2.1;net6.0</TargetFrameworks>
     <IsPackable>true</IsPackable>
-    <Description>
-      Repository pattern with POCO object (including C# 9 records!) support for storing to Azure/Cosmos DB Table Storage.
-    </Description>
-    <PackageReadmeFile>readme.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,7 +18,6 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="Tests" />
-    <None Include="..\..\readme.md" PackagePath="readme.md" />
   </ItemGroup>
 
 </Project>

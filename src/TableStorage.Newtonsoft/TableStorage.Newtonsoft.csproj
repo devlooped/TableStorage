@@ -4,12 +4,6 @@
     <AssemblyName>Devlooped.TableStorage.Newtonsoft</AssemblyName>
     <TargetFrameworks>netstandard2.0;net6.0</TargetFrameworks>
     <IsPackable>true</IsPackable>
-    <Description>A Newtonsoft.Json-based serializer for use with document-based repositories.
-
-Usage:
-
-  var repo = DocumentRepository.Create&lt;Product&gt;(storageAccount, serializer: JsonDocumentSerializer.Default);
-    </Description>
   </PropertyGroup>
 
   <ItemGroup>
