@@ -4,6 +4,7 @@
     <AssemblyName>Devlooped.TableStorage.Protobuf</AssemblyName>
     <TargetFrameworks>netstandard2.0;net6.0</TargetFrameworks>
     <IsPackable>true</IsPackable>
+    <Description>A Protocol Buffers binary serializer for use with document-based repositories.</Description>
   </PropertyGroup>
 
   <ItemGroup>

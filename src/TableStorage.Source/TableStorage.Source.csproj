@@ -6,6 +6,7 @@
     <IsPackable>true</IsPackable>
     <PackBuildOutput>false</PackBuildOutput>
     <PackCompile>true</PackCompile>
+    <Description>Source-only repository pattern with POCO object support for storing to Azure/CosmosDB Table Storage</Description>
   </PropertyGroup>
 
   <ItemGroup>

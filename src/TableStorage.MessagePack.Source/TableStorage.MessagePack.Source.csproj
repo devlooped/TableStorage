@@ -6,6 +6,7 @@
     <IsPackable>true</IsPackable>
     <PackBuildOutput>false</PackBuildOutput>
     <PackCompile>true</PackCompile>
+    <Description>A source-only MessagePack binary serializer for use with document-based repositories.</Description>
   </PropertyGroup>
 
   <ItemGroup>

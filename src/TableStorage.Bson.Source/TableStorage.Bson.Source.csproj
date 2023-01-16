@@ -6,12 +6,7 @@
     <IsPackable>true</IsPackable>
     <PackBuildOutput>false</PackBuildOutput>
     <PackCompile>true</PackCompile>
-    <Description>A source-only BSON binary serializer for use with document-based repositories.
-
-Usage:
-
-  var repo = DocumentRepository.Create&lt;Product&gt;(storageAccount, serializer: BsonDocumentSerializer.Default);
-    </Description>
+    <Description>A source-only BSON binary serializer for use with document-based repositories.</Description>
   </PropertyGroup>
 
   <ItemGroup>
