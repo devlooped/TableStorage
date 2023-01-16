@@ -6,12 +6,6 @@
     <IsPackable>true</IsPackable>
     <PackBuildOutput>false</PackBuildOutput>
     <PackCompile>true</PackCompile>
-    <Description>A source-only Protocol Buffers binary serializer for use with document-based repositories.
-
-Usage:
-
-  var repo = DocumentRepository.Create&lt;Product&gt;(storageAccount, serializer: ProtobufDocumentSerializer.Default);
-    </Description>
   </PropertyGroup>
 
   <ItemGroup>

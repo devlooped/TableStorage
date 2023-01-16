@@ -86,21 +86,11 @@ namespace Devlooped
 
         public record Book(string ISBN, string Title, string Author, BookFormat Format, int Pages, bool IsPublished = true);
 
-        class Product
+        public record Product(string Category, string Id)
         {
-            public Product(string category, string id)
-            {
-                Category = category;
-                Id = id;
-            }
-
-            public string Category { get; }
-
-            public string Id { get; }
-
-            public string? Title { get; set; }
-
-            public double Price { get; set; }
+            public string? Title { get; init; }
+            public double Price { get; init; }
+            public DateOnly CreatedAt { get; init; }
         }
     }
 }

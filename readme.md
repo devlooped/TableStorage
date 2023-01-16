@@ -6,6 +6,7 @@
 [![License](https://img.shields.io/github/license/devlooped/TableStorage.svg?color=blue)](https://github.com/devlooped/TableStorage/blob/main/license.txt) 
 [![Build](https://github.com/devlooped/TableStorage/workflows/build/badge.svg?branch=main)](https://github.com/devlooped/TableStorage/actions)
 
+<!-- #content -->
 Repository pattern with POCO object support for storing to Azure/CosmosDB Table Storage
 
 ![Screenshot of basic usage](https://raw.githubusercontent.com/devlooped/TableStorage/main/assets/img/tablestorage.png)
@@ -19,7 +20,7 @@ public record Product(string Category, string Id)
 {
   public string? Title { get; init; }
   public double Price { get; init; }
-  public DateOnly Created { get; init; }
+  public DateOnly CreatedAt { get; init; }
 }
 ```
 
@@ -38,7 +39,7 @@ var repo = TableRepository.Create<Product>(storageAccount,
     partitionKey: p => p.Category, 
     rowKey: p => p.Id);
 
-var product = new Product("Book", "1234") 
+var product = new Product("book", "1234") 
 {
   Title = "Table Storage is Cool",
   Price = 25.5,
@@ -47,8 +48,8 @@ var product = new Product("Book", "1234")
 // Insert or Update behavior (aka "upsert")
 await repo.PutAsync(product);
 
-// Enumerate all products in category "Book"
-await foreach (var p in repo.EnumerateAsync("Book"))
+// Enumerate all products in category "book"
+await foreach (var p in repo.EnumerateAsync("book"))
    Console.WriteLine(p.Price);
 
 // Query books priced in the 20-50 range, 
@@ -59,10 +60,10 @@ await foreach (var info in from prod in repo.CreateQuery()
   Console.WriteLine($"{info.Title}: {info.Price}");
 
 // Get previously saved product.
-Product saved = await repo.GetAsync("Book", "1234");
+Product saved = await repo.GetAsync("book", "1234");
 
 // Delete product
-await repo.DeleteAsync("Book", "1234");
+await repo.DeleteAsync("book", "1234");
 
 // Can also delete passing entity
 await repo.DeleteAsync(saved);
@@ -103,7 +104,9 @@ for example. In that case, you could use a `TableRepository<Book>` when
 saving:
 
 ```csharp
-var repo = TableRepository.Create<Book>(storageAccount, "Books", x => x.Author, x => x.ISBN);
+var repo = TableRepository.Create<Book>(storageAccount, "Books",
+  partitionKey: x => x.Author, 
+  rowKey: x => x.ISBN);
 
 await repo.PutAsync(book);
 ```
@@ -112,7 +115,9 @@ And later on when listing/filtering books by a particular author, you can use
 a `TablePartition<Book>` so all querying is automatically scoped to that author:
 
 ```csharp
-var partition = TablePartition.Create<Book>(storageAccount, "Books", "Rick Riordan", x => x.ISBN);
+var partition = TablePartition.Create<Book>(storageAccount, "Books", 
+  partitionKey: "Rick Riordan", 
+  rowKey: x => x.ISBN);
 
 // Get Rick Riordan books, only from Disney/Hyperion, with over 1000 pages
 var query = from book in repo.CreateQuery()
@@ -127,50 +132,78 @@ Using table partitions is quite convenient for handling reference data too, for 
 Enumerating all entries in the partition wouldn't be something you'd typically do for 
 your "real" data, but for reference data, it could come in handy.
 
-Stored entities use individual columns for properties, which makes it easy to browse 
-the data (and query, as shown above!). If you don't need the individual columns, and would 
-like a document-like storage mechanism instead, you can use the `DocumentRepository.Create` 
-and `DocumentPartition.Create` factory methods instead. The API is otherwise the same, but 
-you can see the effect of using one or the other in the following screenshots of the 
-[Storage Explorer](https://azure.microsoft.com/en-us/features/storage-explorer/) for the same 
-`Product` entity shown in the first example above:
+> NOTE: if access to the `Timestamp` managed by Azure Table Storage for the entity is needed, 
+> just declare a property with that name with either `DateTimeOffset`, `DateTime` or `string` type
+> to read it.
 
-![Screenshot of entity persisted with separate columns for properties](https://raw.githubusercontent.com/devlooped/TableStorage/main/assets/img/entity.png)
+Stored entities using `TableRepository` and `TablePartition` use individual columns for 
+properties, which makes it easy to browse the data (and query, as shown above!). 
 
-![Screenshot of entity persisted as a document](https://raw.githubusercontent.com/devlooped/TableStorage/main/assets/img/document.png)
+But document-based storage is also available via `DocumentRepository` and `DocumentPartition` if 
+you don't need the individual columns.
 
-The code that persisted both entities is:
+<!-- #documents -->
+## Document Storage
+
+The `DocumentRepository.Create` and `DocumentPartition.Create` factory methods provide access 
+to document-based storage, exposing the a similar API as column-based storage. 
+
+Document repositories cause entities to be persisted as a single document column, alongside type and version 
+information to handle versioning a the app level as needed. 
+
+The API is mostly the same as for column-based repositories (document repositories implement 
+the same underlying `ITableStorage` interface):
 
 ```csharp
+public record Product(string Category, string Id) 
+{
+  public string? Title { get; init; }
+  public double Price { get; init; }
+  public DateOnly CreatedAt { get; init; }
+}
+
+var book = new Product("book", "9781473217386")
+{
+    Title = "Neuromancer",
+    Price = 7.32
+};
+
+// Column-based storage
 var repo = TableRepository.Create<Product>(
     CloudStorageAccount.DevelopmentStorageAccount,
     tableName: "Products",
     partitionKey: p => p.Category,
     rowKey: p => p.Id);
 
-await repo.PutAsync(new Product("book", "9781473217386")
-{
-    Title = "Neuromancer",
-    Price = 7.32
-});
+await repo.PutAsync(book);
 
+// Document-based storage
 var docs = DocumentRepository.Create<Product>(
     CloudStorageAccount.DevelopmentStorageAccount,
     tableName: "Documents",
     partitionKey: p => p.Category,
-    rowKey: p => p.Id);
+    rowKey: p => p.Id
+    serializer: [SERIALIZER]);
 
-await docs.PutAsync(new Product("book", "9781473217386")
-{
-    Title = "Neuromancer",
-    Price = 7.32
-});
+await docs.PutAsync(book);
 ```
 
-The `Type` column persisted in the table is the `Type.FullName` of the persited entity, and the 
-`Version` is the `Major.Minor` of its assembly, which could be used for advanced data migration scenarios. 
+> If not provided, the serializer defaults to the `System.Text.Json`-based `DocumentSerializer.Default`.
+
+The resulting differences in storage can be seen in the following screenshots of the 
+[Azure Storage Explorer](https://azure.microsoft.com/en-us/features/storage-explorer/):
+
+![Screenshot of entity persisted with separate columns for properties](https://raw.githubusercontent.com/devlooped/TableStorage/main/assets/img/entity.png)
+
+![Screenshot of entity persisted as a document](https://raw.githubusercontent.com/devlooped/TableStorage/main/assets/img/document.png)
+
+
+The `Type` column persisted in the documents table is the `Type.FullName` of the persisted entity, and the 
+`Version` is the `[Major].[Minor]` of its assembly, which could be used for advanced data migration scenarios. 
 The major and minor version components are also provided as individual columns for easier querying 
 by various version ranges, using `IDocumentRepository.EnumerateAsync(predicate)`.
+
+<!-- #documents -->
 
 In addition to the default built-in JSON plain-text based serializer (which uses the 
 [System.Text.Json](https://www.nuget.org/packages/system.text.json) package), there are other 
@@ -189,10 +222,8 @@ var repo = TableRepository.Create<Product>(...,
 > NOTE: when using alternative serializers, entities might need to be annotated with whatever 
 > attributes are required by the underlying libraries.
 
-> NOTE: if access to the `Timestamp` managed by Table Storage for the entity is needed, just declare a property 
-> with that name with either `DateTimeOffset`, `DateTime` or `string` type.
 
-### Attributes
+## Attributes
 
 If you want to avoid using strings with the factory methods, you can also annotate the 
 entity type to modify the default values used:
@@ -224,7 +255,7 @@ In addition, if you want to omit a particular property from persistence, you can
 it with `[Browsable(false)]` and it will be skipped when persisting and reading the entity.
 
 
-### TableEntity Support
+## TableEntity Support
 
 Since these repository APIs are quite a bit more intuitive than working directly against a  
 `TableClient`, you might want to retrieve/enumerate entities just by their built-in `TableEntity` 
@@ -264,6 +295,8 @@ Assert.Equal("Neuromancer", entity["Title"]);
 Assert.Equal(7.32, (double)entity["Price"]);
 ```
 
+<!-- #content -->
+
 ## Installation
 
 ```
@@ -296,7 +329,7 @@ The versioning scheme for packages is:
 - PR builds: *42.42.42-pr*`[NUMBER]`
 - Branch builds: *42.42.42-*`[BRANCH]`.`[COMMITS]`
 
-
+<!-- #sponsors -->
 <!-- include https://github.com/devlooped/sponsors/raw/main/footer.md -->
 # Sponsors 
 
