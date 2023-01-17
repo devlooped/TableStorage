@@ -430,6 +430,17 @@ namespace Devlooped
             Assert.Equal("rocks", entity["Notes"]);
         }
 
+        [Fact]
+        public void CanAnnotateFixedPartition()
+        {
+            var partition = TablePartition.Create<CustomPartition>(
+                CloudStorageAccount.DevelopmentStorageAccount,
+                nameof(CanAnnotateFixedPartition),
+                x => x.Id);
+
+            Assert.Equal("MyPartition", partition.PartitionKey);
+        }
+
         class MyEntity
         {
             public MyEntity(string id) => Id = id;
@@ -484,5 +495,8 @@ namespace Devlooped
         {
             public DateTime? Timestamp { get; set; }
         }
+
+        [PartitionKey("MyPartition")]
+        record CustomPartition(string Id);
     }
 }

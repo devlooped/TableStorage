@@ -2,6 +2,7 @@
 #nullable enable
 using System;
 using System.Collections.Concurrent;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Azure.Data.Tables;
@@ -145,8 +146,10 @@ namespace Devlooped
         /// Gets a default partition key to use for entities of type <typeparamref name="T"/>. Will be the 
         /// the type name, stripped of a suffix <c>Entity</c> if present.
         /// </summary>
-        public static string GetDefaultPartitionKey<T>() => typeof(T).Name.EndsWith("Entity") ?
+        public static string GetDefaultPartitionKey<T>() => 
+            typeof(T).GetCustomAttribute<PartitionKeyAttribute>()?.PartitionKey ??
+            (typeof(T).Name.EndsWith("Entity") ?
             typeof(T).Name.Substring(0, typeof(T).Name.Length - 6) :
-            typeof(T).Name;
+            typeof(T).Name);
     }
 }
