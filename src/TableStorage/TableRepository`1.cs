@@ -22,7 +22,6 @@ namespace Devlooped
     /// <inheritdoc />
     partial class TableRepository<T> : ITableRepository<T> where T : class
     {
-        static readonly ConcurrentDictionary<Type, PropertyInfo[]> entityProperties = new();
         static readonly IStringDocumentSerializer serializer = DocumentSerializer.Default;
 
         readonly TableConnection tableConnection;
@@ -142,34 +141,12 @@ namespace Devlooped
         {
             var partitionKey = this.partitionKey.Invoke(entity);
             var rowKey = this.rowKey.Invoke(entity);
-            var properties = entityProperties.GetOrAdd(entity.GetType(), type => type
-                .GetProperties()
-                .Where(prop =>
-                    prop.GetCustomAttribute<BrowsableAttribute>()?.Browsable != false &&
-                    prop.Name != partitionKeyProperty &&
-                    prop.Name != rowKeyProperty)
-                .ToArray());
-
-            var table = await this.tableConnection.GetTableAsync().ConfigureAwait(false);
-            var values = properties
-                .Select(prop => new { Name = prop.Name, Value = prop.GetValue(entity) })
-                .Where(pair => pair.Value != null)
-                .ToDictionary(
-                    pair => pair.Name,
-                    pair =>
-#if NET6_0_OR_GREATER
-                    pair.Value is DateOnly date ? 
-                        date.ToString("O") : 
-                        pair.Value.GetType().IsEnum ? 
-                        pair.Value.ToString() : pair.Value
-#else
-                    pair.Value.GetType().IsEnum ? pair.Value.ToString() : pair.Value
-#endif
-                    );
+            var values = EntityPropertiesMapper.Default.ToProperties(entity, partitionKeyProperty, rowKeyProperty);
 
             values[nameof(ITableEntity.PartitionKey)] = partitionKey;
             values[nameof(ITableEntity.RowKey)] = rowKey;
 
+            var table = await this.tableConnection.GetTableAsync().ConfigureAwait(false);
             var result = await table.UpsertEntityAsync(new TableEntity(values), UpdateMode, cancellation)
                 .ConfigureAwait(false);
             

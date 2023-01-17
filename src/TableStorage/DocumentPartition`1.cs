@@ -21,8 +21,9 @@ namespace Devlooped
         /// <param name="partitionKey">The fixed partition key that backs this table partition.</param>
         /// <param name="rowKey">A function to determine the row key for an entity of type <typeparamref name="T"/> within the partition.</param>
         /// <param name="serializer">The serializer to use.</param>
-        protected internal DocumentPartition(CloudStorageAccount storageAccount, string tableName, string partitionKey, Func<T, string> rowKey, IDocumentSerializer serializer)
-            : this(new TableConnection(storageAccount, tableName ?? DocumentPartition.GetDefaultTableName<T>()), partitionKey, rowKey, serializer)
+        /// <param name="includeProperties">Whether to serialize properties as columns too, like table repositories, for easier querying.</param>
+        protected internal DocumentPartition(CloudStorageAccount storageAccount, string tableName, string partitionKey, Func<T, string> rowKey, IDocumentSerializer serializer, bool includeProperties = false)
+            : this(new TableConnection(storageAccount, tableName ?? DocumentPartition.GetDefaultTableName<T>()), partitionKey, rowKey, serializer, includeProperties)
         {
         }
 
@@ -33,14 +34,16 @@ namespace Devlooped
         /// <param name="partitionKey">The fixed partition key that backs this table partition.</param>
         /// <param name="rowKey">A function to determine the row key for an entity of type <typeparamref name="T"/> within the partition.</param>
         /// <param name="serializer">The serializer to use.</param>
-        protected internal DocumentPartition(TableConnection tableConnection, string partitionKey, Func<T, string> rowKey, IDocumentSerializer serializer)
+        /// <param name="includeProperties">Whether to serialize properties as columns too, like table repositories, for easier querying.</param>
+        protected internal DocumentPartition(TableConnection tableConnection, string partitionKey, Func<T, string> rowKey, IDocumentSerializer serializer, bool includeProperties = false)
         {
             PartitionKey = partitionKey ?? TablePartition.GetDefaultPartitionKey<T>();
             repository = new DocumentRepository<T>(
                 tableConnection,
                 _ => PartitionKey,
                 rowKey ?? RowKeyAttribute.CreateCompiledAccessor<T>(),
-                serializer);
+                serializer, 
+                includeProperties);
         }
 
         /// <inheritdoc />

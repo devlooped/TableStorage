@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Azure.Data.Tables;
 using MessagePack;
 using ProtoBuf;
 using Xunit;
@@ -171,6 +172,93 @@ namespace Devlooped
                     .ToListAsync();
 
                 Assert.Single(entities);
+            }
+            finally
+            {
+                await table.DeleteAsync();
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(Serializers))]
+        public async Task CanIncludeProperties(IDocumentSerializer serializer)
+        {
+            var table = CloudStorageAccount.DevelopmentStorageAccount
+                .CreateTableServiceClient()
+                .GetTableClient(nameof(CanIncludeProperties) + serializer.GetType().Name);
+
+            await table.DeleteAsync();
+            await table.CreateAsync();
+
+            try
+            {
+                var repo = DocumentRepository.Create<DocumentEntity>(CloudStorageAccount.DevelopmentStorageAccount,
+                    table.Name, serializer: serializer, includeProperties: true);
+
+                var partitionKey = "P5943C610208D4008BEC052272ED07214";
+
+                await repo.PutAsync(new DocumentEntity
+                {
+                    PartitionKey = partitionKey,
+                    RowKey = "Bar",
+                    Title = "Bar",
+                });
+
+                await repo.PutAsync(new DocumentEntity
+                {
+                    PartitionKey = partitionKey,
+                    RowKey = "Foo",
+                    Title = "Foo",
+                });
+
+                var entity = table.GetEntity<TableEntity>(partitionKey, "Bar");
+                Assert.Equal("Bar", entity.Value["Title"]);
+
+                entity = table.GetEntity<TableEntity>(partitionKey, "Foo");
+                Assert.Equal("Foo", entity.Value["Title"]);
+            }
+            finally
+            {
+                await table.DeleteAsync();
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(Serializers))]
+        public async Task CanIncludePropertiesInParition(IDocumentSerializer serializer)
+        {
+            var table = CloudStorageAccount.DevelopmentStorageAccount
+                .CreateTableServiceClient()
+                .GetTableClient(nameof(CanIncludeProperties) + serializer.GetType().Name);
+
+            await table.DeleteAsync();
+            await table.CreateAsync();
+
+            try
+            {
+                var partitionKey = "P5943C610208D4008BEC052272ED07214";
+                var repo = DocumentPartition.Create<DocumentEntity>(CloudStorageAccount.DevelopmentStorageAccount,
+                    table.Name, partitionKey, serializer: serializer, includeProperties: true);
+
+                await repo.PutAsync(new DocumentEntity
+                {
+                    PartitionKey = partitionKey,
+                    RowKey = "Bar",
+                    Title = "Bar",
+                });
+
+                await repo.PutAsync(new DocumentEntity
+                {
+                    PartitionKey = partitionKey,
+                    RowKey = "Foo",
+                    Title = "Foo",
+                });
+
+                var entity = table.GetEntity<TableEntity>(partitionKey, "Bar");
+                Assert.Equal("Bar", entity.Value["Title"]);
+
+                entity = table.GetEntity<TableEntity>(partitionKey, "Foo");
+                Assert.Equal("Foo", entity.Value["Title"]);
             }
             finally
             {

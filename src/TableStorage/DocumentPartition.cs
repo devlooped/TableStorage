@@ -29,12 +29,14 @@ namespace Devlooped
         /// <param name="storageAccount">The storage account to use.</param>
         /// <param name="rowKey">Function to retrieve the row key for a given entity.</param>
         /// <param name="serializer">Optional serializer to use instead of the default <see cref="DocumentSerializer.Default"/>.</param>
+        /// <param name="includeProperties">Whether to serialize properties as columns too, like table repositories, for easier querying.</param>
         /// <returns>The new <see cref="ITablePartition{T}"/>.</returns>
         public static IDocumentPartition<T> Create<T>(
             CloudStorageAccount storageAccount,
             Func<T, string> rowKey,
-            IDocumentSerializer? serializer = default) where T : class
-            => Create<T>(storageAccount, DefaultTableName, typeof(T).Name, rowKey);
+            IDocumentSerializer? serializer = default, 
+            bool includeProperties = false) where T : class
+            => Create<T>(storageAccount, DefaultTableName, typeof(T).Name, rowKey, serializer, includeProperties);
 
         /// <summary>
         /// Creates an <see cref="ITablePartition{T}"/> for the given entity type 
@@ -46,13 +48,15 @@ namespace Devlooped
         /// <param name="tableName">Table name to use.</param>
         /// <param name="rowKey">Function to retrieve the row key for a given entity.</param>
         /// <param name="serializer">Optional serializer to use instead of the default <see cref="DocumentSerializer.Default"/>.</param>
+        /// <param name="includeProperties">Whether to serialize properties as columns too, like table repositories, for easier querying.</param>
         /// <returns>The new <see cref="ITablePartition{T}"/>.</returns>
         public static IDocumentPartition<T> Create<T>(
             CloudStorageAccount storageAccount,
             string tableName,
             Func<T, string> rowKey,
-            IDocumentSerializer? serializer = default) where T : class
-            => Create<T>(storageAccount, tableName, default, rowKey);
+            IDocumentSerializer? serializer = default, 
+            bool includeProperties = false) where T : class
+            => Create<T>(storageAccount, tableName, default, rowKey, serializer, includeProperties);
 
         /// <summary>
         /// Creates an <see cref="ITablePartition{T}"/> for the given entity type 
@@ -62,12 +66,14 @@ namespace Devlooped
         /// <param name="tableConnection">The table to connect to.</param>
         /// <param name="rowKey">Function to retrieve the row key for a given entity.</param>
         /// <param name="serializer">Optional serializer to use instead of the default <see cref="DocumentSerializer.Default"/>.</param>
+        /// <param name="includeProperties">Whether to serialize properties as columns too, like table repositories, for easier querying.</param>
         /// <returns>The new <see cref="ITablePartition{T}"/>.</returns>
         public static IDocumentPartition<T> Create<T>(
             TableConnection tableConnection,
             Func<T, string> rowKey,
-            IDocumentSerializer? serializer = default) where T : class
-            => Create<T>(tableConnection, default, rowKey, serializer);
+            IDocumentSerializer? serializer = default,
+            bool includeProperties = false) where T : class
+            => Create<T>(tableConnection, default, rowKey, serializer, includeProperties);
 
         /// <summary>
         /// Creates an <see cref="ITablePartition{T}"/> for the given entity type 
@@ -82,14 +88,16 @@ namespace Devlooped
         /// <param name="rowKey">Optional function to retrieve the row key for a given entity. 
         /// If not provided, the class will need a property annotated with <see cref="RowKeyAttribute"/>.</param>
         /// <param name="serializer">Optional serializer to use instead of the default <see cref="DocumentSerializer.Default"/>.</param>
+        /// <param name="includeProperties">Whether to serialize properties as columns too, like table repositories, for easier querying.</param>
         /// <returns>The new <see cref="ITablePartition{T}"/>.</returns>
         public static IDocumentPartition<T> Create<T>(
             CloudStorageAccount storageAccount,
             string? tableName = default,
             string? partitionKey = null,
             Func<T, string>? rowKey = null,
-            IDocumentSerializer? serializer = default) where T : class
-            => Create<T>(new TableConnection(storageAccount, tableName ?? GetDefaultTableName<T>()), partitionKey, rowKey, serializer);
+            IDocumentSerializer? serializer = default, 
+            bool includeProperties = false) where T : class
+            => Create<T>(new TableConnection(storageAccount, tableName ?? GetDefaultTableName<T>()), partitionKey, rowKey, serializer, includeProperties);
 
         /// <summary>
         /// Creates an <see cref="ITablePartition{T}"/> for the given entity type 
@@ -102,18 +110,20 @@ namespace Devlooped
         /// <param name="rowKey">Optional function to retrieve the row key for a given entity. 
         /// If not provided, the class will need a property annotated with <see cref="RowKeyAttribute"/>.</param>
         /// <param name="serializer">Optional serializer to use instead of the default <see cref="DocumentSerializer.Default"/>.</param>
+        /// <param name="includeProperties">Whether to serialize properties as columns too, like table repositories, for easier querying.</param>
         /// <returns>The new <see cref="ITablePartition{T}"/>.</returns>
         public static IDocumentPartition<T> Create<T>(
             TableConnection tableConnection,
             string? partitionKey = null,
             Func<T, string>? rowKey = null,
-            IDocumentSerializer? serializer = default) where T : class
+            IDocumentSerializer? serializer = default, 
+            bool includeProperties = false) where T : class
         {
             partitionKey ??= TablePartition.GetDefaultPartitionKey<T>();
             rowKey ??= RowKeyAttribute.CreateCompiledAccessor<T>();
             serializer ??= DocumentSerializer.Default;
 
-            return new DocumentPartition<T>(tableConnection, partitionKey, rowKey, serializer);
+            return new DocumentPartition<T>(tableConnection, partitionKey, rowKey, serializer, includeProperties);
         }
 
         /// <summary>

@@ -26,6 +26,7 @@ namespace Devlooped
 
         readonly Func<T, string> partitionKey;
         readonly Func<T, string> rowKey;
+        readonly bool includeProperties;
 
         readonly Func<Func<IQueryable<IDocumentEntity>, IQueryable<IDocumentEntity>>, CancellationToken, IAsyncEnumerable<T>> enumerate;
         readonly Func<string, string, CancellationToken, Task<T?>> get;
@@ -47,11 +48,12 @@ namespace Devlooped
         /// <param name="partitionKey">A function to determine the partition key for an entity of type <typeparamref name="T"/>.</param>
         /// <param name="rowKey">A function to determine the row key for an entity of type <typeparamref name="T"/>.</param>
         /// <param name="serializer">Optional serializer to use instead of the default <see cref="DocumentSerializer.Default"/>.</param>
-        protected internal DocumentRepository(CloudStorageAccount storageAccount, string tableName, Func<T, string> partitionKey, Func<T, string> rowKey, IDocumentSerializer serializer)
-            : this(new TableConnection(storageAccount, tableName ?? TableRepository.GetDefaultTableName<T>()), partitionKey, rowKey, serializer)
+        /// <param name="includeProperties">Whether to serialize properties as columns too, like table repositories, for easier querying.</param>
+        protected internal DocumentRepository(CloudStorageAccount storageAccount, string tableName, Func<T, string> partitionKey, Func<T, string> rowKey, IDocumentSerializer serializer, bool includeProperties)
+            : this(new TableConnection(storageAccount, tableName ?? TableRepository.GetDefaultTableName<T>()), partitionKey, rowKey, serializer, includeProperties)
         {
         }
-        
+
         /// <summary>
         /// Initializes the table repository.
         /// </summary>
@@ -59,11 +61,13 @@ namespace Devlooped
         /// <param name="partitionKey">A function to determine the partition key for an entity of type <typeparamref name="T"/>.</param>
         /// <param name="rowKey">A function to determine the row key for an entity of type <typeparamref name="T"/>.</param>
         /// <param name="serializer">Optional serializer to use instead of the default <see cref="DocumentSerializer.Default"/>.</param>
-        protected internal DocumentRepository(TableConnection tableConnection, Func<T, string> partitionKey, Func<T, string> rowKey, IDocumentSerializer serializer)
+        /// <param name="includeProperties">Whether to serialize properties as columns too, like table repositories, for easier querying.</param>
+        protected internal DocumentRepository(TableConnection tableConnection, Func<T, string> partitionKey, Func<T, string> rowKey, IDocumentSerializer serializer, bool includeProperties = false)
         {
             this.tableConnection = tableConnection;
             this.partitionKey = partitionKey ?? PartitionKeyAttribute.CreateCompiledAccessor<T>();
             this.rowKey = rowKey ?? RowKeyAttribute.CreateCompiledAccessor<T>();
+            this.includeProperties = includeProperties;
 
             stringSerializer = serializer as IStringDocumentSerializer;
             binarySerializer = serializer as IBinaryDocumentSerializer;
@@ -170,16 +174,12 @@ namespace Devlooped
             var rowKey = this.rowKey.Invoke(entity);
             var table = await this.tableConnection.GetTableAsync().ConfigureAwait(false);
 
+            var row = ToTable(entity);
+            row["Document"] = binarySerializer!.Serialize(entity);
+
             // We use Replace because all the existing entity data is in a single 
             // column, no point in merging since it can't be done at that level anyway.
-            var result = await table.UpsertEntityAsync(new BinaryDocumentEntity(partitionKey, rowKey)
-            {
-                Document = binarySerializer!.Serialize(entity),
-                Type = typeof(T).FullName?.Replace('+', '.'),
-                Version = documentVersion,
-                MajorVersion = documentMajorVersion,
-                MinorVersion = documentMinorVersion,
-            }, TableUpdateMode.Replace, cancellation).ConfigureAwait(false);
+            var result = await table.UpsertEntityAsync(row, TableUpdateMode.Replace, cancellation).ConfigureAwait(false);
 
             return await GetBinaryAsync(partitionKey, rowKey, cancellation).ConfigureAwait(false) ?? entity;
         }
@@ -190,7 +190,7 @@ namespace Devlooped
 
         async IAsyncEnumerable<T> EnumerateStringAsync(Func<IQueryable<IDocumentEntity>, IQueryable<IDocumentEntity>> filter, [EnumeratorCancellation] CancellationToken cancellation = default)
         {
-            IQueryable<IDocumentEntity> query = new TableRepositoryQuery<DocumentEntity>(
+            IQueryable<IDocumentEntity> query = new TableRepositoryQuery<StringDocumentEntity>(
                 tableConnection.StorageAccount,
                 DocumentSerializer.Default,
                 TableName, null, null);
@@ -199,7 +199,7 @@ namespace Devlooped
 
             await foreach (var entity in results.WithCancellation(cancellation))
             {
-                if (entity is DocumentEntity document && 
+                if (entity is StringDocumentEntity document && 
                     document.Document is string data)
                 {
                     var value = stringSerializer!.Deserialize<T>(data);
@@ -215,7 +215,7 @@ namespace Devlooped
 
             try
             {
-                var result = await table.GetEntityAsync<DocumentEntity>(partitionKey, rowKey, cancellationToken: cancellation).ConfigureAwait(false);
+                var result = await table.GetEntityAsync<StringDocumentEntity>(partitionKey, rowKey, cancellationToken: cancellation).ConfigureAwait(false);
 
                 var document = result.Value.Document;
                 if (document == null)
@@ -235,20 +235,39 @@ namespace Devlooped
             var rowKey = this.rowKey.Invoke(entity);
             var table = await this.tableConnection.GetTableAsync().ConfigureAwait(false);
 
+            var row = ToTable(entity);
+            row["Document"] = stringSerializer!.Serialize(entity);
+
             // We use Replace because all the existing entity data is in a single 
             // column, no point in merging since it can't be done at that level anyway.
-            var result = await table.UpsertEntityAsync(new DocumentEntity(partitionKey, rowKey)
-            {
-                Document = stringSerializer!.Serialize(entity),
-                Type = typeof(T).FullName?.Replace('+', '.'),
-                Version = documentVersion,
-                MajorVersion = documentMajorVersion,
-                MinorVersion = documentMinorVersion,
-            }, TableUpdateMode.Replace, cancellation).ConfigureAwait(false);
+            var result = await table.UpsertEntityAsync(row, TableUpdateMode.Replace, cancellation).ConfigureAwait(false);
 
             return await GetStringAsync(partitionKey, rowKey, cancellation).ConfigureAwait(false) ?? entity;
         }
 
         #endregion
-   }
+
+        TableEntity ToTable(T entity)
+        {
+            var te = new TableEntity(this.partitionKey.Invoke(entity), this.rowKey.Invoke(entity))
+            {
+                { "Type", typeof(T).FullName?.Replace('+', '.') },
+                { "Version", documentVersion },
+                { "MajorVersion", documentMajorVersion },
+                { "MinorVersion", documentMinorVersion },
+            };
+
+            if (!includeProperties)
+                return te;
+
+            foreach (var prop in EntityPropertiesMapper.Default.ToProperties(entity))
+            {
+                // Never allow properties to overwrite out built-in queryable columns
+                if (!te.ContainsKey(prop.Key))
+                    te[prop.Key] = prop.Value;
+            }
+
+            return te;
+        }
+    }
 }

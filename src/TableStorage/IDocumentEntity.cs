@@ -54,10 +54,10 @@ namespace Devlooped
         public ETag ETag { get; set; } = ETag.All;
     }
 
-    internal class DocumentEntity : ITableEntity, IDocumentEntity
+    internal class StringDocumentEntity : ITableEntity, IDocumentEntity
     {
-        public DocumentEntity() { }
-        public DocumentEntity(string partitionKey, string rowKey)
+        public StringDocumentEntity() { }
+        public StringDocumentEntity(string partitionKey, string rowKey)
             => (PartitionKey, RowKey)
             = (partitionKey, rowKey);
 
