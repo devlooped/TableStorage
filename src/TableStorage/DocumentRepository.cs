@@ -25,20 +25,22 @@ namespace Devlooped
         /// <param name="rowKey">Optional function to retrieve the row key for a given entity. 
         /// If not provided, the class will need a property annotated with <see cref="RowKeyAttribute"/>.</param>
         /// <param name="serializer">Optional serializer to use instead of the default <see cref="DocumentSerializer.Default"/>.</param>
+        /// <param name="includeProperties">Whether to serialize properties as columns too, like table repositories, for easier querying.</param>
         /// <returns>The new <see cref="ITableRepository{T}"/>.</returns>
         public static IDocumentRepository<T> Create<T>(
             CloudStorageAccount storageAccount,
             string? tableName = default,
             Func<T, string>? partitionKey = default,
             Func<T, string>? rowKey = default,
-            IDocumentSerializer? serializer = default) where T : class
+            IDocumentSerializer? serializer = default, 
+            bool includeProperties = false) where T : class
         {
             tableName ??= TableRepository.GetDefaultTableName<T>();
             partitionKey ??= PartitionKeyAttribute.CreateCompiledAccessor<T>();
             rowKey ??= RowKeyAttribute.CreateCompiledAccessor<T>();
             serializer ??= DocumentSerializer.Default;
 
-            return new DocumentRepository<T>(storageAccount, tableName, partitionKey, rowKey, serializer);
+            return new DocumentRepository<T>(storageAccount, tableName, partitionKey, rowKey, serializer, includeProperties);
         }
     }
 }
