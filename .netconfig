@@ -140,3 +140,8 @@
 	sha = 8990ebb36199046e0b8098bad9e46dcef739c56e
 	etag = e1dc114d2e8b57d50649989d32dbf0c9080ec77da3738a4cc79e9256d6ca5d3e
 	weak
+[file ".github/workflows/publish.yml"]
+	url = https://github.com/devlooped/oss/blob/main/.github/workflows/publish.yml
+	sha = d3022567c9ef2bc9461511e53b8abe065afdf03b
+	etag = 58601b5a71c805647ab26e84053acdfb8d174eaa93330487af8a5503753c5707
+	weak
