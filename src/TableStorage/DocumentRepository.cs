@@ -32,15 +32,37 @@ namespace Devlooped
             string? tableName = default,
             Func<T, string>? partitionKey = default,
             Func<T, string>? rowKey = default,
-            IDocumentSerializer? serializer = default, 
+            IDocumentSerializer? serializer = default,
+            bool includeProperties = false) where T : class
+            => Create<T>(
+                new TableConnection(storageAccount, tableName ??= TableRepository.GetDefaultTableName<T>()), 
+                partitionKey, rowKey, serializer, includeProperties);
+
+        /// <summary>
+        /// Creates an <see cref="ITableRepository{T}"/> for the given entity type 
+        /// <typeparamref name="T"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of entity that the repository will manage.</typeparam>
+        /// <param name="tableConnection">The storage account and table to use.</param>
+        /// <param name="partitionKey">Optional function to retrieve the partition key for a given entity. 
+        /// If not provided, the class will need a property annotated with <see cref="PartitionKeyAttribute"/>.</param>
+        /// <param name="rowKey">Optional function to retrieve the row key for a given entity. 
+        /// If not provided, the class will need a property annotated with <see cref="RowKeyAttribute"/>.</param>
+        /// <param name="serializer">Optional serializer to use instead of the default <see cref="DocumentSerializer.Default"/>.</param>
+        /// <param name="includeProperties">Whether to serialize properties as columns too, like table repositories, for easier querying.</param>
+        /// <returns>The new <see cref="ITableRepository{T}"/>.</returns>
+        public static IDocumentRepository<T> Create<T>(
+            TableConnection tableConnection,
+            Func<T, string>? partitionKey = default,
+            Func<T, string>? rowKey = default,
+            IDocumentSerializer? serializer = default,
             bool includeProperties = false) where T : class
         {
-            tableName ??= TableRepository.GetDefaultTableName<T>();
             partitionKey ??= PartitionKeyAttribute.CreateCompiledAccessor<T>();
             rowKey ??= RowKeyAttribute.CreateCompiledAccessor<T>();
             serializer ??= DocumentSerializer.Default;
 
-            return new DocumentRepository<T>(storageAccount, tableName, partitionKey, rowKey, serializer, includeProperties);
+            return new DocumentRepository<T>(tableConnection, partitionKey, rowKey, serializer, includeProperties);
         }
     }
 }
