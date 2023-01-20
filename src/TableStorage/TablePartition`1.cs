@@ -52,7 +52,11 @@ namespace Devlooped
         /// <summary>
         /// The <see cref="TableUpdateMode"/> to use when updating an existing entity.
         /// </summary>
-        public TableUpdateMode UpdateMode { get; set; }
+        public TableUpdateMode UpdateMode 
+        {
+            get => repository.UpdateMode;
+            set => repository.UpdateMode = value; 
+        }
 
         /// <summary>
         /// The strategy to use when updating an existing entity.
@@ -61,8 +65,8 @@ namespace Devlooped
         public UpdateStrategy UpdateStrategy
         {
             // Backs-compatible implementation
-            get => UpdateMode == TableUpdateMode.Replace ? UpdateStrategy.Replace : UpdateStrategy.Merge;
-            set => UpdateMode = value.UpdateMode;
+            get => repository.UpdateStrategy;
+            set => repository.UpdateStrategy = value;
         }
 
         /// <inheritdoc />
