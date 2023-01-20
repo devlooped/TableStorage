@@ -1,26 +1,30 @@
 # Changelog
 
+## [v4.1.3](https://github.com/devlooped/TableStorage/tree/v4.1.3) (2023-01-20)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v4.1.2...v4.1.3)
+
+:sparkles: Implemented enhancements:
+
+- Add support for TableConnection overload for DocumentRepository [\#173](https://github.com/devlooped/TableStorage/pull/173) (@kzu)
+- As documented \[PartitionKey\], honor it at class level [\#172](https://github.com/devlooped/TableStorage/pull/172) (@kzu)
+- Allow persistence of entity properties as columns in document [\#171](https://github.com/devlooped/TableStorage/pull/171) (@kzu)
+- Allow retrieving the table client from the connection [\#165](https://github.com/devlooped/TableStorage/pull/165) (@kzu)
+
+:bug: Fixed bugs:
+
+- Update mode on table partition should set table repository mode [\#174](https://github.com/devlooped/TableStorage/pull/174) (@kzu)
+
 ## [v4.1.2](https://github.com/devlooped/TableStorage/tree/v4.1.2) (2023-01-16)
 
-[Full Changelog](https://github.com/devlooped/TableStorage/compare/v4.1.1...v4.1.2)
-
-## [v4.1.1](https://github.com/devlooped/TableStorage/tree/v4.1.1) (2023-01-16)
-
-[Full Changelog](https://github.com/devlooped/TableStorage/compare/v4.1.0...v4.1.1)
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v4.0.0...v4.1.2)
 
 :sparkles: Implemented enhancements:
 
 - Add TableConnection overloads for TableRepository factory methods [\#161](https://github.com/devlooped/TableStorage/issues/161)
+- Allow reusing/caching the combination of CloudStorageAccount and TableClient [\#155](https://github.com/devlooped/TableStorage/issues/155)
 - Provide comprehensive readmes for all packages [\#164](https://github.com/devlooped/TableStorage/pull/164) (@kzu)
 - Add TableConnection overloads for TableRepository factory methods [\#162](https://github.com/devlooped/TableStorage/pull/162) (@kzu)
-
-## [v4.1.0](https://github.com/devlooped/TableStorage/tree/v4.1.0) (2023-01-15)
-
-[Full Changelog](https://github.com/devlooped/TableStorage/compare/v4.0.0...v4.1.0)
-
-:sparkles: Implemented enhancements:
-
-- Allow reusing/caching the combination of CloudStorageAccount and TableClient [\#155](https://github.com/devlooped/TableStorage/issues/155)
 - Allow creating partitions from the same table connection [\#156](https://github.com/devlooped/TableStorage/pull/156) (@kzu)
 
 :twisted_rightwards_arrows: Merged:
