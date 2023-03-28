@@ -12,7 +12,7 @@
   <ItemGroup>
     <PackageReference Include="NuGetizer" Version="1.0.1" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="all" />
-    <PackageReference Include="Devlooped.CloudStorageAccount" Version="1.0.1" />
+    <PackageReference Include="Devlooped.CloudStorageAccount" Version="1.1.0" />
     <PackageReference Include="Azure.Data.Tables" Version="12.6.1" />
     <PackageReference Include="Microsoft.OData.Client" Version="7.14.0" />
     <PackageReference Include="System.Text.Json" Version="6.0.6" />
