@@ -11,7 +11,7 @@
     <PackageReference Include="NuGetizer" Version="1.0.1" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="all" />
     <PackageReference Include="Devlooped.CloudStorageAccount" Version="1.0.1" />
-    <PackageReference Include="Azure.Data.Tables" Version="12.6.1" />
+    <PackageReference Include="Azure.Data.Tables" Version="12.8.0" />
     <PackageReference Include="Microsoft.OData.Client" Version="7.14.0" />
     <PackageReference Include="PolySharp" Version="1.12.1" PrivateAssets="all" />
     <PackageReference Include="System.Text.Json" Version="6.0.6" />
