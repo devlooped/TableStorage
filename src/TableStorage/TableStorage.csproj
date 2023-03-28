@@ -13,8 +13,8 @@
     <PackageReference Include="Devlooped.CloudStorageAccount" Version="1.0.1" />
     <PackageReference Include="Azure.Data.Tables" Version="12.6.1" />
     <PackageReference Include="Microsoft.OData.Client" Version="7.14.0" />
+    <PackageReference Include="PolySharp" Version="1.12.1" PrivateAssets="all" />
     <PackageReference Include="System.Text.Json" Version="6.0.6" />
-    <PackageReference Include="Nullable" Version="1.3.1" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TableStorage.CodeAnalysis\TableStorage.CodeAnalysis.csproj"  ReferenceOutputAssembly="false" OutputItemType="None" />
+    <ProjectReference Include="..\TableStorage.CodeAnalysis\TableStorage.CodeAnalysis.csproj" ReferenceOutputAssembly="false" OutputItemType="None" />
   </ItemGroup>
 
 </Project>
