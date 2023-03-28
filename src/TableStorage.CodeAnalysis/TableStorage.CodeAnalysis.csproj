@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <AssemblyName>Devlooped.TableStorage.CodeAnalysis</AssemblyName>
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackFolder>analyzers/dotnet/roslyn4.0</PackFolder>
     <SignAssembly>false</SignAssembly>
