@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31220.234
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33516.290
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TableStorage", "src\TableStorage\TableStorage.csproj", "{FDB4D659-0F65-4D99-98C4-476E9408F767}"
 EndProject
@@ -35,6 +35,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TableStorage.Newtonsoft", "src\TableStorage.Newtonsoft\TableStorage.Newtonsoft.csproj", "{B291DE8D-0261-4762-85EB-728342EDFB2E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TableStorage.Newtonsoft.Source", "src\TableStorage.Newtonsoft.Source\TableStorage.Newtonsoft.Source.csproj", "{72663FB4-F999-4EC0-94A8-9E0E002C5F87}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TableStorage.CodeAnalysis", "src\TableStorage.CodeAnalysis\TableStorage.CodeAnalysis.csproj", "{BC1CD1F2-5E6B-43B1-8672-E70F784F90C0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -86,6 +88,10 @@ Global
 		{72663FB4-F999-4EC0-94A8-9E0E002C5F87}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{72663FB4-F999-4EC0-94A8-9E0E002C5F87}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{72663FB4-F999-4EC0-94A8-9E0E002C5F87}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC1CD1F2-5E6B-43B1-8672-E70F784F90C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC1CD1F2-5E6B-43B1-8672-E70F784F90C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC1CD1F2-5E6B-43B1-8672-E70F784F90C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC1CD1F2-5E6B-43B1-8672-E70F784F90C0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

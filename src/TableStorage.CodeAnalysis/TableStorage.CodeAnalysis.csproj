@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <PackFolder>analyzers/dotnet/roslyn4.0</PackFolder>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NuGetizer" Version="1.0.1" PrivateAssets="all" PackTransitive="false" />
+    <PackageReference Include="ThisAssembly.AssemblyInfo" Version="1.2.12" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.1" Pack="false" />
+    <PackageReference Include="Devlooped.SponsorLink" Version="0.10.3" />
+  </ItemGroup>
+
+</Project>
