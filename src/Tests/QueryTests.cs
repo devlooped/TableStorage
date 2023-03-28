@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Azure;
 using Azure.Data.Tables;
@@ -11,11 +12,13 @@ namespace Devlooped
 {
     public class QueryTests
     {
+        string TableName([CallerMemberName] string? caller = default) => $"{nameof(QueryTests)}{caller}";
+
         [Fact]
         public async Task CanTake()
         {
             var account = CloudStorageAccount.DevelopmentStorageAccount;
-            var repo = TableRepository.Create<Book>(account, nameof(CanTake), x => "Book", x => x.ISBN);
+            var repo = TableRepository.Create<Book>(account, TableName(), x => "Book", x => x.ISBN);
             await LoadBooksAsync(repo);
 
             var query = from book in repo.CreateQuery()
@@ -31,7 +34,7 @@ namespace Devlooped
         public async Task CanGetAll()
         {
             var account = CloudStorageAccount.DevelopmentStorageAccount;
-            var repo = TableRepository.Create<Book>(account, nameof(CanGetAll), x => x.Author, x => x.ISBN);
+            var repo = TableRepository.Create<Book>(account, TableName(), x => x.Author, x => x.ISBN);
             await LoadBooksAsync(repo);
 
             var result = await repo.CreateQuery().AsAsyncEnumerable().ToListAsync();
@@ -44,13 +47,7 @@ namespace Devlooped
         public async Task CanProject()
         {
             var account = CloudStorageAccount.DevelopmentStorageAccount;
-            var repo = TableRepository.Create<Book>(account, $"{nameof(QueryTests)}{nameof(CanProject)}", x => x.Author, x => x.ISBN);
-
-            // For some reason, this test alone fails due to what looks like a timing issue in finishing creating the table
-            while ((await account.CreateTableServiceClient().GetTableClient(repo.TableName).CreateIfNotExistsAsync()) != null)
-            {
-                await Task.Delay(50);
-            }
+            var repo = TableRepository.Create<Book>(account, TableName(), x => x.Author, x => x.ISBN);
 
             await LoadBooksAsync(repo);
 
@@ -74,10 +71,10 @@ namespace Devlooped
             var account = CloudStorageAccount.DevelopmentStorageAccount;
 
             // Load with author + isbn as keys
-            await LoadBooksAsync(TableRepository.Create<Book>(account, nameof(CanProjectPartition), x => x.Author, x => x.ISBN));
+            await LoadBooksAsync(TableRepository.Create<Book>(account, TableName(), x => x.Author, x => x.ISBN));
 
             // Query single author by scoping to partition key
-            var repo = TablePartition.Create<Book>(account, nameof(CanProjectPartition), "Rick Riordan", x => x.ISBN);
+            var repo = TablePartition.Create<Book>(account, TableName(), "Rick Riordan", x => x.ISBN);
 
             var hasResults = false;
 
@@ -97,9 +94,9 @@ namespace Devlooped
         public async Task CanFilterByRowKey()
         {
             var account = CloudStorageAccount.DevelopmentStorageAccount;
-            await LoadBooksAsync(TableRepository.Create<Book>(account, nameof(CanFilterByRowKey), x => x.Author, x => x.ISBN));
+            await LoadBooksAsync(TableRepository.Create<Book>(account, TableName(), x => x.Author, x => x.ISBN));
 
-            var repo = TablePartition.Create<Book>(account, nameof(CanFilterByRowKey), "Rick Riordan", x => x.ISBN);
+            var repo = TablePartition.Create<Book>(account, TableName(), "Rick Riordan", x => x.ISBN);
 
             // Get specific set of books from one particular publisher/country combination
             // in this case, 978-[English-speaking country, 1][Disney Editions, 4231]
@@ -119,9 +116,9 @@ namespace Devlooped
         public async Task CanFilterByColumn()
         {
             var account = CloudStorageAccount.DevelopmentStorageAccount;
-            await LoadBooksAsync(TableRepository.Create<Book>(account, nameof(CanFilterByColumn), x => x.Author, x => x.ISBN));
+            await LoadBooksAsync(TableRepository.Create<Book>(account, TableName(), x => x.Author, x => x.ISBN));
 
-            var repo = TablePartition.Create<Book>(account, nameof(CanFilterByRowKey), "Rick Riordan", x => x.ISBN);
+            var repo = TablePartition.Create<Book>(account, TableName(), "Rick Riordan", x => x.ISBN);
 
             // Get specific set of books from one particular publisher/country combination
             // in this case, 978-[English-speaking country, 1][Disney Editions, 4231]
@@ -140,9 +137,9 @@ namespace Devlooped
         {
             var account = CloudStorageAccount.DevelopmentStorageAccount;
             await LoadBooksAsync(DocumentRepository.Create<Book>(
-                account, nameof(CanFilterDocuments), x => x.Author, x => x.ISBN));
+                account, TableName(), x => x.Author, x => x.ISBN));
 
-            var repo = DocumentPartition.Create<Book>(account, nameof(CanFilterDocuments), "Rick Riordan", x => x.ISBN);
+            var repo = DocumentPartition.Create<Book>(account, TableName(), "Rick Riordan", x => x.ISBN);
 
             //// Get specific set of books from one particular publisher/country combination
             //// in this case, 978-[English-speaking country, 1][Disney Editions, 4231]
@@ -162,7 +159,7 @@ namespace Devlooped
         public async Task EnumFailsInTableClient()
         {
             var account = CloudStorageAccount.DevelopmentStorageAccount;
-            var table = account.CreateTableServiceClient().GetTableClient(nameof(EnumFailsInTableClient));
+            var table = account.CreateTableServiceClient().GetTableClient(TableName());
 
             await table.CreateIfNotExistsAsync();
 
