@@ -1,5 +1,17 @@
 # Changelog
 
+## [v4.2.0](https://github.com/devlooped/TableStorage/tree/v4.2.0) (2023-03-28)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v4.1.3...v4.2.0)
+
+:sparkles: Implemented enhancements:
+
+- Add SponsorLink to ensure ongoing development and support [\#193](https://github.com/devlooped/TableStorage/pull/193) (@kzu)
+
+:twisted_rightwards_arrows: Merged:
+
+- Switch to Polysharp for the NS2 polyfills [\#194](https://github.com/devlooped/TableStorage/pull/194) (@kzu)
+
 ## [v4.1.3](https://github.com/devlooped/TableStorage/tree/v4.1.3) (2023-01-20)
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/v4.1.2...v4.1.3)
