@@ -1,5 +1,13 @@
 # Changelog
 
+## [v4.2.1](https://github.com/devlooped/TableStorage/tree/v4.2.1) (2023-04-17)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v4.2.0...v4.2.1)
+
+:sparkles: Implemented enhancements:
+
+- Allow persisting key properties as columns [\#198](https://github.com/devlooped/TableStorage/pull/198) (@kzu)
+
 ## [v4.2.0](https://github.com/devlooped/TableStorage/tree/v4.2.0) (2023-03-28)
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/v4.1.3...v4.2.0)
