@@ -441,6 +441,28 @@ namespace Devlooped
             Assert.Equal("MyPartition", partition.PartitionKey);
         }
 
+        [Fact]
+        public async Task CanPersistKeyProperties()
+        {
+            await CloudStorageAccount.DevelopmentStorageAccount
+                .CreateTableServiceClient()
+                .GetTableClient(nameof(CanPersistKeyProperties))
+                .DeleteAsync();
+
+            var connection = new TableConnection(CloudStorageAccount.DevelopmentStorageAccount, nameof(CanPersistKeyProperties));
+
+            await new TablePartition<MyEntity>(connection, "Entities")
+            {
+                PersistKeyProperties = true
+            }.PutAsync(new MyEntity("1234") { Name = "kzu" });
+
+            var entity = await TablePartition.Create(connection, "Entities").GetAsync("1234");
+            Assert.NotNull(entity);
+
+            Assert.Equal("1234", entity["Id"]);
+            Assert.Equal("kzu", entity["Name"]);
+        }
+
         class MyEntity
         {
             public MyEntity(string id) => Id = id;
