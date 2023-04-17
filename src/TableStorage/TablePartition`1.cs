@@ -20,26 +20,77 @@ namespace Devlooped
         /// Initializes the repository with the given storage account and optional table name.
         /// </summary>
         /// <param name="storageAccount">The <see cref="CloudStorageAccount"/> to use to connect to the table.</param>
-        /// <param name="tableName">The table that backs this table partition.</param>
-        /// <param name="partitionKey">The fixed partition key that backs this table partition.</param>
-        /// <param name="rowKey">A function to determine the row key for an entity of type <typeparamref name="T"/> within the partition.</param>
-        protected internal TablePartition(CloudStorageAccount storageAccount, string tableName, string partitionKey, Expression<Func<T, string>> rowKey)
-            : this(new TableConnection(storageAccount, tableName ?? TablePartition.GetDefaultTableName<T>()), partitionKey, rowKey)
-        {
-        }
+        public TablePartition(CloudStorageAccount storageAccount)
+            : this(new TableConnection(storageAccount, TablePartition.GetDefaultTableName<T>()),
+                  TablePartition.GetDefaultPartitionKey<T>(), 
+                  RowKeyAttribute.CreateAccessor<T>())
+        { }
 
         /// <summary>
         /// Initializes the repository with the given storage account and optional table name.
         /// </summary>
-        /// <param name="tableStorage">The storage account and table to use.</param>
+        /// <param name="storageAccount">The <see cref="CloudStorageAccount"/> to use to connect to the table.</param>
+        /// <param name="tableName">The table that backs this table partition.</param>
+        public TablePartition(CloudStorageAccount storageAccount, string tableName)
+            : this(new TableConnection(storageAccount, tableName ?? TablePartition.GetDefaultTableName<T>()),
+                  TablePartition.GetDefaultPartitionKey<T>(),
+                  RowKeyAttribute.CreateAccessor<T>())
+        { }
+
+        /// <summary>
+        /// Initializes the repository with the given storage account and optional table name.
+        /// </summary>
+        /// <param name="tableConnection">The storage account and table to use.</param>
+        public TablePartition(TableConnection tableConnection)
+            : this(tableConnection,
+                  TablePartition.GetDefaultPartitionKey<T>(),
+                  RowKeyAttribute.CreateAccessor<T>())
+        { }
+
+        /// <summary>
+        /// Initializes the repository with the given storage account and optional table name.
+        /// </summary>
+        /// <param name="storageAccount">The <see cref="CloudStorageAccount"/> to use to connect to the table.</param>
+        /// <param name="tableName">The table that backs this table partition.</param>
+        /// <param name="partitionKey">The fixed partition key that backs this table partition.</param>
+        public TablePartition(CloudStorageAccount storageAccount, string tableName, string partitionKey)
+            : this(new TableConnection(storageAccount, tableName ?? TablePartition.GetDefaultTableName<T>()), 
+                  partitionKey, 
+                  RowKeyAttribute.CreateAccessor<T>())
+        { }
+
+        /// <summary>
+        /// Initializes the repository with the given storage account and optional table name.
+        /// </summary>
+        /// <param name="storageAccount">The <see cref="CloudStorageAccount"/> to use to connect to the table.</param>
+        /// <param name="tableName">The table that backs this table partition.</param>
         /// <param name="partitionKey">The fixed partition key that backs this table partition.</param>
         /// <param name="rowKey">A function to determine the row key for an entity of type <typeparamref name="T"/> within the partition.</param>
-        protected internal TablePartition(TableConnection tableStorage, string partitionKey, Expression<Func<T, string>> rowKey)
+        public TablePartition(CloudStorageAccount storageAccount, string tableName, string partitionKey, Expression<Func<T, string>> rowKey)
+            : this(new TableConnection(storageAccount, tableName ?? TablePartition.GetDefaultTableName<T>()), partitionKey, rowKey)
+        { }
+
+        /// <summary>
+        /// Initializes the repository with the given storage account and optional table name.
+        /// </summary>
+        /// <param name="tableConnection">The storage account and table to use.</param>
+        /// <param name="partitionKey">The fixed partition key that backs this table partition.</param>
+        public TablePartition(TableConnection tableConnection, string partitionKey)
+            : this(tableConnection, partitionKey, RowKeyAttribute.CreateAccessor<T>())
+        { }
+
+        /// <summary>
+        /// Initializes the repository with the given storage account and optional table name.
+        /// </summary>
+        /// <param name="tableConnection">The storage account and table to use.</param>
+        /// <param name="partitionKey">The fixed partition key that backs this table partition.</param>
+        /// <param name="rowKey">A function to determine the row key for an entity of type <typeparamref name="T"/> within the partition.</param>
+        public TablePartition(TableConnection tableConnection, string partitionKey, Expression<Func<T, string>> rowKey)
         {
             partitionKey ??= TablePartition.GetDefaultPartitionKey<T>();
             PartitionKey = partitionKey;
 
-            repository = new TableRepository<T>(tableStorage, _ => partitionKey,
+            repository = new TableRepository<T>(tableConnection, _ => partitionKey,
                 rowKey ?? RowKeyAttribute.CreateAccessor<T>());
         }
 
@@ -56,6 +107,16 @@ namespace Devlooped
         {
             get => repository.UpdateMode;
             set => repository.UpdateMode = value; 
+        }
+
+        /// <summary>
+        /// Whether to persist the entity properties marked as partition and row 
+        /// keys with their original property names too or not. Defaults to false.
+        /// </summary>
+        public bool PersistKeyProperties 
+        {
+            get => repository.PersistKeyProperties;
+            set => repository.PersistKeyProperties = value;
         }
 
         /// <summary>
