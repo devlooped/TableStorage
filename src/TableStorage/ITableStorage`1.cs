@@ -52,6 +52,14 @@ namespace Devlooped
         Task<T?> GetAsync(string partitionKey, string rowKey, CancellationToken cancellation = default);
 
         /// <summary>
+        /// Retrieves an entity from the repository.
+        /// </summary>
+        /// <param name="entity">The entity to use to lookup partition and row key values.</param>
+        /// <param name="cancellation">Optional <see cref="CancellationToken"/>.</param>
+        /// <returns>The retrieved entity, or <see langword="null"/> if not found.</returns>
+        Task<T?> GetAsync(T entity, CancellationToken cancellation = default);
+
+        /// <summary>
         /// Writes an entity to the table, overwriting an existing value, if any.
         /// </summary>
         /// <param name="entity">The entity to persist.</param>

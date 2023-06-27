@@ -463,6 +463,28 @@ namespace Devlooped
             Assert.Equal("kzu", entity["Name"]);
         }
 
+        [Fact]
+        public async Task CanGetFromEntity()
+        {
+            var repo = TableRepository.Create<AttributedRecordEntity>(CloudStorageAccount.DevelopmentStorageAccount);
+            var entity = await repo.PutAsync(new AttributedRecordEntity("Book", "1234"));
+
+            Assert.NotNull(entity);
+
+            var stored = await repo.GetAsync(entity);
+
+            Assert.NotNull(stored);
+            Assert.Equal(entity.ID, stored.ID);
+            Assert.Equal(entity.Kind, stored.Kind);
+
+            var generic = await new TableEntityRepository(CloudStorageAccount.DevelopmentStorageAccount, TableRepository.GetDefaultTableName<AttributedRecordEntity>())
+                .GetAsync(new TableEntity(entity.Kind, entity.ID));
+
+            Assert.NotNull(generic);
+            Assert.Equal(entity.ID, generic.RowKey);
+            Assert.Equal(entity.Kind, generic.PartitionKey);
+        }
+
         class MyEntity
         {
             public MyEntity(string id) => Id = id;
