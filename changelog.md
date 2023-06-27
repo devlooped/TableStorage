@@ -1,5 +1,14 @@
 # Changelog
 
+## [v4.3.0](https://github.com/devlooped/TableStorage/tree/v4.3.0) (2023-06-27)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v4.2.1...v4.3.0)
+
+:sparkles: Implemented enhancements:
+
+- Allow entity lookup from entity value [\#215](https://github.com/devlooped/TableStorage/issues/215)
+- Allow entity lookup from entity value [\#216](https://github.com/devlooped/TableStorage/pull/216) (@kzu)
+
 ## [v4.2.1](https://github.com/devlooped/TableStorage/tree/v4.2.1) (2023-04-17)
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/v4.2.0...v4.2.1)
