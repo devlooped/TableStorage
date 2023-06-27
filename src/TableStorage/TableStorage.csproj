@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <AssemblyName>Devlooped.TableStorage</AssemblyName>
@@ -12,7 +12,7 @@
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="all" />
     <PackageReference Include="Devlooped.CloudStorageAccount" Version="1.1.0" />
     <PackageReference Include="Azure.Data.Tables" Version="12.8.0" />
-    <PackageReference Include="Microsoft.OData.Client" Version="7.15.0" />
+    <PackageReference Include="Microsoft.OData.Client" Version="7.17.0" />
     <PackageReference Include="PolySharp" Version="1.13.1" PrivateAssets="all" />
     <PackageReference Include="System.Text.Json" Version="6.0.6" />
   </ItemGroup>
