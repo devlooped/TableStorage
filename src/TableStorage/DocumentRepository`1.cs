@@ -116,6 +116,10 @@ namespace Devlooped
             => enumerate(query => query.Where(predicate), cancellation);
 
         /// <inheritdoc />
+        public Task<T?> GetAsync(T entity, CancellationToken cancellation = default)
+            => GetAsync(partitionKey(entity), rowKey(entity), cancellation);
+
+        /// <inheritdoc />
         public Task<T?> GetAsync(string partitionKey, string rowKey, CancellationToken cancellation = default)
             => get(partitionKey, rowKey, cancellation);
 

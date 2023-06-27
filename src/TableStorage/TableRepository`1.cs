@@ -153,6 +153,10 @@ namespace Devlooped
         }
 
         /// <inheritdoc />
+        public Task<T?> GetAsync(T entity, CancellationToken cancellation = default)
+            => GetAsync(partitionKey(entity), rowKey(entity), cancellation);
+
+        /// <inheritdoc />
         public async Task<T?> GetAsync(string partitionKey, string rowKey, CancellationToken cancellation = default)
         {
             var table = await this.tableConnection.GetTableAsync().ConfigureAwait(false);
