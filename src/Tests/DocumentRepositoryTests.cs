@@ -282,7 +282,7 @@ namespace Devlooped
             [ProtoMember(3)]
             public string? Title { get; set; }
             [Key(3)]
-            [ProtoMember(4)]
+            [ProtoMember(4, IsRequired = true)]
             public DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.Today);
         }
     }
