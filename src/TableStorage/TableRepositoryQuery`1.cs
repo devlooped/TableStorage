@@ -68,34 +68,37 @@ namespace Devlooped
             if (count == top)
                 yield break;
 
-            if (qs["$select"] != null)
+            // Collect the properties being projected, and append the built-in ones to them.
+            if (expression.CanReduce)
             {
-                // Collect the properties being projected, and append the built-in ones to them.
                 var projection = new ProjectionVisitor();
                 projection.Visit(expression);
 
                 if (projection.Properties.Count > 0)
                 {
-                    qs["$select"] = string.Join(",", projection.Properties
-                        // NOTE: skip key properties since they are renamed back before deserialization below
-                        .Where(prop => prop != partitionKeyProperty && prop != rowKeyProperty)
-                        // NOTE: always project the built-in props.
+                    var props = projection.Properties
                         .Concat(new[]
                         {
-                            nameof(ITableEntity.PartitionKey),
-                            nameof(ITableEntity.RowKey),
-                            nameof(ITableEntity.ETag),
-                            nameof(ITableEntity.Timestamp)
-                        }));
+                        nameof(ITableEntity.PartitionKey),
+                        nameof(ITableEntity.RowKey),
+                        nameof(ITableEntity.ETag),
+                        nameof(ITableEntity.Timestamp)
+                        });
+
+                    // append or replace the select query string
+                    if (qs["$select"] is string select)
+                        qs["$select"] = string.Join(",", new HashSet<string>(select.Split(',').Concat(props)));
+                    else
+                        qs["$select"] = string.Join(",", props);
                 }
             }
 
             var filter = qs["$filter"];
             if (filter != null && (partitionKeyProperty != null || rowKeyProperty != null))
             {
-                if (partitionKeyProperty != null)
+                if (partitionKeyProperty != null && partitionKeyProperty != nameof(ITableEntity.PartitionKey))
                     filter = Regex.Replace(filter, partitionKeyProperty + "(\\W)", "PartitionKey$1");
-                if (rowKeyProperty != null)
+                if (rowKeyProperty != null && rowKeyProperty != nameof(ITableEntity.RowKey))
                     filter = Regex.Replace(filter, rowKeyProperty + "(\\W)", "RowKey$1");
 
                 qs["$filter"] = filter;
@@ -135,9 +138,9 @@ namespace Devlooped
                     writer.WriteStartObject();
 
                     // Write the renamed key properties, if any.
-                    if (partitionKeyProperty != null)
+                    if (partitionKeyProperty != null && partitionKeyProperty != nameof(ITableEntity.PartitionKey))
                         writer.WriteString(partitionKeyProperty, element.GetProperty("PartitionKey").GetString());
-                    if (rowKeyProperty != null)
+                    if (rowKeyProperty != null && rowKeyProperty != nameof(ITableEntity.RowKey))
                         writer.WriteString(rowKeyProperty, element.GetProperty("RowKey").GetString());
 
                     foreach (var property in element.EnumerateObject())
@@ -222,6 +225,18 @@ namespace Devlooped
             class PropertyExpressionVisitor : ExpressionVisitor
             {
                 public HashSet<string> Properties { get; } = new HashSet<string>();
+
+                protected override Expression VisitMethodCall(MethodCallExpression node)
+                {
+                    if (node.Method.Name == "get_Item" && node.Method.GetParameters() is var parameters && 
+                        parameters.Length == 1 &&
+                        node.Arguments[0] is ConstantExpression constant)
+                    {
+                        Properties.Add((string)constant.Value);
+                    }
+
+                    return node; 
+                }
 
                 protected override Expression VisitMember(MemberExpression node)
                 {
