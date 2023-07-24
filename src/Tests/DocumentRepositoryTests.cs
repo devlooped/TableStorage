@@ -67,7 +67,7 @@ namespace Devlooped
                 Assert.Null(await repo.GetAsync(partitionKey, rowKey));
 
                 await foreach (var _ in repo.EnumerateAsync(partitionKey))
-                    Assert.False(true, "Did not expect to find any entities");
+                    Assert.Fail("Did not expect to find any entities");
             }
             finally
             {
@@ -122,7 +122,7 @@ namespace Devlooped
                 Assert.Null(await repo.GetAsync(rowKey));
 
                 await foreach (var _ in repo.EnumerateAsync())
-                    Assert.False(true, "Did not expect to find any entities");
+                    Assert.Fail("Did not expect to find any entities");
             }
             finally
             {

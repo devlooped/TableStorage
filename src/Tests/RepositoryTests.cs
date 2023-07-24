@@ -41,7 +41,7 @@ namespace Devlooped
             Assert.Null(await repo.GetAsync("My", "asdf"));
 
             await foreach (var _ in repo.EnumerateAsync("My"))
-                Assert.False(true, "Did not expect to find any entities");
+                Assert.Fail("Did not expect to find any entities");
         }
 
         [Fact]
@@ -76,7 +76,7 @@ namespace Devlooped
             Assert.Null(await repo.GetAsync("Book", "1234"));
 
             await foreach (var _ in repo.EnumerateAsync("Book"))
-                Assert.False(true, "Did not expect to find any entities");
+                Assert.Fail("Did not expect to find any entities");
         }
 
         [Fact]
@@ -137,7 +137,7 @@ namespace Devlooped
             Assert.Null(await repo.GetAsync("asdf"));
 
             await foreach (var _ in repo.EnumerateAsync())
-                Assert.False(true, "Did not expect to find any entities");
+                Assert.Fail("Did not expect to find any entities");
         }
 
         [Fact]
@@ -226,7 +226,7 @@ namespace Devlooped
             Assert.Null(await repo.GetAsync("123", "Foo"));
 
             await foreach (var _ in repo.EnumerateAsync("123"))
-                Assert.False(true, "Did not expect to find any entities");
+                Assert.Fail("Did not expect to find any entities");
         }
 
         [Fact]
@@ -260,7 +260,7 @@ namespace Devlooped
             Assert.Null(await partition.GetAsync("123"));
 
             await foreach (var _ in partition.EnumerateAsync())
-                Assert.False(true, "Did not expect to find any entities");
+                Assert.Fail("Did not expect to find any entities");
         }
 
         [Fact]
@@ -373,7 +373,7 @@ namespace Devlooped
             var result = await repo.GetAsync("Book", "1234");
             if (result is not TableEntity entity)
             {
-                Assert.False(true, "Expected TableEntity");
+                Assert.Fail("Expected TableEntity");
                 return;
             }
 
