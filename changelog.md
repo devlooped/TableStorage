@@ -1,5 +1,14 @@
 # Changelog
 
+## [v4.3.1](https://github.com/devlooped/TableStorage/tree/v4.3.1) (2023-07-24)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v4.3.0...v4.3.1)
+
+:sparkles: Implemented enhancements:
+
+- Add support for querying over TableEntityRepository [\#231](https://github.com/devlooped/TableStorage/issues/231)
+- Add support for querying over TableEntityRepository [\#232](https://github.com/devlooped/TableStorage/pull/232) (@kzu)
+
 ## [v4.3.0](https://github.com/devlooped/TableStorage/tree/v4.3.0) (2023-06-27)
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/v4.2.1...v4.3.0)
