@@ -190,12 +190,18 @@ namespace Devlooped
             // Can project direct entities
             Assert.Equal(4, (await query.AsAsyncEnumerable().ToListAsync()).Count);
 
+            var entity = (await query.AsAsyncEnumerable().ToListAsync()).First();
+            Assert.NotEmpty(entity.PartitionKey);
+            Assert.NotEmpty(entity.RowKey);
+            Assert.NotEqual(default(ETag), entity.ETag);
+            Assert.NotEqual(DateTime.MinValue, entity.Timestamp);
+
             var projection = from book in repo.CreateQuery()
                              where
                                  book.PartitionKey == "Rick Riordan" &&
                                  book.RowKey.CompareTo("97814231") >= 0 &&
                                  book.RowKey.CompareTo("97814232") < 0
-                             select new { Title = (string)book["Title"] };
+                             select new { Title = (string)book["Title"], Pages = (int)book["Pages"] };
 
             var result = await projection.AsAsyncEnumerable().ToListAsync();
             // Can project directly just the titles
@@ -207,8 +213,10 @@ namespace Devlooped
             Assert.Contains(result, x => x.Title == "The Blood of Olympus");
 
             // Can enumerate async directly too
-            await foreach (var isbn in query)
+            await foreach (var item in projection)
             {
+                Assert.True(item.Pages > 100);
+                Assert.NotEmpty(item.Title);
             }
         }
 

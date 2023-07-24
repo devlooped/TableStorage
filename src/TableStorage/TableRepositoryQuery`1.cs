@@ -3,6 +3,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
@@ -122,6 +123,9 @@ namespace Devlooped
             var request = new HttpRequestMessage(HttpMethod.Get, builder.Uri)
                 .AddAuthorizationHeader(account);
 
+            if (typeof(T) == typeof(TableEntity))
+                request.Headers.TryAddWithoutValidation("Accept", "application/json;odata=minimalmetadata");
+
             var response = await Http.Client.SendAsync(request);
             while (true)
             {
@@ -132,31 +136,46 @@ namespace Devlooped
 
                 foreach (var element in doc.RootElement.GetProperty("value").EnumerateArray())
                 {
-                    var mem = new MemoryStream();
-                    var writer = new Utf8JsonWriter(mem);
-
-                    writer.WriteStartObject();
-
-                    // Write the renamed key properties, if any.
-                    if (partitionKeyProperty != null && partitionKeyProperty != nameof(ITableEntity.PartitionKey))
-                        writer.WriteString(partitionKeyProperty, element.GetProperty("PartitionKey").GetString());
-                    if (rowKeyProperty != null && rowKeyProperty != nameof(ITableEntity.RowKey))
-                        writer.WriteString(rowKeyProperty, element.GetProperty("RowKey").GetString());
-
-                    foreach (var property in element.EnumerateObject())
-                        property.WriteTo(writer);
-
-                    writer.WriteEndObject();
-                    writer.Flush();
-
-                    var data = Encoding.UTF8.GetString(mem.ToArray());
-                    var item = serializer.Deserialize<T>(data);
-                    if (item != null)
+                    // Optimize code path for TableEntity, which is simpler.
+                    if (typeof(T) == typeof(TableEntity))
                     {
-                        yield return item;
-                        count++;
-                        if (count == top)
-                            yield break;
+                        var entity = new TableEntity(JsonElementToDictionary(element));
+                        if (entity != null)
+                        {
+                            yield return (T)(object)entity;
+                            count++;
+                            if (count == top)
+                                yield break;
+                        }
+                    }
+                    else
+                    {
+                        var mem = new MemoryStream();
+                        var writer = new Utf8JsonWriter(mem);
+
+                        writer.WriteStartObject();
+
+                        // Write the renamed key properties, if any.
+                        if (partitionKeyProperty != null && partitionKeyProperty != nameof(ITableEntity.PartitionKey))
+                            writer.WriteString(partitionKeyProperty, element.GetProperty("PartitionKey").GetString());
+                        if (rowKeyProperty != null && rowKeyProperty != nameof(ITableEntity.RowKey))
+                            writer.WriteString(rowKeyProperty, element.GetProperty("RowKey").GetString());
+
+                        foreach (var property in element.EnumerateObject())
+                            property.WriteTo(writer);
+
+                        writer.WriteEndObject();
+                        writer.Flush();
+
+                        var data = Encoding.UTF8.GetString(mem.ToArray());
+                        var item = serializer.Deserialize<T>(data);
+                        if (item != null)
+                        {
+                            yield return item;
+                            count++;
+                            if (count == top)
+                                yield break;
+                        }
                     }
                 }
 
@@ -206,6 +225,69 @@ namespace Devlooped
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
+        static Dictionary<string, object> JsonElementToDictionary(JsonElement element)
+        {
+            var dictionary = new Dictionary<string, object>();
+            var properties = element.EnumerateObject().ToDictionary(x => x.Name);
+
+            foreach (var property in properties.Values)
+            {
+                if (property.Value.ValueKind == JsonValueKind.Null || 
+                    property.Name.EndsWith("@odata.type"))
+                    continue;
+
+                // See heuristics from https://learn.microsoft.com/en-us/rest/api/storageservices/payload-format-for-table-service-operations#property-types-in-a-json-feed
+                switch (property.Value.ValueKind)
+                {
+                    case JsonValueKind.String:
+                        var value = property.Value.GetString();
+                        if (value is null)
+                            continue;
+
+                        if (properties.TryGetValue(property.Name + "@odata.type", out var metadata) && 
+                            metadata.Value.GetString() is string type)
+                        {
+                            // These cases will contain an annotation with the type.
+                            switch (type)
+                            {
+                                case "Edm.Binary":
+                                    dictionary.Add(property.Name, Convert.FromBase64String(value));
+                                    continue;
+                                case "Edm.DateTime":
+                                    dictionary.Add(property.Name, DateTime.Parse(value, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind));
+                                    continue;
+                                case "Edm.Guid":
+                                    dictionary.Add(property.Name, Guid.Parse(value));
+                                    continue;
+                                case "Edm.Int64":
+                                    dictionary.Add(property.Name, long.Parse(value, CultureInfo.InvariantCulture));
+                                    continue;
+                            }
+                        }
+
+                        dictionary.Add(property.Name, value);
+                        break;
+                    case JsonValueKind.Number:
+                        var number = property.Value.GetRawText();
+                        if (number.Contains("."))
+                            dictionary.Add(property.Name, property.Value.GetDouble());
+                        else
+                            dictionary.Add(property.Name, property.Value.GetInt32());
+                        break;
+                    case JsonValueKind.True:
+                    case JsonValueKind.False:
+                        dictionary.Add(property.Name, property.Value.GetBoolean());
+                        break;
+                    default:
+                        // Ignore other non-native values and arrays.
+                        break;
+                }
+            }
+
+            return dictionary;
+        }
+
+
         class ProjectionVisitor : ExpressionVisitor
         {
             readonly PropertyExpressionVisitor visitor = new PropertyExpressionVisitor();
@@ -228,14 +310,14 @@ namespace Devlooped
 
                 protected override Expression VisitMethodCall(MethodCallExpression node)
                 {
-                    if (node.Method.Name == "get_Item" && node.Method.GetParameters() is var parameters && 
+                    if (node.Method.Name == "get_Item" && node.Method.GetParameters() is var parameters &&
                         parameters.Length == 1 &&
                         node.Arguments[0] is ConstantExpression constant)
                     {
                         Properties.Add((string)constant.Value);
                     }
 
-                    return node; 
+                    return node;
                 }
 
                 protected override Expression VisitMember(MemberExpression node)
