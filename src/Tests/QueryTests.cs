@@ -7,10 +7,11 @@ using System.Threading.Tasks;
 using Azure;
 using Azure.Data.Tables;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Devlooped
 {
-    public class QueryTests
+    public class QueryTests(ITestOutputHelper output)
     {
         string TableName([CallerMemberName] string? caller = default) => $"{nameof(QueryTests)}{caller}";
 
@@ -171,6 +172,46 @@ namespace Devlooped
             //     select new { book.Title })
             //    .ToList());
         }
+
+        [Fact]
+        public async Task CanFilterByEntityRowKey()
+        {
+            var account = CloudStorageAccount.DevelopmentStorageAccount;
+            await LoadBooksAsync(TableRepository.Create<Book>(account, TableName(), x => x.Author, x => x.ISBN));
+            var repo = TableRepository.Create(account, TableName());
+
+            var query = from book in repo.CreateQuery()
+                        where
+                            book.PartitionKey == "Rick Riordan" &&
+                            book.RowKey.CompareTo("97814231") >= 0 &&
+                            book.RowKey.CompareTo("97814232") < 0
+                        select book;
+
+            // Can project direct entities
+            Assert.Equal(4, (await query.AsAsyncEnumerable().ToListAsync()).Count);
+
+            var projection = from book in repo.CreateQuery()
+                             where
+                                 book.PartitionKey == "Rick Riordan" &&
+                                 book.RowKey.CompareTo("97814231") >= 0 &&
+                                 book.RowKey.CompareTo("97814232") < 0
+                             select new { Title = (string)book["Title"] };
+
+            var result = await projection.AsAsyncEnumerable().ToListAsync();
+            // Can project directly just the titles
+            Assert.Equal(4, result.Count);
+
+            Assert.Contains(result, x => x.Title == "The Son of Neptune");
+            Assert.Contains(result, x => x.Title == "The Mark of Athena");
+            Assert.Contains(result, x => x.Title == "Percy Jackson & the Olympians Boxed Set");
+            Assert.Contains(result, x => x.Title == "The Blood of Olympus");
+
+            // Can enumerate async directly too
+            await foreach (var isbn in query)
+            {
+            }
+        }
+
 
         async Task LoadBooksAsync(ITableStorage<Book> books)
         {

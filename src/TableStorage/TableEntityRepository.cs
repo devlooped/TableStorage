@@ -52,8 +52,9 @@ namespace Devlooped
 
         /// <inheritdoc />
         public IQueryable<TableEntity> CreateQuery()
-            => throw new NotImplementedException();
-            //=> storageAccount.CreateCloudstorage.GetTableAsync()().GetTableReference(TableName).CreateQuery<DynamicTableEntity>();
+            => new TableRepositoryQuery<TableEntity>(
+                tableConnection.StorageAccount, DocumentSerializer.Default, 
+                tableConnection.TableName, nameof(ITableEntity.PartitionKey), nameof(ITableEntity.RowKey));
 
         /// <inheritdoc />
         public async Task<bool> DeleteAsync(string partitionKey, string rowKey, CancellationToken cancellation = default)
