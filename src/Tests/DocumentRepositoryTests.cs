@@ -62,6 +62,15 @@ namespace Devlooped
 
                 Assert.Single(entities);
 
+                // Verify that the entity is not serialized as a string for non-string serializer
+                if (serializer is not IStringDocumentSerializer)
+                {
+                    var generic = TableRepository.Create(CloudStorageAccount.DevelopmentStorageAccount, table.Name);
+                    var row = await generic.GetAsync(partitionKey, rowKey);
+                    Assert.NotNull(row);
+                    Assert.IsType<byte[]>(row["Document"]);
+                }
+
                 await repo.DeleteAsync(saved);
 
                 Assert.Null(await repo.GetAsync(partitionKey, rowKey));

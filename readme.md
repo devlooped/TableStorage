@@ -139,6 +139,8 @@ your "real" data, but for reference data, it could come in handy.
 Stored entities using `TableRepository` and `TablePartition` use individual columns for 
 properties, which makes it easy to browse the data (and query, as shown above!). 
 
+> NOTE: partition and row keys can also be typed as `Guid`
+
 But document-based storage is also available via `DocumentRepository` and `DocumentPartition` if 
 you don't need the individual columns.
 

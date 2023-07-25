@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 using Azure;
 using Azure.Data.Tables;
@@ -485,6 +486,31 @@ namespace Devlooped
             Assert.Equal(entity.Kind, generic.PartitionKey);
         }
 
+        [Fact]
+        public async Task CanGetFromEdmEntityTypes()
+        {
+            var repo = TableRepository.Create<EdmAnnotatedEntity>(CloudStorageAccount.DevelopmentStorageAccount);
+            var entity = new EdmAnnotatedEntity(Guid.NewGuid(), Guid.NewGuid(), DateTimeOffset.Now, Encoding.UTF8.GetBytes("Hello World"), Random.Shared.NextInt64(int.MaxValue, long.MaxValue));
+
+            var saved = await repo.PutAsync(entity);
+
+            Assert.NotNull(saved);
+
+            Assert.Equal(entity.ID, saved.ID);
+            Assert.Equal(entity.Date, saved.Date);
+            Assert.Equal("Hello World", Encoding.UTF8.GetString(saved.Data));
+            Assert.Equal(entity.Count, saved.Count);
+
+            var generic = await new TableEntityRepository(CloudStorageAccount.DevelopmentStorageAccount, TableRepository.GetDefaultTableName<EdmAnnotatedEntity>())
+                .GetAsync(new TableEntity(entity.Partition.ToString(), entity.ID.ToString()));
+
+            Assert.NotNull(generic);
+            Assert.Equal(entity.ID.ToString(), generic.RowKey);
+            Assert.IsType<byte[]>(generic["Data"]);
+            Assert.IsType<DateTimeOffset>(generic["Date"]);
+            Assert.IsType<long>(generic["Count"]);
+        }
+
         class MyEntity
         {
             public MyEntity(string id) => Id = id;
@@ -539,6 +565,9 @@ namespace Devlooped
         {
             public DateTime? Timestamp { get; set; }
         }
+
+        [Table(nameof(EdmAnnotatedEntity))]
+        record EdmAnnotatedEntity([PartitionKey] Guid Partition, [RowKey] Guid ID, DateTimeOffset Date, byte[] Data, long Count);
 
         [PartitionKey("MyPartition")]
         record CustomPartition(string Id);

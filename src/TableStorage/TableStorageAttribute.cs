@@ -77,8 +77,8 @@ namespace Devlooped
                 throw new ArgumentException($"Expected entity type '{typeof(TEntity).Name}' to have one property annotated with [{attributeName}]");
             }
 
-            if (keyProp.PropertyType != typeof(string))
-                throw new ArgumentException($"Property '{typeof(TEntity).Name}.{keyProp.Name}' annotated with [{attributeName}] must be of type string.");
+            if (keyProp.PropertyType != typeof(string) && keyProp.PropertyType != typeof(Guid))
+                throw new ArgumentException($"Property '{typeof(TEntity).Name}.{keyProp.Name}' annotated with [{attributeName}] must be of type string or Guid.");
 
             var param = Expression.Parameter(typeof(TEntity), "entity");
 
@@ -94,7 +94,9 @@ namespace Devlooped
                         typeof(TableStorageAttribute).GetMethod(nameof(EnsureValid), BindingFlags.NonPublic | BindingFlags.Static)!,
                         Expression.Constant(attributeName),
                         Expression.Constant(keyProp.Name, typeof(string)),
-                        Expression.Property(param, keyProp))),
+                        keyProp.PropertyType == typeof(string)
+                            ? Expression.Property(param, keyProp)
+                            : Expression.Call(Expression.Property(param, keyProp), typeof(Guid).GetMethod(nameof(Guid.ToString), Type.EmptyTypes)!))),
                 param);
         }
 

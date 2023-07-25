@@ -10,7 +10,10 @@ using Azure.Data.Tables;
 
 namespace Devlooped
 {
-    /// <inheritdoc />
+    /// <summary>
+    /// A specific partition within a <see cref="TableEntityRepository"/>, which 
+    /// allows querying by the entity properties, since they are stored in individual columns.
+    /// </summary>
     partial class TableEntityPartition : ITablePartition<TableEntity>
     {
         readonly TableEntityRepository repository;
