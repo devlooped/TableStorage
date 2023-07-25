@@ -6,12 +6,15 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using Azure.Data.Tables;
 
 namespace Devlooped
 {
     class EntityPropertiesMapper
     {
         static readonly ConcurrentDictionary<Type, PropertyInfo[]> propertiesMap = new();
+        static readonly ConcurrentDictionary<Type, IDictionary<string, string>> edmAnnotations = new();
+        static readonly KeyValuePair<string, string> edmNone = new("", "");
 
         private EntityPropertiesMapper() { }
 
@@ -27,6 +30,37 @@ namespace Devlooped
                     prop.Name != rowKeyProperty)
                 .ToArray());
 
+            var annotations = edmAnnotations.GetOrAdd(entity.GetType(), _ =>
+            {
+                var dictionary = properties
+                    .Where(prop =>
+                        prop.GetCustomAttribute<BrowsableAttribute>()?.Browsable != false &&
+                        prop.Name != partitionKeyProperty &&
+                        prop.Name != rowKeyProperty)
+                    .Select(prop => prop.PropertyType switch
+                    {
+                        var type when type == typeof(byte[]) => new KeyValuePair<string, string>(prop.Name + "@odata.type", "Edm.Binary"),
+                        //var type when type == typeof(DateTime) => new KeyValuePair<string, string>(prop.Name + "@odata.type", "Edm.DateTime"),
+                        var type when type == typeof(DateTimeOffset) => new KeyValuePair<string, string>(prop.Name + "@odata.type", "Edm.DateTime"),
+                        var type when type == typeof(Guid) => new KeyValuePair<string, string>(prop.Name + "@odata.type", "Edm.Guid"),
+                        var type when type == typeof(long) => new KeyValuePair<string, string>(prop.Name + "@odata.type", "Edm.Int64"),
+                        _ => edmNone,
+                    })
+                    // This is an unnecessary annotation, so skip it.
+                    .Where(x => x.Key != edmNone.Key)
+                    .ToDictionary(x => x.Key, x => x.Value);
+
+                // Make sure the Timestamp property is always annotated as DateTime, since it can also
+                // be read by the client using a string or a DateTime, according to our documentation.
+                // It will typically never be written back, since it's a server-managed value, but this 
+                // makes it more obvious and consistent with the Azure SDK behavior which always includes 
+                // this annotation when using odata:minimalmetadata or fullmetadata.
+                if (properties.Any(x => x.Name == nameof(ITableEntity.Timestamp)) && !dictionary.ContainsKey(nameof(ITableEntity.Timestamp)))
+                    dictionary.Add(nameof(ITableEntity.Timestamp), "Edm.DateTime");
+
+                return dictionary;
+            });
+
             var values = properties
                 .Select(prop => new { prop.Name, Value = prop.GetValue(entity) })
                 .Where(pair => pair.Value != null)
@@ -35,13 +69,22 @@ namespace Devlooped
                     pair =>
 #if NET6_0_OR_GREATER
                     pair.Value is DateOnly date ? 
-                        date.ToString("O") : 
-                        pair.Value.GetType().IsEnum ? 
-                        pair.Value.ToString() : pair.Value!
-#else
-                    pair.Value.GetType().IsEnum ? pair.Value!.ToString() : pair.Value!
+                    date.ToString("O") : 
 #endif
-                    );
+                    // EDM annotation for date time requires persisting as UTC only, which is best practice too.
+                    //pair.Value is DateTime dateTime ?
+                    //dateTime.ToUniversalTime().ToString("O") :
+                    pair.Value is DateTimeOffset dateOffset ? 
+                    dateOffset.ToUniversalTime().ToString("O") :
+                    pair.Value.GetType().IsEnum ? pair.Value!.ToString() : 
+                    pair.Value!
+                );
+
+            // Add any required metadata annotations to improve persistence.
+            foreach (var annotation in annotations)
+            {
+                values.Add(annotation.Key, annotation.Value);
+            }
 
             return (IDictionary<string, object>)values;
         }

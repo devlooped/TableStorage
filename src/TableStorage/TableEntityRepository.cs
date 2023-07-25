@@ -12,7 +12,10 @@ using Azure.Data.Tables;
 
 namespace Devlooped
 {
-    /// <inheritdoc />
+    /// <summary>
+    /// Default implementation of <see cref="ITableRepository{TableEntity}"/> which allows querying 
+    /// the repository by the entity properties, since they are stored in individual columns.
+    /// </summary>
     partial class TableEntityRepository : ITableRepository<TableEntity>
     {
         TableConnection tableConnection;

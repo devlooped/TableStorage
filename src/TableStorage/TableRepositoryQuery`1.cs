@@ -254,7 +254,8 @@ namespace Devlooped
                                     dictionary.Add(property.Name, Convert.FromBase64String(value));
                                     continue;
                                 case "Edm.DateTime":
-                                    dictionary.Add(property.Name, DateTime.Parse(value, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind));
+                                    // Reading from Azure SDK will always return DateTimeOffset for dates, instead of date time.
+                                    dictionary.Add(property.Name, DateTimeOffset.Parse(value, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind));
                                     continue;
                                 case "Edm.Guid":
                                     dictionary.Add(property.Name, Guid.Parse(value));

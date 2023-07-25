@@ -180,6 +180,7 @@ namespace Devlooped
 
             var row = ToTable(entity);
             row["Document"] = binarySerializer!.Serialize(entity);
+            row["Document@odata.type"] = "Edm.Binary";
 
             // We use Replace because all the existing entity data is in a single 
             // column, no point in merging since it can't be done at that level anyway.
@@ -266,7 +267,7 @@ namespace Devlooped
 
             foreach (var prop in EntityPropertiesMapper.Default.ToProperties(entity))
             {
-                // Never allow properties to overwrite out built-in queryable columns
+                // Never allow properties to overwrite our built-in queryable columns
                 if (!te.ContainsKey(prop.Key))
                     te[prop.Key] = prop.Value;
             }
