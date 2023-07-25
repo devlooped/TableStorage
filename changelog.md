@@ -1,5 +1,14 @@
 # Changelog
 
+## [v5.0.1](https://github.com/devlooped/TableStorage/tree/v5.0.1) (2023-07-25)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v5.0.0...v5.0.1)
+
+:sparkles: Implemented enhancements:
+
+- Use OData type annotations to disambiguate property types when persisting [\#235](https://github.com/devlooped/TableStorage/issues/235)
+- Empty query results does not throw [\#237](https://github.com/devlooped/TableStorage/pull/237) (@kzu)
+
 ## [v5.0.0](https://github.com/devlooped/TableStorage/tree/v5.0.0) (2023-07-25)
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/v4.3.0...v5.0.0)
