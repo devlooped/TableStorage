@@ -1,12 +1,15 @@
 # Changelog
 
-## [v4.3.1](https://github.com/devlooped/TableStorage/tree/v4.3.1) (2023-07-24)
+## [v5.0.0](https://github.com/devlooped/TableStorage/tree/v5.0.0) (2023-07-25)
 
-[Full Changelog](https://github.com/devlooped/TableStorage/compare/v4.3.0...v4.3.1)
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v4.3.0...v5.0.0)
 
 :sparkles: Implemented enhancements:
 
+- When hydrating queries for TableEntity, use native .NET types for properties [\#233](https://github.com/devlooped/TableStorage/issues/233)
 - Add support for querying over TableEntityRepository [\#231](https://github.com/devlooped/TableStorage/issues/231)
+- Improve persistence by annotating supported types with OData Edm [\#236](https://github.com/devlooped/TableStorage/pull/236) (@kzu)
+- When hydrating queries for TableEntity, use native .NET types for properties [\#234](https://github.com/devlooped/TableStorage/pull/234) (@kzu)
 - Add support for querying over TableEntityRepository [\#232](https://github.com/devlooped/TableStorage/pull/232) (@kzu)
 
 ## [v4.3.0](https://github.com/devlooped/TableStorage/tree/v4.3.0) (2023-06-27)
