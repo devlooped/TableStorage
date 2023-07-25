@@ -220,6 +220,21 @@ namespace Devlooped
             }
         }
 
+        [Fact]
+        public async Task EmptyQueryDoesNotFail()
+        {
+            var account = CloudStorageAccount.DevelopmentStorageAccount;
+            var repo = TableRepository.Create(account, TableName());
+
+            var query = from book in repo.CreateQuery()
+                        where
+                            book.PartitionKey == "Rick Riordan" &&
+                            book.RowKey.CompareTo("97814231") >= 0 &&
+                            book.RowKey.CompareTo("97814232") < 0
+                        select book;
+
+            Assert.Empty((await query.AsAsyncEnumerable().ToListAsync()));
+        }
 
         async Task LoadBooksAsync(ITableStorage<Book> books)
         {

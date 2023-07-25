@@ -129,6 +129,9 @@ namespace Devlooped
             var response = await Http.Client.SendAsync(request);
             while (true)
             {
+                if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                    yield break;
+
                 response.EnsureSuccessStatusCode();
 
                 var json = await response.Content.ReadAsStringAsync();
