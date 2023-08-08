@@ -1,5 +1,9 @@
 # Changelog
 
+## [v5.0.2](https://github.com/devlooped/TableStorage/tree/v5.0.2) (2023-08-08)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v5.0.1...v5.0.2)
+
 ## [v5.0.1](https://github.com/devlooped/TableStorage/tree/v5.0.1) (2023-07-25)
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/v5.0.0...v5.0.1)
