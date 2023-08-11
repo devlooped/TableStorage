@@ -1,5 +1,13 @@
 # Changelog
 
+## [v5.1.0](https://github.com/devlooped/TableStorage/tree/v5.1.0) (2023-08-11)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v5.0.2...v5.1.0)
+
+:twisted_rightwards_arrows: Merged:
+
+- Remove current implementation of SponsorLink for now [\#244](https://github.com/devlooped/TableStorage/pull/244) (@kzu)
+
 ## [v5.0.2](https://github.com/devlooped/TableStorage/tree/v5.0.2) (2023-08-08)
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/v5.0.1...v5.0.2)
