@@ -12,7 +12,7 @@ namespace Devlooped
 {
     class EntityPropertiesMapper
     {
-        static readonly ConcurrentDictionary<Type, PropertyInfo[]> propertiesMap = new();
+        static readonly ConcurrentDictionary<(Type, string), PropertyInfo[]> propertiesMap = new();
         static readonly ConcurrentDictionary<Type, IDictionary<string, string>> edmAnnotations = new();
         static readonly KeyValuePair<string, string> edmNone = new("", "");
 
@@ -22,7 +22,7 @@ namespace Devlooped
 
         public IDictionary<string, object> ToProperties<T>(T entity, string? partitionKeyProperty = default, string? rowKeyProperty = default) where T: notnull
         {
-            var properties = propertiesMap.GetOrAdd(entity.GetType(), type => type
+            var properties = propertiesMap.GetOrAdd((entity.GetType(), $"{partitionKeyProperty}|{rowKeyProperty}"), key => key.Item1
                 .GetProperties()
                 .Where(prop =>
                     prop.GetCustomAttribute<BrowsableAttribute>()?.Browsable != false &&

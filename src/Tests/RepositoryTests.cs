@@ -511,6 +511,46 @@ namespace Devlooped
             Assert.IsType<long>(generic["Count"]);
         }
 
+        [Fact]
+        public async Task CanPersistPropertiesFromComputedRowKeys()
+        {
+            var storage = CloudStorageAccount.DevelopmentStorageAccount;
+            var repo1 = TableRepository.Create<Dependency>(
+                storage,
+                tableName: "Dependency",
+                partitionKey: d => d.Repository,
+                rowKey: d => $"{d.Name}|{d.Version}");
+
+            var repo2 = TableRepository.Create<Dependency>(
+                storage,
+                tableName: "Dependency",
+                partitionKey: d => d.Name,
+                rowKey: d => $"{d.Version}|{d.Repository}");
+
+            var dep = new Dependency("org", "repo", "npm", "foo", "1.0");
+
+            await repo1.PutAsync(dep);
+            await repo2.PutAsync(dep);
+
+            var entities = TableRepository.Create(storage, "Dependency");
+
+            var entity = await entities.GetAsync("repo", "foo|1.0");
+            Assert.NotNull(entity);
+            // Since the PK is the Repository property, it's not persisted as a property.
+            Assert.Null(entity[nameof(Dependency.Repository)]);
+            // But the name is, since it's a computed row key.
+            Assert.Equal("foo", entity[nameof(Dependency.Name)]);
+
+            entity = await entities.GetAsync("foo", "1.0|repo");
+            Assert.NotNull(entity);
+            // Conversely, since the PK here is the Name property, the Repository should be persisted.
+            Assert.Equal("repo", entity[nameof(Dependency.Repository)]);
+            // And the Name shouldn't, since it's the PK
+            Assert.Null(entity[nameof(Dependency.Name)]);
+        }
+
+        record Dependency(string Organization, string Repository, string Type, string Name, string Version);
+
         class MyEntity
         {
             public MyEntity(string id) => Id = id;
