@@ -1,5 +1,14 @@
 # Changelog
 
+## [v5.1.1](https://github.com/devlooped/TableStorage/tree/v5.1.1) (2023-10-04)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v5.1.0...v5.1.1)
+
+:bug: Fixed bugs:
+
+- KeyProperties are not being persisted properly [\#252](https://github.com/devlooped/TableStorage/issues/252)
+- Properly persist computed colums for same type [\#253](https://github.com/devlooped/TableStorage/pull/253) (@kzu)
+
 ## [v5.1.0](https://github.com/devlooped/TableStorage/tree/v5.1.0) (2023-08-11)
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/v5.0.2...v5.1.0)
