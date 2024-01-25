@@ -18,18 +18,6 @@ namespace Devlooped
         /// </summary>
         public static IDocumentSerializer Default { get; } = new ProtobufDocumentSerializer();
 
-#if NET6_0_OR_GREATER
-        static ProtobufDocumentSerializer()
-        {
-            RuntimeTypeModel.Default.SetSurrogate<DateOnly, int>(
-                UnderlyingToSurrogate, 
-                SurrogateToUnderlying);
-        }
-
-        static int UnderlyingToSurrogate(DateOnly value) => value.DayNumber;
-        static DateOnly SurrogateToUnderlying(int value) => DateOnly.FromDayNumber(value);
-#endif
-
         /// <inheritdoc />
         public T? Deserialize<T>(byte[] data)
         {
