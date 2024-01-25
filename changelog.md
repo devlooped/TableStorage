@@ -1,5 +1,13 @@
 # Changelog
 
+## [v5.1.2](https://github.com/devlooped/TableStorage/tree/v5.1.2) (2024-01-25)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v5.1.1...v5.1.2)
+
+:sparkles: Implemented enhancements:
+
+- Update to latest protobuf with built-in support for DateOnly and TimeOnly [\#273](https://github.com/devlooped/TableStorage/pull/273) (@kzu)
+
 ## [v5.1.1](https://github.com/devlooped/TableStorage/tree/v5.1.1) (2023-10-04)
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/v5.1.0...v5.1.1)
