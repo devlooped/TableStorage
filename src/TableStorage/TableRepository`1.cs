@@ -148,7 +148,7 @@ namespace Devlooped
 
             await foreach (var entity in table.QueryAsync<TableEntity>(filter, cancellationToken: cancellation).WithCancellation(cancellation))
             {
-                yield return ToEntity(entity);
+                yield return EntityPropertiesMapper.Default.ToEntity<T>(entity, partitionKeyProperty, rowKeyProperty);
             }
         }
 
@@ -166,7 +166,7 @@ namespace Devlooped
                 var result = await table.GetEntityAsync<TableEntity>(partitionKey, rowKey, cancellationToken: cancellation)
                     .ConfigureAwait(false);
 
-                return ToEntity(result.Value);
+                return EntityPropertiesMapper.Default.ToEntity<T>(result.Value, partitionKeyProperty, rowKeyProperty);
             }
             catch (RequestFailedException ex) when (ex.Status == 404)
             {
@@ -191,74 +191,6 @@ namespace Devlooped
                 .ConfigureAwait(false);
             
             return (await GetAsync(partitionKey, rowKey, cancellation).ConfigureAwait(false))!;
-        }
-
-        /// <summary>
-        /// Uses JSON deserialization to convert from the persisted entity data 
-        /// to the entity type, so that the right constructor and property 
-        /// setters can be invoked, even if they are internal/private.
-        /// </summary>
-        T ToEntity(TableEntity entity)
-        {
-            using var mem = new MemoryStream();
-            using var writer = new Utf8JsonWriter(mem);
-
-            // Write entity properties in json format so deserializer can 
-            // perform its advanced ctor and conversion detection as usual.
-            writer.WriteStartObject();
-
-            if (partitionKeyProperty != null && !entity.ContainsKey(partitionKeyProperty))
-                writer.WriteString(partitionKeyProperty, entity.PartitionKey);
-
-            if (rowKeyProperty != null && !entity.ContainsKey(rowKeyProperty))
-                writer.WriteString(rowKeyProperty, entity.RowKey);
-
-            if (entity.Timestamp != null && !entity.ContainsKey(nameof(ITableEntity.Timestamp)))
-                writer.WriteString(nameof(ITableEntity.Timestamp), entity.Timestamp.Value.ToString("O"));
-
-            foreach (var property in entity)
-            {
-                switch (property.Value)
-                {
-                    case string value:
-                        writer.WriteString(property.Key, value);
-                        break;
-                    case byte[] value:
-                        writer.WriteBase64String(property.Key, value);
-                        break;
-                    case bool value:
-                        writer.WriteBoolean(property.Key, value);
-                        break;
-                    case DateTime value:
-                        writer.WriteString(property.Key, value);
-                        break;
-                    case DateTimeOffset value:
-                        writer.WriteString(property.Key, value);
-                        break;
-                    case double value:
-                        writer.WriteNumber(property.Key, value);
-                        break;
-                    case int value:
-                        writer.WriteNumber(property.Key, value);
-                        break;
-                    case long value:
-                        writer.WriteNumber(property.Key, value);
-                        break;
-                    case Guid value:
-                        writer.WriteString(property.Key, value);
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            writer.WriteEndObject();
-            writer.Flush();
-            mem.Position = 0;
-
-            var json = new StreamReader(mem).ReadToEnd();
-
-            return serializer.Deserialize<T>(json)!;
         }
     }
 }

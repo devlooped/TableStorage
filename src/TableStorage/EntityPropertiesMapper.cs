@@ -4,8 +4,10 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text.Json;
 using Azure.Data.Tables;
 
 namespace Devlooped
@@ -87,6 +89,74 @@ namespace Devlooped
             }
 
             return (IDictionary<string, object>)values;
+        }
+
+        /// <summary>
+        /// Uses JSON deserialization to convert from the persisted entity data 
+        /// to the entity type, so that the right constructor and property 
+        /// setters can be invoked, even if they are internal/private.
+        /// </summary>
+        public T ToEntity<T>(TableEntity data, string? partitionKeyProperty = default, string? rowKeyProperty = default)
+        {
+            using var mem = new MemoryStream();
+            using var writer = new Utf8JsonWriter(mem);
+
+            // Write entity properties in json format so deserializer can 
+            // perform its advanced ctor and conversion detection as usual.
+            writer.WriteStartObject();
+
+            if (partitionKeyProperty != null && !data.ContainsKey(partitionKeyProperty))
+                writer.WriteString(partitionKeyProperty, data.PartitionKey);
+
+            if (rowKeyProperty != null && !data.ContainsKey(rowKeyProperty))
+                writer.WriteString(rowKeyProperty, data.RowKey);
+
+            if (data.Timestamp != null && !data.ContainsKey(nameof(ITableEntity.Timestamp)))
+                writer.WriteString(nameof(ITableEntity.Timestamp), data.Timestamp.Value.ToString("O"));
+
+            foreach (var property in data)
+            {
+                switch (property.Value)
+                {
+                    case string value:
+                        writer.WriteString(property.Key, value);
+                        break;
+                    case byte[] value:
+                        writer.WriteBase64String(property.Key, value);
+                        break;
+                    case bool value:
+                        writer.WriteBoolean(property.Key, value);
+                        break;
+                    case DateTime value:
+                        writer.WriteString(property.Key, value);
+                        break;
+                    case DateTimeOffset value:
+                        writer.WriteString(property.Key, value);
+                        break;
+                    case double value:
+                        writer.WriteNumber(property.Key, value);
+                        break;
+                    case int value:
+                        writer.WriteNumber(property.Key, value);
+                        break;
+                    case long value:
+                        writer.WriteNumber(property.Key, value);
+                        break;
+                    case Guid value:
+                        writer.WriteString(property.Key, value);
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            writer.WriteEndObject();
+            writer.Flush();
+            mem.Position = 0;
+
+            var json = new StreamReader(mem).ReadToEnd();
+
+            return DocumentSerializer.Default.Deserialize<T>(json)!;
         }
     }
 }
