@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NuGetizer" Version="1.1.1" />
+    <PackageReference Include="NuGetizer" Version="1.2.2" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="all" />
     <PackageReference Include="Devlooped.CloudStorageAccount" Version="1.2.0" />
     <PackageReference Include="Azure.Data.Tables" Version="12.8.2" />
