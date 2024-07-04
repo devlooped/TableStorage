@@ -18,16 +18,17 @@ Given an entity like:
 ```csharp
 public record Product(string Category, string Id) 
 {
-  public string? Title { get; init; }
+  public required string? Title { get; init; }
   public double Price { get; init; }
   public DateOnly CreatedAt { get; init; }
 }
 ```
 
-> NOTE: entity can have custom constructor, key properties can be read-only, 
-> and it doesn't need to inherit from anything, implement any interfaces or use 
+> NOTE: entity can have custom constructor, key properties can be read-only 
+> (Category and Id in this case for example), and it doesn't need to inherit 
+> from anything, implement any interfaces or use 
 > any custom attributes (unless you want to). As shown above, it can even be 
-> a simple record type, with support for .NET 6 DateOnly type to boot!
+> a simple record type.
 
 The entity can be stored and retrieved with:
 
@@ -69,55 +70,41 @@ await repo.DeleteAsync("book", "1234");
 await repo.DeleteAsync(saved);
 ```
 
-If a unique identifier among all entities already exists, you can also store all 
-entities in a single table, using a fixed partition key matching the entity type name, for 
-example. In such a case, instead of a `TableRepository`, you can use a `TablePartition`:
+Attributes can also be used to eliminate the need for lambdas altogether when 
+the entity storage layout is known at compile time:
 
 ```csharp
-public record Book(string ISBN, string Title, string Author, BookFormat Format, int Pages);
+[Table("Products")]
+public record Product([PartitionKey] string Category, [RowKey] string Id) ... 
+
+var storageAccount = CloudStorageAccount.DevelopmentStorageAccount;
+// Everything discovered from attributes.
+var repo = TableRepository.Create<Product>(storageAccount);
 ```
 
-```csharp
-var storageAccount = CloudStorageAccount.DevelopmentStorageAccount; // or production one
+See the [Attributes](#attributes) section below for more details on how to use them.
 
-// Leverage defaults: TableName=Entities, PartitionKey=Book
-var repo = TablePartition.Create<Region>(storageAccount, 
-  rowKey: book => book.ISBN);
-
-// insert/get/delete same API shown above.
-
-// query filtering by rowKey, in this case, books by a certain 
-// language/publisher combination. For Disney/Hyperion in English, 
-// for example: ISBNs starting with 978(prefix)-1(english)-4231(publisher)
-var query = from book in repo.CreateQuery()
-            where 
-                book.ISBN.CompareTo("97814231") >= 0 &&
-                book.ISBN.CompareTo("97814232") < 0
-            select new { book.ISBN, book.Title };
-
-await foreach (var book in query)
-   ...
-```
-
-For the books example above, it might make sense to partition by author, 
-for example. In that case, you could use a `TableRepository<Book>` when 
-saving:
+If the product were books for example, it might make sense to partition by author. 
+In that case, you could use a `TableRepository<Book>` when saving:
 
 ```csharp
-var repo = TableRepository.Create<Book>(storageAccount, "Books",
-  partitionKey: x => x.Author, 
-  rowKey: x => x.ISBN);
+public record Book([RowKey] string ISBN, string Title, string Author, BookFormat Format, int Pages);
+
+var repo = TableRepository.Create<Product>(storageAccount, "Books",
+  partitionKey: x => x.Author);
 
 await repo.PutAsync(book);
 ```
 
+> Note how you can mix and match attributes and explicit lambdas as needed. 
+> The latter takes precedence over the former.
+
 And later on when listing/filtering books by a particular author, you can use 
-a `TablePartition<Book>` so all querying is automatically scoped to that author:
+a `TablePartition<Product>` so all querying is automatically scoped to that author:
 
 ```csharp
 var partition = TablePartition.Create<Book>(storageAccount, "Books", 
-  partitionKey: "Rick Riordan", 
-  rowKey: x => x.ISBN);
+  partitionKey: "Rick Riordan");
 
 // Get Rick Riordan books, only from Disney/Hyperion, with over 1000 pages
 var query = from book in repo.CreateQuery()
@@ -141,7 +128,7 @@ properties, which makes it easy to browse the data (and query, as shown above!).
 
 > NOTE: partition and row keys can also be typed as `Guid`
 
-But document-based storage is also available via `DocumentRepository` and `DocumentPartition` if 
+Document-based storage is also available via `DocumentRepository` and `DocumentPartition` if 
 you don't need the individual columns.
 
 <!-- #documents -->
