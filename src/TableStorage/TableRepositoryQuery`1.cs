@@ -267,6 +267,12 @@ namespace Devlooped
                                     dictionary.Add(property.Name, long.Parse(value, CultureInfo.InvariantCulture));
                                     continue;
                             }
+                        } 
+                        else if (property.Name == nameof(ITableEntity.Timestamp))
+                        {
+                            // Reading from Azure SDK will always return DateTimeOffset for dates, instead of date time.
+                            dictionary.Add(property.Name, DateTimeOffset.Parse(value, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind));
+                            continue;
                         }
 
                         dictionary.Add(property.Name, value);
@@ -316,9 +322,10 @@ namespace Devlooped
                 {
                     if (node.Method.Name == "get_Item" && node.Method.GetParameters() is var parameters &&
                         parameters.Length == 1 &&
-                        node.Arguments[0] is ConstantExpression constant)
+                        node.Arguments[0] is ConstantExpression constant && 
+                        constant.Value is string value)
                     {
-                        Properties.Add((string)constant.Value);
+                        Properties.Add(value);
                     }
 
                     return node;

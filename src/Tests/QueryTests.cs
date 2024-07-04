@@ -174,6 +174,26 @@ namespace Devlooped
         }
 
         [Fact]
+        public async Task CanQueryWithAndWithoutFilter()
+        {
+            var repo = TableRepository.Create(CloudStorageAccount.DevelopmentStorageAccount, "test2");
+            await repo.PutAsync(new TableEntity("partition", "row")
+            {
+                { "foo", "bar" }
+            });
+
+            await foreach (var item in repo.CreateQuery().Where(x => x.PartitionKey == "foo"))
+            {
+                Assert.NotNull(item.Timestamp);
+            }
+
+            await foreach (var item in repo.CreateQuery())
+            {
+                Assert.NotNull(item.Timestamp);
+            }
+        }
+
+        [Fact]
         public async Task CanFilterByEntityRowKey()
         {
             var account = CloudStorageAccount.DevelopmentStorageAccount;
@@ -194,7 +214,7 @@ namespace Devlooped
             Assert.NotEmpty(entity.PartitionKey);
             Assert.NotEmpty(entity.RowKey);
             Assert.NotEqual(default(ETag), entity.ETag);
-            Assert.NotEqual(DateTime.MinValue, entity.Timestamp);
+            Assert.NotNull(entity.Timestamp);
 
             var projection = from book in repo.CreateQuery()
                              where
