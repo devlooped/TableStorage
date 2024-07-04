@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Azure;
@@ -106,6 +107,44 @@ namespace Devlooped
             saved = await repo.GetAsync("Request", "1234");
 
             Assert.True(entity.Equals(saved));
+        }
+        static string Sanitize(string value) => new string(value.Where(c => !char.IsControl(c) && c != '|' && c != '/').ToArray());
+
+        [Fact]
+        public async Task PersistsKeyPropertyIfNotSimpleRetrieval()
+        {
+
+            var repo = TableRepository.Create<RecordEntity>(CloudStorageAccount.DevelopmentStorageAccount,
+                x => "Prefix-" + x.Kind,
+                x => Sanitize(x.ID));
+
+            await repo.DeleteAsync("Request", "1234");
+            var entity = new RecordEntity("Request", "1234") { Status = "OK" };
+            await repo.PutAsync(entity);
+
+            var client = CloudStorageAccount.DevelopmentStorageAccount.CreateCloudTableClient();
+            var table = client.GetTableClient(repo.TableName);
+            var result = await table.GetEntityAsync<TableEntity>("Prefix-Request", "1234");
+
+            Assert.NotNull(result.Value);
+
+            Assert.True(result.Value.ContainsKey(nameof(RecordEntity.Kind)));
+            Assert.True(result.Value.ContainsKey(nameof(RecordEntity.ID)));
+        }
+
+        [Fact]
+        public async Task DoesNotDuplicateAttributedKeyProperties()
+        {
+            var repo = TableRepository.Create<AttributedRecordEntity>(CloudStorageAccount.DevelopmentStorageAccount);
+            await repo.DeleteAsync("Book", "1234");
+            var entity = await repo.PutAsync(new AttributedRecordEntity("Book", "1234"));
+
+            var generic = await new TableEntityRepository(CloudStorageAccount.DevelopmentStorageAccount, repo.TableName)
+                .GetAsync(entity.Kind, entity.ID);
+
+            Assert.NotNull(generic);
+            Assert.False(generic.ContainsKey(nameof(entity.Kind)), "PartitionKey-annotated property should not be persisted by default");
+            Assert.False(generic.ContainsKey(nameof(entity.ID)), "RowKey-annotated property should not be persisted by default");
         }
 
         [Fact]

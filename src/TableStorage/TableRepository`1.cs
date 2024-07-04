@@ -3,11 +3,9 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure;
@@ -179,6 +177,11 @@ namespace Devlooped
         {
             var partitionKey = this.partitionKey.Invoke(entity);
             var rowKey = this.rowKey.Invoke(entity);
+
+            // TODO: validate partitionKey and rowKey before trying to save, should 
+            // result in better error messages? Essentially do what EnsureValid does for 
+            // attributed props (that's inconsistent).
+
             var values = PersistKeyProperties ?
                 EntityPropertiesMapper.Default.ToProperties(entity) : 
                 EntityPropertiesMapper.Default.ToProperties(entity, partitionKeyProperty, rowKeyProperty);

@@ -100,6 +100,7 @@ namespace Devlooped
                 param);
         }
 
+        [NonMutating]
         static string EnsureValid(string attributeName, string propertyName, string value)
         {
             if (value == null)
