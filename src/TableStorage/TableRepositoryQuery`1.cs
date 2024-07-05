@@ -80,10 +80,10 @@ namespace Devlooped
                     var props = projection.Properties
                         .Concat(new[]
                         {
-                        nameof(ITableEntity.PartitionKey),
-                        nameof(ITableEntity.RowKey),
-                        nameof(ITableEntity.ETag),
-                        nameof(ITableEntity.Timestamp)
+                            nameof(ITableEntity.PartitionKey),
+                            nameof(ITableEntity.RowKey),
+                            nameof(ITableEntity.ETag),
+                            nameof(ITableEntity.Timestamp)
                         });
 
                     // append or replace the select query string
