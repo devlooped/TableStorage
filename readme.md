@@ -11,6 +11,10 @@ Repository pattern with POCO object support for storing to Azure/CosmosDB Table 
 
 ![Screenshot of basic usage](https://raw.githubusercontent.com/devlooped/TableStorage/main/assets/img/tablestorage.png)
 
+> NOTE: This library is a thin wrapper around the latest Azure SDK v12+ for Table Storage,
+> and uses [CloudStorageAccount](https://www.nuget.org/packages/Devlooped.CloudStorageAccount) which 
+> is a 100% backwards compatible implementation of the Azure SDK v11 `CloudStorageAccount` class.
+
 ## Usage
 
 Given an entity like:
