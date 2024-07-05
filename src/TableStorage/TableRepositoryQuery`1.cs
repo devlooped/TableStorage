@@ -21,22 +21,20 @@ namespace Devlooped
 {
     class TableRepositoryQuery<T> : IQueryable<T>, IQueryProvider, IAsyncEnumerable<T>
     {
-        readonly CloudStorageAccount account;
+        readonly ITableConnection connection;
         readonly IStringDocumentSerializer serializer;
-        readonly string tableName;
         readonly string? partitionKeyProperty;
         readonly string? rowKeyProperty;
         readonly Expression expression;
 
-        public TableRepositoryQuery(CloudStorageAccount account, IStringDocumentSerializer serializer, string tableName,
+        public TableRepositoryQuery(ITableConnection connection, IStringDocumentSerializer serializer, 
             string? partitionKeyProperty, string? rowKeyProperty, Expression? expression = default)
         {
-            this.account = account;
+            this.connection = connection;
             this.serializer = serializer;
-            this.tableName = tableName;
             this.partitionKeyProperty = partitionKeyProperty;
             this.rowKeyProperty = rowKeyProperty;
-            this.expression = expression ?? new DataServiceContext(account.TableEndpoint).CreateQuery<T>(tableName).Expression;
+            this.expression = expression ?? new DataServiceContext(connection.Uri).CreateQuery<T>(connection.TableName).Expression;
         }
 
         /// <summary>
@@ -46,7 +44,7 @@ namespace Devlooped
 
         public async IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellation = default)
         {
-            var query = (DataServiceQuery)new DataServiceContext(account.TableEndpoint).CreateQuery<T>(tableName)
+            var query = (DataServiceQuery)new DataServiceContext(connection.Uri).CreateQuery<T>(connection.TableName)
                 .Provider.CreateQuery(expression);
 
             // OData will translate the enum value in a filter to TYPENAME.'ENUMVALUE'.

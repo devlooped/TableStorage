@@ -18,7 +18,7 @@ namespace Devlooped
     {
         static readonly IStringDocumentSerializer serializer = DocumentSerializer.Default;
 
-        readonly TableConnection tableConnection;
+        readonly ITableConnection tableConnection;
         readonly Func<T, string> partitionKey;
         readonly string? partitionKeyProperty;
         readonly Func<T, string> rowKey;
@@ -32,7 +32,7 @@ namespace Devlooped
             : this(storageAccount,
                 TableRepository.GetDefaultTableName<T>(),
                 PartitionKeyAttribute.CreateAccessor<T>(),
-                RowKeyAttribute.CreateAccessor<T>()) 
+                RowKeyAttribute.CreateAccessor<T>())
         { }
 
         /// <summary>
@@ -42,16 +42,6 @@ namespace Devlooped
         /// <param name="tableName">The table that backs this repository.</param>
         public TableRepository(CloudStorageAccount storageAccount, string tableName)
             : this(storageAccount, tableName ?? TableRepository.GetDefaultTableName<T>(),
-                PartitionKeyAttribute.CreateAccessor<T>(),
-                RowKeyAttribute.CreateAccessor<T>()) 
-        { }
-
-        /// <summary>
-        /// Initializes the table repository.
-        /// </summary>
-        /// <param name="tableConnection">The <see cref="TableConnection"/> to use to connect to the table.</param>
-        public TableRepository(TableConnection tableConnection)
-            : this(tableConnection,
                 PartitionKeyAttribute.CreateAccessor<T>(),
                 RowKeyAttribute.CreateAccessor<T>())
         { }
@@ -63,9 +53,10 @@ namespace Devlooped
         /// <param name="tableName">The table that backs this repository.</param>
         /// <param name="partitionKey">A function to determine the partition key for an entity of type <typeparamref name="T"/>.</param>
         /// <param name="rowKey">A function to determine the row key for an entity of type <typeparamref name="T"/>.</param>
-        public TableRepository(CloudStorageAccount storageAccount, string tableName, Expression<Func<T, string>>? partitionKey, Expression<Func<T, string>>? rowKey)
-            : this(new TableConnection(storageAccount, tableName ?? TableRepository.GetDefaultTableName<T>()), 
-                  partitionKey, rowKey)
+        public TableRepository(CloudStorageAccount storageAccount, string tableName, Expression<Func<T, string>>? partitionKey = default, Expression<Func<T, string>>? rowKey = default)
+            : this(new TableConnection(storageAccount, tableName ?? TableRepository.GetDefaultTableName<T>()),
+                  partitionKey ?? PartitionKeyAttribute.CreateAccessor<T>(),
+                  rowKey ?? RowKeyAttribute.CreateAccessor<T>())
         { }
 
         /// <summary>
@@ -74,9 +65,43 @@ namespace Devlooped
         /// <param name="tableConnection">The <see cref="TableConnection"/> to use to connect to the table.</param>
         /// <param name="partitionKey">A function to determine the partition key for an entity of type <typeparamref name="T"/>.</param>
         /// <param name="rowKey">A function to determine the row key for an entity of type <typeparamref name="T"/>.</param>
-        public TableRepository(TableConnection tableConnection, Expression<Func<T, string>>? partitionKey, Expression<Func<T, string>>? rowKey)
+        public TableRepository(TableConnection tableConnection, Expression<Func<T, string>>? partitionKey = default, Expression<Func<T, string>>? rowKey = default)
+            : this((ITableConnection)tableConnection,
+                  partitionKey ?? PartitionKeyAttribute.CreateAccessor<T>(),
+                  rowKey ?? RowKeyAttribute.CreateAccessor<T>())
+        { }
+
+        /// <summary>
+        /// Initializes the table repository.
+        /// </summary>
+        /// <param name="tableClient">The Azure <see cref="TableClient"/> to use.</param>
+        public TableRepository(TableClient tableClient)
+            : this(new TableClientConnection(tableClient),
+                  PartitionKeyAttribute.CreateAccessor<T>(),
+                  RowKeyAttribute.CreateAccessor<T>())
+        { }
+
+        /// <summary>
+        /// Initializes the table repository.
+        /// </summary>
+        /// <param name="tableClient">The Azure <see cref="TableClient"/> to use.</param>
+        /// <param name="partitionKey">A function to determine the partition key for an entity of type <typeparamref name="T"/>.</param>
+        /// <param name="rowKey">A function to determine the row key for an entity of type <typeparamref name="T"/>.</param>
+        public TableRepository(TableClient tableClient, Expression<Func<T, string>>? partitionKey = default, Expression<Func<T, string>>? rowKey = default)
+            : this(new TableClientConnection(tableClient), 
+                  partitionKey ?? PartitionKeyAttribute.CreateAccessor<T>(), 
+                  rowKey ?? RowKeyAttribute.CreateAccessor<T>())
+        { }
+
+        /// <summary>
+        /// Initializes the table repository.
+        /// </summary>
+        /// <param name="tableConnection">The <see cref="TableConnection"/> to use to connect to the table.</param>
+        /// <param name="partitionKey">A function to determine the partition key for an entity of type <typeparamref name="T"/>.</param>
+        /// <param name="rowKey">A function to determine the row key for an entity of type <typeparamref name="T"/>.</param>
+        TableRepository(ITableConnection tableConnection, Expression<Func<T, string>>? partitionKey, Expression<Func<T, string>>? rowKey)
         {
-            this.tableConnection = tableConnection; 
+            this.tableConnection = tableConnection;
             this.partitionKey = partitionKey == null ?
                 PartitionKeyAttribute.CreateCompiledAccessor<T>() :
                 partitionKey.Compile();
@@ -183,7 +208,7 @@ namespace Devlooped
             // attributed props (that's inconsistent).
 
             var values = PersistKeyProperties ?
-                EntityPropertiesMapper.Default.ToProperties(entity) : 
+                EntityPropertiesMapper.Default.ToProperties(entity) :
                 EntityPropertiesMapper.Default.ToProperties(entity, partitionKeyProperty, rowKeyProperty);
 
             values[nameof(ITableEntity.PartitionKey)] = partitionKey;
@@ -192,7 +217,7 @@ namespace Devlooped
             var table = await this.tableConnection.GetTableAsync().ConfigureAwait(false);
             var result = await table.UpsertEntityAsync(new TableEntity(values), UpdateMode, cancellation)
                 .ConfigureAwait(false);
-            
+
             return (await GetAsync(partitionKey, rowKey, cancellation).ConfigureAwait(false))!;
         }
     }
