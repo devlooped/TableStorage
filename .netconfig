@@ -105,8 +105,8 @@
 	weak
 [file "Gemfile"]
 	url = https://github.com/clarius/pages/blob/main/Gemfile
-	sha = 565a77f40db0863cb47ceb36f88790259a697c91
-	etag = 24e482e91192e292b633e3c17c4f095286ffb5a041d299d761b2e6ef99ee7669
+	sha = 90fa16ed0e7300a78a38ee1d23c34a7e875aab27
+	etag = 3dd7febc8ae6760f19abfe787711f469c288cd803a6f1c545edec34264d48e71
 	weak
 [file ".github/workflows/test/action.yml"]
 	url = https://github.com/devlooped/oss/blob/main/.github/workflows/test/action.yml
@@ -202,8 +202,8 @@
 	weak
 [file "src/SponsorLink/SponsorLink/DiagnosticsManager.cs"]
 	url = https://github.com/devlooped/SponsorLink/blob/main/samples/dotnet/SponsorLink/DiagnosticsManager.cs
-	sha = f47528874a6d9192b5546f84b455f5ccc474a707
-	etag = 0f2bb6afa53513c0837dc7621fdf86f66cbd8b5eaa1978047dc50b96e3a87c99
+	sha = dbf1cb075923d964e797d047a793ca2152f9d040
+	etag = 6f6470fd6c8cc53f16e332b14bccc994277f2e123a79db33411d605b687cdc55
 	weak
 [file "src/SponsorLink/SponsorLink/ManifestStatus.cs"]
 	url = https://github.com/devlooped/SponsorLink/blob/main/samples/dotnet/SponsorLink/ManifestStatus.cs
@@ -222,8 +222,8 @@
 	weak
 [file "src/SponsorLink/SponsorLink/SponsorLink.cs"]
 	url = https://github.com/devlooped/SponsorLink/blob/main/samples/dotnet/SponsorLink/SponsorLink.cs
-	sha = f47528874a6d9192b5546f84b455f5ccc474a707
-	etag = a5b16dc3c8022add752db5c3b0055fbfd7df9b14dad2ff1a6360a6ecafda1ce1
+	sha = dbf1cb075923d964e797d047a793ca2152f9d040
+	etag = 6a6b4579c0802f43f965e0f1f8661e0c5063a0170eaa7376dc57149f9251f8a4
 	weak
 [file "src/SponsorLink/SponsorLink/SponsorLink.csproj"]
 	url = https://github.com/devlooped/SponsorLink/blob/main/samples/dotnet/SponsorLink/SponsorLink.csproj
@@ -362,6 +362,6 @@
 	weak
 [file "src/SponsorLink/SponsorLink.Analyzer.targets"]
 	url = https://github.com/devlooped/SponsorLink/blob/main/samples/dotnet/SponsorLink.Analyzer.targets
-	sha = 7407f5b3461213ae764f53ee93651a34487e458c
-	etag = 1fcd01807eeb1b4fc78792573ba0b0d591a80dd3ecbd0de1fbaaea8938dea704
+	sha = 330f826844a5a8be0b1ed6d670e3de2804b595ae
+	etag = 8fde8a0cd161428bec1aec37a592447fdc769ea6892cf75208ebfd847c3219d4
 	weak
