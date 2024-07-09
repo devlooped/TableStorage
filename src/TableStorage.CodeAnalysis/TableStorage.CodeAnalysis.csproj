@@ -6,6 +6,7 @@
     <PackFolder>analyzers/dotnet/roslyn4.0</PackFolder>
     <SignAssembly>false</SignAssembly>
     <CustomAfterMicrosoftCSharpTargets>$(MSBuildThisFileDirectory)..\SponsorLink\SponsorLink.Analyzer.targets</CustomAfterMicrosoftCSharpTargets>
+    <FundingPackageId>Devlooped.TableStorage</FundingPackageId>
   </PropertyGroup>
 
   <ItemGroup>

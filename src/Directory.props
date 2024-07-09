@@ -7,6 +7,7 @@
     <RestoreSources>https://api.nuget.org/v3/index.json;https://pkg.kzu.io/index.json;$(RestoreSources)</RestoreSources>
     
     <PackageProjectUrl>https://clarius.org/TableStorage</PackageProjectUrl>
+    <Product>Devlooped.TableStorage</Product>
   </PropertyGroup>
 
 </Project>
