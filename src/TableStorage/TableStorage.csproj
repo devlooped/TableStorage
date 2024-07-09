@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!--<ProjectReference Include="..\TableStorage.CodeAnalysis\TableStorage.CodeAnalysis.csproj" ReferenceOutputAssembly="false" OutputItemType="None" />-->
+    <ProjectReference Include="..\TableStorage.CodeAnalysis\TableStorage.CodeAnalysis.csproj" ReferenceOutputAssembly="false" OutputItemType="None" />
   </ItemGroup>
 
 </Project>
