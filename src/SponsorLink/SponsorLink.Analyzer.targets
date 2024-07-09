@@ -23,7 +23,7 @@
 
     <!-- Strong-naming analyzers is both unnecessary and additionally unsupported by ILRepack when run as a dotnet tool -->
     <SignAssembly Condition="'$(MergeAnalyzerAssemblies)' == 'true'">false</SignAssembly>
-  </PropertyGroup>
+</PropertyGroup>
 
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)SponsorLink/*.cs"
