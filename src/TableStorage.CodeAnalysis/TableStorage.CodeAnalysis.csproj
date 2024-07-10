@@ -7,6 +7,7 @@
     <SignAssembly>false</SignAssembly>
     <CustomAfterMicrosoftCSharpTargets>$(MSBuildThisFileDirectory)..\SponsorLink\SponsorLink.Analyzer.targets</CustomAfterMicrosoftCSharpTargets>
     <FundingPackageId>Devlooped.TableStorage</FundingPackageId>
+    <IsRoslynComponent>true</IsRoslynComponent>
   </PropertyGroup>
 
   <ItemGroup>

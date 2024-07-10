@@ -20,6 +20,8 @@
     <ProjectReference Include="..\TableStorage.Newtonsoft\TableStorage.Newtonsoft.csproj" />
     <ProjectReference Include="..\TableStorage.Protobuf\TableStorage.Protobuf.csproj" />
     <ProjectReference Include="..\TableStorage\TableStorage.csproj" />
+    <!-- This project reference allows debugging the source generator/analyzer project -->
+    <ProjectReference Include="..\TableStorage.CodeAnalysis\TableStorage.CodeAnalysis.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
   </ItemGroup>
 
   <ItemGroup>

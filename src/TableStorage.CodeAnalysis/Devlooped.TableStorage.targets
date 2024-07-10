@@ -3,5 +3,6 @@
   <ItemGroup>
     <!-- Brings in the analyzer file to report installation time -->
     <FundingPackageId Include="Devlooped.TableStorage" />
+    <FundingProduct Include="Devlooped.TableStorage" />
   </ItemGroup>
 </Project>
