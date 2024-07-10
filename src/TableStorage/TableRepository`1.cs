@@ -195,5 +195,39 @@ namespace Devlooped
             
             return (await GetAsync(partitionKey, rowKey, cancellation).ConfigureAwait(false))!;
         }
+
+        /// <inheritdoc />
+        public async Task PutAsync(IEnumerable<T> entities, CancellationToken cancellation = default)
+        {
+            var table = await this.tableConnection.GetTableAsync().ConfigureAwait(false);
+            var actionType = UpdateMode == TableUpdateMode.Replace 
+                ? TableTransactionActionType.UpsertReplace 
+                : TableTransactionActionType.UpsertMerge;
+
+            // Batch operations are limited to 100 entities
+            foreach (var chunk in entities.Chunk(100))
+            {
+                var actions = chunk.Select(entity =>
+                {
+                    var partitionKey = this.partitionKey.Invoke(entity);
+                    var rowKey = this.rowKey.Invoke(entity);
+
+                    // TODO: validate partitionKey and rowKey before trying to save, should 
+                    // result in better error messages? Essentially do what EnsureValid does for 
+                    // attributed props (that's inconsistent).
+
+                    var values = PersistKeyProperties ?
+                        EntityPropertiesMapper.Default.ToProperties(entity) :
+                        EntityPropertiesMapper.Default.ToProperties(entity, partitionKeyProperty, rowKeyProperty);
+
+                    values[nameof(ITableEntity.PartitionKey)] = partitionKey;
+                    values[nameof(ITableEntity.RowKey)] = rowKey;
+
+                    return new TableTransactionAction(actionType, new TableEntity(values));
+                });
+
+                await table.SubmitTransactionAsync(actions, cancellation).ConfigureAwait(false);
+            }
+        }
     }
 }

@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="Tests" />
+    <Compile Remove="System\*.cs" Condition="'$(TargetFramework)' == 'net6.0'" />
   </ItemGroup>
 
   <ItemGroup>

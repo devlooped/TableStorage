@@ -66,5 +66,15 @@ namespace Devlooped
         /// <param name="cancellation">Optional <see cref="CancellationToken"/>.</param>
         /// <returns>The saved entity.</returns>
         Task<T> PutAsync(T entity, CancellationToken cancellation = default);
+
+        /// <summary>
+        /// Writes a set of entities to the table, overwriting a existing values, if any.
+        /// </summary>
+        /// <param name="entities">The entities to persist.</param>
+        /// <param name="cancellation">Optional <see cref="CancellationToken"/>.</param>
+        /// <remarks>
+        /// Automatically batches operations for better performance.
+        /// </remarks>
+        Task PutAsync(IEnumerable<T> entities, CancellationToken cancellation = default);
     }
 }

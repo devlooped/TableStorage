@@ -119,5 +119,23 @@ namespace Devlooped
 
             return (await GetAsync(entity.PartitionKey, entity.RowKey, cancellation).ConfigureAwait(false))!;
         }
+
+        /// <inheritdoc />
+        public async Task PutAsync(IEnumerable<TableEntity> entities, CancellationToken cancellation = default)
+        {
+            var table = await this.tableConnection.GetTableAsync().ConfigureAwait(false);
+            var actionType = UpdateMode == TableUpdateMode.Replace
+                ? TableTransactionActionType.UpsertReplace
+                : TableTransactionActionType.UpsertMerge;
+
+            // Batch operations are limited to 100 entities
+            foreach (var chunk in entities.Chunk(100))
+            {
+                await table.SubmitTransactionAsync(
+                        chunk.Select(entity => new TableTransactionAction(actionType, entity)), 
+                        cancellation)
+                    .ConfigureAwait(false);
+            }
+        }
     }
 }
