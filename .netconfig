@@ -365,3 +365,7 @@
 	sha = e2d7e6f3b23ef5d5ead947f48c63efc77f3d4741
 	etag = 6959847d7e6425906530095e564f46bdfddf26995e6663142cfd2b065c0bb3c4
 	weak
+[file "src/TableStorage/System/Chunk.cs"]
+	url = https://github.com/dotnet/runtime/blob/main/src/libraries/System.Linq/src/System/Linq/Chunk.cs
+	etag = e4b499f860370250f0960e7afa5098c9490c2431515fca389a07b23a28fed90d
+	weak

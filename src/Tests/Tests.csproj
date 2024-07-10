@@ -28,4 +28,6 @@
     <None Update="Books.csv" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
+  <Import Project="..\SponsorLink\SponsorLink.Analyzer.Tests.targets"/>
+
 </Project>

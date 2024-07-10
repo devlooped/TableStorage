@@ -47,6 +47,26 @@ namespace Devlooped
         }
 
         [Fact]
+        public async Task TableBatchEndToEnd()
+        {
+            var repo = TableRepository.Create<MyEntity>(CloudStorageAccount.DevelopmentStorageAccount, "BatchEntities");
+            await repo.PutAsync(
+            [
+                new MyEntity("A"),
+                new MyEntity("B"),
+            ]);
+
+            var entities = new List<MyEntity>();
+
+            await foreach (var e in repo.EnumerateAsync("My"))
+                entities.Add(e);
+
+            Assert.Equal(2, entities.Count);
+            Assert.Contains(entities, x => x.Id == "A");
+            Assert.Contains(entities, x => x.Id == "B");
+        }
+
+        [Fact]
         public async Task TableRecordEndToEnd()
         {
             var repo = TableRepository.Create<AttributedRecordEntity>(CloudStorageAccount.DevelopmentStorageAccount);

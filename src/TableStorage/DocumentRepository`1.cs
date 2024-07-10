@@ -31,6 +31,7 @@ namespace Devlooped
         readonly Func<Func<IQueryable<IDocumentEntity>, IQueryable<IDocumentEntity>>, CancellationToken, IAsyncEnumerable<T>> enumerate;
         readonly Func<string, string, CancellationToken, Task<T?>> get;
         readonly Func<T, CancellationToken, Task<T>> put;
+        readonly Func<IEnumerable<T>, CancellationToken, Task> puts;
 
         static DocumentRepository()
         {
@@ -81,12 +82,14 @@ namespace Devlooped
                 enumerate = EnumerateStringAsync;
                 get = GetStringAsync;
                 put = PutStringAsync;
+                puts = PutsStringAsync;
             }
             else
             {
                 enumerate = EnumerateBinaryAsync;
                 get = GetBinaryAsync;
                 put = PutBinaryAsync;
+                puts = PutsBinaryAsync;
             }
         }
 
@@ -126,6 +129,9 @@ namespace Devlooped
         /// <inheritdoc />
         public Task<T> PutAsync(T entity, CancellationToken cancellation = default)
             => put(entity, cancellation);
+
+        public Task PutAsync(IEnumerable<T> entities, CancellationToken cancellation = default) 
+            => puts(entities, cancellation);
 
         #region Binary
 
@@ -189,6 +195,30 @@ namespace Devlooped
             return await GetBinaryAsync(partitionKey, rowKey, cancellation).ConfigureAwait(false) ?? entity;
         }
 
+        /// <inheritdoc />
+        async Task PutsBinaryAsync(IEnumerable<T> entities, CancellationToken cancellation = default)
+        {
+            var table = await this.tableConnection.GetTableAsync().ConfigureAwait(false);
+
+            // Batch operations are limited to 100 entities
+            foreach (var chunk in entities.Chunk(100))
+            {
+                var actions = chunk.Select(entity =>
+                {
+                    var partitionKey = this.partitionKey.Invoke(entity);
+                    var rowKey = this.rowKey.Invoke(entity);
+
+                    var row = ToTable(entity);
+                    row["Document"] = binarySerializer!.Serialize(entity);
+                    row["Document@odata.type"] = "Edm.Binary";
+
+                    return new TableTransactionAction(TableTransactionActionType.UpsertReplace, new TableEntity(row));
+                });
+
+                await table.SubmitTransactionAsync(actions, cancellation).ConfigureAwait(false);
+            }
+        }
+
         #endregion
 
         #region String
@@ -248,6 +278,29 @@ namespace Devlooped
             var result = await table.UpsertEntityAsync(row, TableUpdateMode.Replace, cancellation).ConfigureAwait(false);
 
             return await GetStringAsync(partitionKey, rowKey, cancellation).ConfigureAwait(false) ?? entity;
+        }
+
+        /// <inheritdoc />
+        async Task PutsStringAsync(IEnumerable<T> entities, CancellationToken cancellation = default)
+        {
+            var table = await this.tableConnection.GetTableAsync().ConfigureAwait(false);
+
+            // Batch operations are limited to 100 entities
+            foreach (var chunk in entities.Chunk(100))
+            {
+                var actions = chunk.Select(entity =>
+                {
+                    var partitionKey = this.partitionKey.Invoke(entity);
+                    var rowKey = this.rowKey.Invoke(entity);
+
+                    var row = ToTable(entity);
+                    row["Document"] = stringSerializer!.Serialize(entity);
+
+                    return new TableTransactionAction(TableTransactionActionType.UpsertReplace, new TableEntity(row));
+                });
+
+                await table.SubmitTransactionAsync(actions, cancellation).ConfigureAwait(false);
+            }
         }
 
         #endregion
