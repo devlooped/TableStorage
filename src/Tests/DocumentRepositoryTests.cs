@@ -8,7 +8,7 @@ using Xunit;
 
 namespace Devlooped
 {
-    public class DocumentRepositoryTests
+    public class DocumentRepositoryTests : IDisposable
     {
         public static IEnumerable<object[]> Serializers => new object[][]
         {
@@ -19,260 +19,190 @@ namespace Devlooped
             new object[] { ProtobufDocumentSerializer.Default },
         };
 
+        TableConnection table = new TableConnection(CloudStorageAccount.DevelopmentStorageAccount, "a" + Guid.NewGuid().ToString("n"));
+        void IDisposable.Dispose() => this.table.GetTableAsync().Result.Delete();
+
         [Theory]
         [MemberData(nameof(Serializers))]
         public async Task DocumentEndToEnd(IDocumentSerializer serializer)
         {
-            var table = CloudStorageAccount.DevelopmentStorageAccount
-                .CreateTableServiceClient()
-                .GetTableClient(serializer.GetType().Name);
+            var repo = DocumentRepository.Create<DocumentEntity>(table, serializer: serializer);
 
-            await table.DeleteAsync();
-            await table.CreateAsync();
+            var partitionKey = "P" + Guid.NewGuid().ToString("N");
+            var rowKey = "R" + Guid.NewGuid().ToString("N");
 
-            try
+            var entity = await repo.PutAsync(new DocumentEntity
             {
-                var repo = DocumentRepository.Create<DocumentEntity>(CloudStorageAccount.DevelopmentStorageAccount,
-                    table.Name, serializer: serializer);
+                PartitionKey = partitionKey,
+                RowKey = rowKey,
+                Title = "Foo",
+            });
 
-                var partitionKey = "P" + Guid.NewGuid().ToString("N");
-                var rowKey = "R" + Guid.NewGuid().ToString("N");
+            entity.Title = "Bar";
 
-                var entity = await repo.PutAsync(new DocumentEntity
-                {
-                    PartitionKey = partitionKey,
-                    RowKey = rowKey,
-                    Title = "Foo",
-                });
+            await repo.PutAsync(entity);
 
-                entity.Title = "Bar";
+            var saved = await repo.GetAsync(partitionKey, rowKey);
 
-                await repo.PutAsync(entity);
+            Assert.NotNull(saved);
+            Assert.Equal("Bar", saved!.Title);
+            Assert.Equal(DateOnly.FromDateTime(DateTime.Today), saved.Date);
 
-                var saved = await repo.GetAsync(partitionKey, rowKey);
+            var entities = new List<DocumentEntity>();
 
-                Assert.NotNull(saved);
-                Assert.Equal("Bar", saved!.Title);
-                Assert.Equal(DateOnly.FromDateTime(DateTime.Today), saved.Date);
+            await foreach (var e in repo.EnumerateAsync(partitionKey))
+                entities.Add(e);
 
-                var entities = new List<DocumentEntity>();
+            Assert.Single(entities);
 
-                await foreach (var e in repo.EnumerateAsync(partitionKey))
-                    entities.Add(e);
-
-                Assert.Single(entities);
-
-                // Verify that the entity is not serialized as a string for non-string serializer
-                if (serializer is not IStringDocumentSerializer)
-                {
-                    var generic = TableRepository.Create(CloudStorageAccount.DevelopmentStorageAccount, table.Name);
-                    var row = await generic.GetAsync(partitionKey, rowKey);
-                    Assert.NotNull(row);
-                    Assert.IsType<byte[]>(row["Document"]);
-                }
-
-                await repo.DeleteAsync(saved);
-
-                Assert.Null(await repo.GetAsync(partitionKey, rowKey));
-
-                await foreach (var _ in repo.EnumerateAsync(partitionKey))
-                    Assert.Fail("Did not expect to find any entities");
-            }
-            finally
+            // Verify that the entity is not serialized as a string for non-string serializer
+            if (serializer is not IStringDocumentSerializer)
             {
-                await table.DeleteAsync();
+                var generic = TableRepository.Create(table);
+                var row = await generic.GetAsync(partitionKey, rowKey);
+                Assert.NotNull(row);
+                Assert.IsType<byte[]>(row["Document"]);
             }
+
+            await repo.DeleteAsync(saved);
+
+            Assert.Null(await repo.GetAsync(partitionKey, rowKey));
+
+            await foreach (var _ in repo.EnumerateAsync(partitionKey))
+                Assert.Fail("Did not expect to find any entities");
         }
 
         [Theory]
         [MemberData(nameof(Serializers))]
         public async Task DocumentPartitionEndToEnd(IDocumentSerializer serializer)
         {
-            var table = CloudStorageAccount.DevelopmentStorageAccount
-                .CreateTableServiceClient()
-                .GetTableClient(serializer.GetType().Name);
+            var repo = DocumentPartition.Create<DocumentEntity>(table, serializer: serializer);
 
-            await table.DeleteAsync();
-            await table.CreateAsync();
+            var partitionKey = "P" + Guid.NewGuid().ToString("N");
+            var rowKey = "R" + Guid.NewGuid().ToString("N");
 
-            try
+            var entity = await repo.PutAsync(new DocumentEntity
             {
-                var repo = DocumentPartition.Create<DocumentEntity>(CloudStorageAccount.DevelopmentStorageAccount,
-                    table.Name, serializer: serializer);
+                PartitionKey = partitionKey,
+                RowKey = rowKey,
+                Title = "Foo",
+            });
 
-                var partitionKey = "P" + Guid.NewGuid().ToString("N");
-                var rowKey = "R" + Guid.NewGuid().ToString("N");
+            entity.Title = "Bar";
 
-                var entity = await repo.PutAsync(new DocumentEntity
-                {
-                    PartitionKey = partitionKey,
-                    RowKey = rowKey,
-                    Title = "Foo",
-                });
+            await repo.PutAsync(entity);
 
-                entity.Title = "Bar";
+            var saved = await repo.GetAsync(rowKey);
 
-                await repo.PutAsync(entity);
+            Assert.NotNull(saved);
+            Assert.Equal("Bar", saved!.Title);
 
-                var saved = await repo.GetAsync(rowKey);
+            var entities = new List<DocumentEntity>();
 
-                Assert.NotNull(saved);
-                Assert.Equal("Bar", saved!.Title);
+            await foreach (var e in repo.EnumerateAsync())
+                entities.Add(e);
 
-                var entities = new List<DocumentEntity>();
+            Assert.Single(entities);
 
-                await foreach (var e in repo.EnumerateAsync())
-                    entities.Add(e);
+            await repo.DeleteAsync(saved);
 
-                Assert.Single(entities);
+            Assert.Null(await repo.GetAsync(rowKey));
 
-                await repo.DeleteAsync(saved);
-
-                Assert.Null(await repo.GetAsync(rowKey));
-
-                await foreach (var _ in repo.EnumerateAsync())
-                    Assert.Fail("Did not expect to find any entities");
-            }
-            finally
-            {
-                await table.DeleteAsync();
-            }
+            await foreach (var _ in repo.EnumerateAsync())
+                Assert.Fail("Did not expect to find any entities");
         }
 
         [Theory]
         [MemberData(nameof(Serializers))]
         public async Task CanQueryDocument(IDocumentSerializer serializer)
         {
-            var table = CloudStorageAccount.DevelopmentStorageAccount
-                .CreateTableServiceClient()
-                .GetTableClient(nameof(CanQueryDocument) + serializer.GetType().Name);
+            var repo = DocumentRepository.Create<DocumentEntity>(table, serializer: serializer);
 
-            await table.DeleteAsync();
-            await table.CreateAsync();
+            var partitionKey = "P5943C610208D4008BEC052272ED07214";
 
-            try
+            await repo.PutAsync(new DocumentEntity
             {
-                var repo = DocumentRepository.Create<DocumentEntity>(CloudStorageAccount.DevelopmentStorageAccount,
-                    table.Name, serializer: serializer);
+                PartitionKey = partitionKey,
+                RowKey = "Bar",
+                Title = "Bar",
+            });
 
-                var partitionKey = "P5943C610208D4008BEC052272ED07214";
-
-                await repo.PutAsync(new DocumentEntity
-                {
-                    PartitionKey = partitionKey,
-                    RowKey = "Bar",
-                    Title = "Bar",
-                });
-
-                await repo.PutAsync(new DocumentEntity
-                {
-                    PartitionKey = partitionKey,
-                    RowKey = "Foo",
-                    Title = "Foo",
-                });
-
-                var typeName = typeof(DocumentEntity).FullName!.Replace('+', '.');
-
-                var entities = await repo.EnumerateAsync(e =>
-                    e.PartitionKey == partitionKey &&
-                    e.RowKey.CompareTo("Foo") >= 0 && e.RowKey.CompareTo("Fop") < 0 &&
-                    e.Version != "1.0" &&
-                    e.Type == typeName)
-                    .ToListAsync();
-
-                Assert.Single(entities);
-            }
-            finally
+            await repo.PutAsync(new DocumentEntity
             {
-                await table.DeleteAsync();
-            }
+                PartitionKey = partitionKey,
+                RowKey = "Foo",
+                Title = "Foo",
+            });
+
+            var typeName = typeof(DocumentEntity).FullName!.Replace('+', '.');
+
+            var entities = await repo.EnumerateAsync(e =>
+                e.PartitionKey == partitionKey &&
+                e.RowKey.CompareTo("Foo") >= 0 && e.RowKey.CompareTo("Fop") < 0 &&
+                e.Version != "1.0" &&
+                e.Type == typeName)
+                .ToListAsync();
+
+            Assert.Single(entities);
         }
 
         [Theory]
         [MemberData(nameof(Serializers))]
         public async Task CanIncludeProperties(IDocumentSerializer serializer)
         {
-            var table = CloudStorageAccount.DevelopmentStorageAccount
-                .CreateTableServiceClient()
-                .GetTableClient(nameof(CanIncludeProperties) + serializer.GetType().Name);
+            var repo = DocumentRepository.Create<DocumentEntity>(table, serializer: serializer, includeProperties: true);
 
-            await table.DeleteAsync();
-            await table.CreateAsync();
+            var partitionKey = "P5943C610208D4008BEC052272ED07214";
 
-            try
+            await repo.PutAsync(new DocumentEntity
             {
-                var repo = DocumentRepository.Create<DocumentEntity>(CloudStorageAccount.DevelopmentStorageAccount,
-                    table.Name, serializer: serializer, includeProperties: true);
+                PartitionKey = partitionKey,
+                RowKey = "Bar",
+                Title = "Bar",
+            });
 
-                var partitionKey = "P5943C610208D4008BEC052272ED07214";
-
-                await repo.PutAsync(new DocumentEntity
-                {
-                    PartitionKey = partitionKey,
-                    RowKey = "Bar",
-                    Title = "Bar",
-                });
-
-                await repo.PutAsync(new DocumentEntity
-                {
-                    PartitionKey = partitionKey,
-                    RowKey = "Foo",
-                    Title = "Foo",
-                });
-
-                var entity = table.GetEntity<TableEntity>(partitionKey, "Bar");
-                Assert.Equal("Bar", entity.Value["Title"]);
-
-                entity = table.GetEntity<TableEntity>(partitionKey, "Foo");
-                Assert.Equal("Foo", entity.Value["Title"]);
-            }
-            finally
+            await repo.PutAsync(new DocumentEntity
             {
-                await table.DeleteAsync();
-            }
+                PartitionKey = partitionKey,
+                RowKey = "Foo",
+                Title = "Foo",
+            });
+
+            var client = await table.GetTableAsync();
+            var entity = client.GetEntity<TableEntity>(partitionKey, "Bar");
+            Assert.Equal("Bar", entity.Value["Title"]);
+
+            entity = client.GetEntity<TableEntity>(partitionKey, "Foo");
+            Assert.Equal("Foo", entity.Value["Title"]);
         }
 
         [Theory]
         [MemberData(nameof(Serializers))]
         public async Task CanIncludePropertiesInParition(IDocumentSerializer serializer)
         {
-            var table = CloudStorageAccount.DevelopmentStorageAccount
-                .CreateTableServiceClient()
-                .GetTableClient(nameof(CanIncludeProperties) + serializer.GetType().Name);
+            var partitionKey = "P5943C610208D4008BEC052272ED07214";
+            var repo = DocumentPartition.Create<DocumentEntity>(table, partitionKey, serializer: serializer, includeProperties: true);
 
-            await table.DeleteAsync();
-            await table.CreateAsync();
-
-            try
+            await repo.PutAsync(new DocumentEntity
             {
-                var partitionKey = "P5943C610208D4008BEC052272ED07214";
-                var repo = DocumentPartition.Create<DocumentEntity>(CloudStorageAccount.DevelopmentStorageAccount,
-                    table.Name, partitionKey, serializer: serializer, includeProperties: true);
+                PartitionKey = partitionKey,
+                RowKey = "Bar",
+                Title = "Bar",
+            });
 
-                await repo.PutAsync(new DocumentEntity
-                {
-                    PartitionKey = partitionKey,
-                    RowKey = "Bar",
-                    Title = "Bar",
-                });
-
-                await repo.PutAsync(new DocumentEntity
-                {
-                    PartitionKey = partitionKey,
-                    RowKey = "Foo",
-                    Title = "Foo",
-                });
-
-                var entity = table.GetEntity<TableEntity>(partitionKey, "Bar");
-                Assert.Equal("Bar", entity.Value["Title"]);
-
-                entity = table.GetEntity<TableEntity>(partitionKey, "Foo");
-                Assert.Equal("Foo", entity.Value["Title"]);
-            }
-            finally
+            await repo.PutAsync(new DocumentEntity
             {
-                await table.DeleteAsync();
-            }
+                PartitionKey = partitionKey,
+                RowKey = "Foo",
+                Title = "Foo",
+            });
+
+            var client = await table.GetTableAsync();
+            var entity = client.GetEntity<TableEntity>(partitionKey, "Bar");
+            Assert.Equal("Bar", entity.Value["Title"]);
+
+            entity = client.GetEntity<TableEntity>(partitionKey, "Foo");
+            Assert.Equal("Foo", entity.Value["Title"]);
         }
 
         [ProtoContract]

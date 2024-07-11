@@ -11,9 +11,14 @@ using Xunit.Abstractions;
 
 namespace Devlooped
 {
-    public class QueryTests(ITestOutputHelper output)
+    public class QueryTests(ITestOutputHelper output) : IDisposable
     {
-        string TableName([CallerMemberName] string? caller = default) => $"{nameof(QueryTests)}{caller}";
+        string TableName([CallerMemberName] string? caller = default) => TableRepository.GetDefaultTableName<Book>();
+
+        void IDisposable.Dispose() => CloudStorageAccount.DevelopmentStorageAccount
+            .CreateTableServiceClient()
+            .GetTableClient(TableName())
+            .Delete();
 
         [Fact]
         public async Task CanTake()
