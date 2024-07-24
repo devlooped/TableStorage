@@ -1,5 +1,46 @@
 # Changelog
 
+## [v5.2.0](https://github.com/devlooped/TableStorage/tree/v5.2.0) (2024-07-24)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v5.2.0-rc.1...v5.2.0)
+
+## [v5.2.0-rc.1](https://github.com/devlooped/TableStorage/tree/v5.2.0-rc.1) (2024-07-11)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v5.2.0-rc...v5.2.0-rc.1)
+
+:sparkles: Implemented enhancements:
+
+- Add support for batch saving multiple entities [\#309](https://github.com/devlooped/TableStorage/pull/309) (@kzu)
+
+:twisted_rightwards_arrows: Merged:
+
+- Improve test tables management [\#312](https://github.com/devlooped/TableStorage/pull/312) (@kzu)
+
+## [v5.2.0-rc](https://github.com/devlooped/TableStorage/tree/v5.2.0-rc) (2024-07-10)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v5.2.0-beta...v5.2.0-rc)
+
+:twisted_rightwards_arrows: Merged:
+
+- Add SponsorLink v2 analyzer [\#302](https://github.com/devlooped/TableStorage/pull/302) (@kzu)
+
+## [v5.2.0-beta](https://github.com/devlooped/TableStorage/tree/v5.2.0-beta) (2024-07-06)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v5.1.2...v5.2.0-beta)
+
+:sparkles: Implemented enhancements:
+
+- Improve key property detection for attributed types [\#292](https://github.com/devlooped/TableStorage/pull/292) (@kzu)
+
+:bug: Fixed bugs:
+
+- Fix TableEntity deserialization issue with newer Azurite [\#291](https://github.com/devlooped/TableStorage/pull/291) (@kzu)
+
+:twisted_rightwards_arrows: Merged:
+
+- Sync latest changes from oss template on build/publish workflows [\#300](https://github.com/devlooped/TableStorage/pull/300) (@kzu)
+- Move ToEntity to the entity properties mapper [\#284](https://github.com/devlooped/TableStorage/pull/284) (@kzu)
+
 ## [v5.1.2](https://github.com/devlooped/TableStorage/tree/v5.1.2) (2024-01-25)
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/v5.1.1...v5.1.2)
