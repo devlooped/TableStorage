@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="NuGetizer" Version="1.2.2" />
-    <PackageReference Include="MessagePack" Version="2.5.168" />
+    <PackageReference Include="MessagePack" Version="2.5.187" />
   </ItemGroup>
 
   <ItemGroup>
