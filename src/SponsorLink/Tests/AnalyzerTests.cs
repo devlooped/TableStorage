@@ -2,9 +2,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Analyzer::Devlooped.Sponsors;
@@ -145,10 +147,26 @@ public class AnalyzerTests : IDisposable
         Assert.Equal(SponsorStatus.Unknown, status);
     }
 
-    [Fact]
-    public async Task WhenSponsoring_ThenReportsSponsor()
+    [Theory]
+    [InlineData("user", SponsorStatus.User)]
+    [InlineData("org", SponsorStatus.Organization)]
+    [InlineData("contrib", SponsorStatus.Contributor)]
+    [InlineData("team", SponsorStatus.Team)]
+    // team trumps everything (since team members will typically also be contributors)
+    [InlineData("user,contrib,team", SponsorStatus.Team)]
+    // user trumps others
+    [InlineData("user,org,contrib", SponsorStatus.User)]
+    // contrib trumps org
+    [InlineData("org,contrib", SponsorStatus.Contributor)]
+    // team trumps contrib (since team members will typically also be contributors
+    [InlineData("contrib,team", SponsorStatus.Team)]
+    [InlineData("contrib,oss", SponsorStatus.Contributor)]
+    [InlineData("user,oss", SponsorStatus.User)]
+    [InlineData("org,oss", SponsorStatus.Organization)]
+    [InlineData("oss", SponsorStatus.OpenSource)]
+    public async Task WhenSponsoringRole_ThenEnsureStatus(string roles, SponsorStatus status)
     {
-        var sponsor = sponsorable.Sign([], expiration: TimeSpan.FromMinutes(5));
+        var sponsor = sponsorable.Sign(roles.Split(',').Select(x => new Claim("roles", x)), expiration: TimeSpan.FromMinutes(5));
         var jwt = Path.Combine(GetTempPath(), "kzu.jwt");
         File.WriteAllText(jwt, sponsor, Encoding.UTF8);
 
@@ -167,23 +185,28 @@ public class AnalyzerTests : IDisposable
         var diagnostic = diagnostics.Single(x => x.Properties.TryGetValue(nameof(SponsorStatus), out var value));
 
         Assert.True(diagnostic.Properties.TryGetValue(nameof(SponsorStatus), out var value));
-        var status = Enum.Parse<SponsorStatus>(value);
+        var actual = Enum.Parse<SponsorStatus>(value);
 
-        Assert.Equal(SponsorStatus.Sponsor, status);
+        Assert.Equal(status, actual);
     }
 
     [Fact]
     public async Task WhenMultipleAnalyzers_ThenReportsOnce()
     {
+        var sponsor = sponsorable.Sign([new("roles", "user")], expiration: TimeSpan.FromMinutes(5));
+        var jwt = Path.Combine(GetTempPath(), "kzu.jwt");
+        File.WriteAllText(jwt, sponsor, Encoding.UTF8);
+
         var compilation = CSharpCompilation.Create("test", [CSharpSyntaxTree.ParseText("//")])
             .WithAnalyzers([new SponsorLinkAnalyzer(), new SponsorLinkAnalyzer()],
-                new AnalyzerOptions([], new TestAnalyzerConfigOptionsProvider(new())
+                new AnalyzerOptions([new AdditionalTextFile(jwt)], new TestAnalyzerConfigOptionsProvider(new())
                 {
                     // Force reporting without wait period
                     { "build_property.SponsorLinkNoInstallGrace", "true" },
                     // Simulate directly referenced package
                     { "build_property.SponsorableLib", "1.0.0" },
                     { "build_property.SponsorLink", "1.0.0" },
+                    { "build_metadata.SponsorManifest.ItemType", "SponsorManifest" }
                 }));
 
         var diagnostics = (await compilation.GetAnalyzerDiagnosticsAsync())

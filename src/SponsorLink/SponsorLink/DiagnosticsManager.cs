@@ -28,7 +28,15 @@ class DiagnosticsManager
         // <Constant Include="Funding.Product" Value="[PRODUCT_NAME]" />
         // <Constant Include="Funding.AnalyzerPrefix" Value="[PREFIX]" />
         { SponsorStatus.Unknown, CreateUnknown([.. Sponsorables.Keys], Funding.Product, Funding.Prefix) },
-        { SponsorStatus.Sponsor, CreateSponsor([.. Sponsorables.Keys], Funding.Prefix) },
+        { SponsorStatus.Grace, CreateGrace([.. Sponsorables.Keys], Funding.Product, Funding.Prefix) },
+        { SponsorStatus.User, CreateSponsor([.. Sponsorables.Keys], Funding.Prefix) },
+        { SponsorStatus.Contributor, CreateContributor([.. Sponsorables.Keys], Funding.Prefix, hidden: true) },
+        // NOTE: similar to contributor, we don't show OSS author membership in the IDE.
+        { SponsorStatus.OpenSource, CreateOpenSource([.. Sponsorables.Keys], Funding.Prefix) },
+        // NOTE: organization is a special case of sponsor, but we report it as hidden since the user isn't directly involved.
+        { SponsorStatus.Organization, CreateSponsor([.. Sponsorables.Keys], Funding.Prefix, hidden: true) },
+        // NOTE: similar to organization, we don't show team membership in the IDE.
+        { SponsorStatus.Team, CreateContributor([.. Sponsorables.Keys], Funding.Prefix, hidden: true) },
         { SponsorStatus.Expiring, CreateExpiring([.. Sponsorables.Keys], Funding.Prefix) },
         { SponsorStatus.Expired,  CreateExpired([.. Sponsorables.Keys], Funding.Prefix) },
     };
@@ -64,18 +72,29 @@ class DiagnosticsManager
 
     /// <summary>
     /// Gets the status of the <see cref="Funding.Product"/>, or sets it from 
+    /// the given set of <paramref name="options"/> if not already set.
+    /// </summary>
+    public SponsorStatus GetOrSetStatus(StatusOptions options)
+        => GetOrSetStatus(() => options.AdditionalFiles, () => options.GlobalOptions);
+
+    /// <summary>
+    /// Gets the status of the <see cref="Funding.Product"/>, or sets it from 
     /// the given analyzer <paramref name="options"/> if not already set.
     /// </summary>
     public SponsorStatus GetOrSetStatus(Func<AnalyzerOptions?> options)
         => GetOrSetStatus(() => options().GetSponsorAdditionalFiles(), () => options()?.AnalyzerConfigOptionsProvider.GlobalOptions);
 
     /// <summary>
-    /// Attemps to remove a diagnostic for the given product.
+    /// Attemps to get the diagnostic for the given product.
     /// </summary>
     /// <param name="product">The product diagnostic that might have been pushed previously.</param>
     /// <returns>The removed diagnostic, or <see langword="null" /> if none was previously pushed.</returns>
-    public Diagnostic? Pop(string product = Funding.Product)
+    public Diagnostic? TryGet(string product = Funding.Product)
     {
+        // Don't pop grace diagnostics, as we report them more than once.
+        if (GetStatus() == SponsorStatus.Grace && Diagnostics.TryGetValue(product, out var grace))
+            return grace;
+
         if (Diagnostics.TryRemove(product, out var diagnostic) &&
             GetStatus(diagnostic) != SponsorStatus.Grace)
         {
@@ -88,13 +107,12 @@ class DiagnosticsManager
     /// <summary>
     /// Pushes a diagnostic for the given product. 
     /// </summary>
-    /// <returns>The same diagnostic that was pushed, for chained invocations.</returns>
-    Diagnostic Push(Diagnostic diagnostic, string product = Funding.Product)
+    SponsorStatus Push(Diagnostic diagnostic, SponsorStatus status, string product = Funding.Product)
     {
         // We only expect to get one warning per sponsorable+product 
         // combination, and first one to set wins.
         Diagnostics.TryAdd(product, diagnostic);
-        return diagnostic;
+        return status;
     }
 
     SponsorStatus GetOrSetStatus(Func<ImmutableArray<AdditionalText>> getAdditionalFiles, Func<AnalyzerConfigOptions?> getGlobalOptions)
@@ -121,45 +139,71 @@ class DiagnosticsManager
 
                 if (installed != default && ((DateTime.Now - installed).TotalDays <= Funding.Grace))
                 {
+                    // get days until grace expiration
+                    var days = Math.Abs((int)(installed.Date.AddDays(Funding.Grace) - DateTime.Now.Date).TotalDays);
                     // report unknown, either unparsed manifest or one with no expiration (which we never emit).
-                    Push(Diagnostic.Create(KnownDescriptors[SponsorStatus.Unknown], null,
-                        properties: ImmutableDictionary.Create<string, string?>().Add(nameof(SponsorStatus), nameof(SponsorStatus.Grace)),
-                        Funding.Product, Sponsorables.Keys.Humanize(Resources.Or)));
-                    return SponsorStatus.Grace;
+                    return Push(Diagnostic.Create(KnownDescriptors[SponsorStatus.Grace], null,
+                        effectiveSeverity: DiagnosticSeverity.Info,
+                        additionalLocations: null,
+                        properties: ImmutableDictionary.Create<string, string?>()
+                            .Add(nameof(SponsorStatus), nameof(SponsorStatus.Grace))
+                            .Add(nameof(SponsorStatus.Grace), days.ToString()),
+                        days, Funding.Product, Sponsorables.Keys.Humanize(Resources.Or)),
+                        SponsorStatus.Grace);
                 }
             }
 
             // report unknown, either unparsed manifest or one with no expiration (which we never emit).
-            Push(Diagnostic.Create(KnownDescriptors[SponsorStatus.Unknown], null,
+            return Push(Diagnostic.Create(KnownDescriptors[SponsorStatus.Unknown], null,
                 properties: ImmutableDictionary.Create<string, string?>().Add(nameof(SponsorStatus), nameof(SponsorStatus.Unknown)),
-                Funding.Product, Sponsorables.Keys.Humanize(Resources.Or)));
-            return SponsorStatus.Unknown;
+                Funding.Product, Sponsorables.Keys.Select(x => "@" + x).Humanize(Resources.Or)),
+                SponsorStatus.Unknown);
         }
         else if (exp < DateTime.Now)
         {
+            var days = Math.Abs((int)(exp.AddDays(Funding.Grace) - DateTime.Now).TotalDays);
             // report expired or expiring soon if still within the configured days of grace period
             if (exp.AddDays(Funding.Grace) < DateTime.Now)
             {
                 // report expiring soon
-                Push(Diagnostic.Create(KnownDescriptors[SponsorStatus.Expiring], null,
-                    properties: ImmutableDictionary.Create<string, string?>().Add(nameof(SponsorStatus), nameof(SponsorStatus.Expiring))));
-                return SponsorStatus.Expiring;
+                return Push(Diagnostic.Create(KnownDescriptors[SponsorStatus.Expiring], null,
+                    properties: ImmutableDictionary.Create<string, string?>()
+                        .Add(nameof(SponsorStatus), nameof(SponsorStatus.Expiring))
+                        .Add(nameof(SponsorStatus.Expiring), days.ToString())),
+                    SponsorStatus.Expiring);
             }
             else
             {
                 // report expired
-                Push(Diagnostic.Create(KnownDescriptors[SponsorStatus.Expired], null,
-                    properties: ImmutableDictionary.Create<string, string?>().Add(nameof(SponsorStatus), nameof(SponsorStatus.Expired))));
-                return SponsorStatus.Expired;
+                return Push(Diagnostic.Create(KnownDescriptors[SponsorStatus.Expired], null,
+                    properties: ImmutableDictionary.Create<string, string?>()
+                        .Add(nameof(SponsorStatus), nameof(SponsorStatus.Expired))
+                        // add how many days ago expiration happened
+                        .Add(nameof(SponsorStatus.Expired), days.ToString())),
+                    SponsorStatus.Expired);
             }
         }
         else
         {
-            // report sponsor
-            Push(Diagnostic.Create(KnownDescriptors[SponsorStatus.Sponsor], null,
-                properties: ImmutableDictionary.Create<string, string?>().Add(nameof(SponsorStatus), nameof(SponsorStatus.Sponsor)),
-                Funding.Product));
-            return SponsorStatus.Sponsor;
+            status =
+                claims.IsInRole("team") ?
+                SponsorStatus.Team :
+                claims.IsInRole("user") ?
+                SponsorStatus.User :
+                claims.IsInRole("contrib") ?
+                SponsorStatus.Contributor :
+                claims.IsInRole("org") ?
+                SponsorStatus.Organization :
+                claims.IsInRole("oss") ?
+                SponsorStatus.OpenSource :
+                SponsorStatus.Unknown;
+
+            if (KnownDescriptors.TryGetValue(status, out var descriptor))
+                return Push(Diagnostic.Create(descriptor, null,
+                    properties: ImmutableDictionary.Create<string, string?>().Add(nameof(SponsorStatus), status.ToString()),
+                    Funding.Product), status);
+
+            return status;
         }
     }
 
@@ -168,26 +212,15 @@ class DiagnosticsManager
         {
             nameof(SponsorStatus.Grace) => SponsorStatus.Grace,
             nameof(SponsorStatus.Unknown) => SponsorStatus.Unknown,
-            nameof(SponsorStatus.Sponsor) => SponsorStatus.Sponsor,
+            nameof(SponsorStatus.User) => SponsorStatus.User,
             nameof(SponsorStatus.Expiring) => SponsorStatus.Expiring,
             nameof(SponsorStatus.Expired) => SponsorStatus.Expired,
             _ => null,
         }
         : null;
 
-    internal static DiagnosticDescriptor CreateSponsor(string[] sponsorable, string prefix) => new(
-            $"{prefix}100",
-            Resources.Sponsor_Title,
-            Resources.Sponsor_Message,
-            "SponsorLink",
-            DiagnosticSeverity.Info,
-            isEnabledByDefault: true,
-            description: Resources.Sponsor_Description,
-            helpLinkUri: "https://github.com/devlooped#sponsorlink",
-            "DoesNotSupportF1Help");
-
     internal static DiagnosticDescriptor CreateUnknown(string[] sponsorable, string product, string prefix) => new(
-        $"{prefix}101",
+        $"{prefix}100",
         Resources.Unknown_Title,
         Resources.Unknown_Message,
         "SponsorLink",
@@ -195,12 +228,25 @@ class DiagnosticsManager
         isEnabledByDefault: true,
         description: string.Format(CultureInfo.CurrentCulture, Resources.Unknown_Description,
             string.Join(", ", sponsorable.Select(x => $"https://github.com/sponsors/{x}")),
-            string.Join(" ", sponsorable)),
-        helpLinkUri: "https://github.com/devlooped#sponsorlink",
+            string.Join(" ", sponsorable.Select(x => "@" + x))),
+        helpLinkUri: Funding.HelpUrl,
+        WellKnownDiagnosticTags.NotConfigurable, "CompilationEnd");
+
+    internal static DiagnosticDescriptor CreateGrace(string[] sponsorable, string product, string prefix) => new(
+        $"{prefix}101",
+        Resources.Grace_Title,
+        Resources.Grace_Message,
+        "SponsorLink",
+        DiagnosticSeverity.Warning,
+        isEnabledByDefault: true,
+        description: string.Format(CultureInfo.CurrentCulture, Resources.Grace_Description,
+            string.Join(", ", sponsorable.Select(x => $"https://github.com/sponsors/{x}")),
+            string.Join(" ", sponsorable.Select(x => "@" + x))),
+        helpLinkUri: Funding.HelpUrl,
         WellKnownDiagnosticTags.NotConfigurable);
 
     internal static DiagnosticDescriptor CreateExpiring(string[] sponsorable, string prefix) => new(
-         $"{prefix}103",
+         $"{prefix}102",
          Resources.Expiring_Title,
          Resources.Expiring_Message,
          "SponsorLink",
@@ -208,10 +254,10 @@ class DiagnosticsManager
          isEnabledByDefault: true,
          description: string.Format(CultureInfo.CurrentCulture, Resources.Expiring_Description, string.Join(" ", sponsorable)),
          helpLinkUri: "https://github.com/devlooped#autosync",
-         "DoesNotSupportF1Help", WellKnownDiagnosticTags.NotConfigurable);
+         "DoesNotSupportF1Help", WellKnownDiagnosticTags.NotConfigurable, "CompilationEnd");
 
     internal static DiagnosticDescriptor CreateExpired(string[] sponsorable, string prefix) => new(
-         $"{prefix}104",
+         $"{prefix}103",
          Resources.Expired_Title,
          Resources.Expired_Message,
          "SponsorLink",
@@ -219,5 +265,38 @@ class DiagnosticsManager
          isEnabledByDefault: true,
          description: string.Format(CultureInfo.CurrentCulture, Resources.Expired_Description, string.Join(" ", sponsorable)),
          helpLinkUri: "https://github.com/devlooped#autosync",
-         "DoesNotSupportF1Help", WellKnownDiagnosticTags.NotConfigurable);
+         "DoesNotSupportF1Help", WellKnownDiagnosticTags.NotConfigurable, "CompilationEnd");
+
+    internal static DiagnosticDescriptor CreateSponsor(string[] sponsorable, string prefix, bool hidden = false) => new(
+            $"{prefix}110",
+            Resources.Sponsor_Title,
+            Resources.Sponsor_Message,
+            "SponsorLink",
+            hidden ? DiagnosticSeverity.Hidden : DiagnosticSeverity.Info,
+            isEnabledByDefault: true,
+            description: Resources.Sponsor_Description,
+            helpLinkUri: Funding.HelpUrl,
+            "DoesNotSupportF1Help", "CompilationEnd");
+
+    internal static DiagnosticDescriptor CreateContributor(string[] sponsorable, string prefix, bool hidden = false) => new(
+            $"{prefix}111",
+            Resources.Contributor_Title,
+            Resources.Contributor_Message,
+            "SponsorLink",
+            hidden ? DiagnosticSeverity.Hidden : DiagnosticSeverity.Info,
+            isEnabledByDefault: true,
+            description: Resources.Contributor_Description,
+            helpLinkUri: Funding.HelpUrl,
+            "DoesNotSupportF1Help", "CompilationEnd");
+
+    internal static DiagnosticDescriptor CreateOpenSource(string[] sponsorable, string prefix, bool hidden = false) => new(
+            $"{prefix}112",
+            Resources.OpenSource_Title,
+            Resources.OpenSource_Message,
+            "SponsorLink",
+            hidden ? DiagnosticSeverity.Hidden : DiagnosticSeverity.Info,
+            isEnabledByDefault: true,
+            description: Resources.OpenSource_Description,
+            helpLinkUri: Funding.HelpUrl,
+            "DoesNotSupportF1Help", "CompilationEnd");
 }
