@@ -1,3 +1,4 @@
+<!-- include https://github.com/devlooped/.github/raw/main/sponsorlink.md -->
 A Protocol Buffers binary serializer for use with document-based repositories.
 
 Usage:
