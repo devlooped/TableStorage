@@ -7,6 +7,10 @@
 [![Build](https://github.com/devlooped/TableStorage/workflows/build/badge.svg?branch=main)](https://github.com/devlooped/TableStorage/actions)
 
 <!-- include https://github.com/devlooped/.github/raw/main/sponsorlink.md -->
+*This project uses [SponsorLink](https://github.com/devlooped#sponsorlink) 
+and may issue IDE-only warnings if no active sponsorship is detected.*
+
+<!-- https://github.com/devlooped/.github/raw/main/sponsorlink.md -->
 <!-- #content -->
 Repository pattern with POCO object support for storing to Azure/CosmosDB Table Storage
 
