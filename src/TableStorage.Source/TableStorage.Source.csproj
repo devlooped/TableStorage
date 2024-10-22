@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <AssemblyName>Devlooped.TableStorage.Source</AssemblyName>
@@ -11,7 +11,6 @@
 
   <ItemGroup>
     <PackageReference Include="NuGetizer" Version="1.2.3" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="all" />
     <PackageReference Include="Devlooped.CloudStorageAccount" Version="1.3.0" />
     <PackageReference Include="Azure.Data.Tables" Version="12.9.1" />
     <PackageReference Include="Microsoft.OData.Client" Version="7.17.0" />
