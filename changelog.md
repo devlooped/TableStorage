@@ -1,5 +1,13 @@
 # Changelog
 
+## [v5.2.1](https://github.com/devlooped/TableStorage/tree/v5.2.1) (2024-10-22)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v5.2.0...v5.2.1)
+
+:twisted_rightwards_arrows: Merged:
+
+- Make sure to include note on SponsorLink v2 [\#332](https://github.com/devlooped/TableStorage/pull/332) (@kzu)
+
 ## [v5.2.0](https://github.com/devlooped/TableStorage/tree/v5.2.0) (2024-07-24)
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/v5.2.0-rc.1...v5.2.0)
