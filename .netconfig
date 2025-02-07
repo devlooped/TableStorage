@@ -56,13 +56,13 @@
 	weak
 [file ".github/workflows/dotnet-file.yml"]
 	url = https://github.com/devlooped/oss/blob/main/.github/workflows/dotnet-file.yml
-	sha = 7afe350f7e80a230e922db026d4e1198ba15cae1
-	etag = 65e9794df6caff779eb989c8f71ddf4d4109b24a75af79e4f8d0fe6ba7bd9702
+	sha = 59aaf432369b5ea597831d4feec5a6ac4024c2e3
+	etag = 1374e3f8c9b7af69c443605c03f7262300dcb7d783738d9eb9fe84268ed2d10c
 	weak
 [file ".gitignore"]
 	url = https://github.com/devlooped/oss/blob/main/.gitignore
-	sha = 02811fa23b0a102b9b33048335d41e515bf75737
-	etag = a9c37ae312afac14b78436a7d018af4483d88736b5f780576f2c5a0b3f14998c
+	sha = e0be248fff1d39133345283b8227372b36574b75
+	etag = c449ec6f76803e1891357ca2b8b4fcb5b2e5deeff8311622fd92ca9fbf1e6575
 	weak
 [file "Directory.Build.rsp"]
 	url = https://github.com/devlooped/oss/blob/main/Directory.Build.rsp
@@ -112,8 +112,8 @@
 	weak
 [file ".github/workflows/includes.yml"]
 	url = https://github.com/devlooped/oss/blob/main/.github/workflows/includes.yml
-	sha = d152e7437fd0d6f6d9363d23cb3b78c07335ea49
-	etag = ec40db34f379d0c6d83b2ec15624f330318a172cc4f85b5417c63e86eaf601df
+	sha = 85829f2510f335f4a411867f3dbaaa116c3ab3de
+	etag = 086f6b6316cc6ea7089c0dcc6980be519e6ed6e6201e65042ef41b82634ec0ee
 	weak
 [file ".github/workflows/combine-prs.yml"]
 	url = https://github.com/devlooped/oss/blob/main/.github/workflows/combine-prs.yml
@@ -225,16 +225,16 @@
 	weak
 [file "src/SponsorLink/SponsorLink/SponsorLink.cs"]
 	url = https://github.com/devlooped/SponsorLink/blob/main/samples/dotnet/SponsorLink/SponsorLink.cs
-	sha = efda32a6eaaeffa485fb480e31adfd2f8130bd48
+	sha = 3f72a9fd35274a659dd380a7d5b747d71b9732a1
 
-	etag = 555128f4279241225b4dc8bb2ec8835894edfe9f6b9223399ee8cb3dc7adaf06
+	etag = 616598e0ecb6d2ce97660aa6ac049e2a31a1c953669743b7b612b61d40c37706
 	weak
 [file "src/SponsorLink/SponsorLink/SponsorLink.csproj"]
 	url = https://github.com/devlooped/SponsorLink/blob/main/samples/dotnet/SponsorLink/SponsorLink.csproj
-	sha = f74ea7a8c7f81c5bceefb3ed7ef4249b1d8574a3
+	sha = 0d22f1ee7d7afc93e11060887de0e1773884978e
 
 
-	etag = d87299dc7de83bd69c5b3232e8f58c8df66dc587c22c6f4539b8829d9d860c52
+	etag = dbf30ffb9baa63e45a4c821bc1433e4289b9af84855c2a306eaa116874a1c9f2
 	weak
 [file "src/SponsorLink/SponsorLink/SponsorLinkAnalyzer.cs"]
 	url = https://github.com/devlooped/SponsorLink/blob/main/samples/dotnet/SponsorLink/SponsorLinkAnalyzer.cs
@@ -322,10 +322,10 @@
 	weak
 [file "src/SponsorLink/Tests/Tests.csproj"]
 	url = https://github.com/devlooped/SponsorLink/blob/main/samples/dotnet/Tests/Tests.csproj
-	sha = b75813df2c8623fbf084e54617c1131dde31180c
+	sha = 0d22f1ee7d7afc93e11060887de0e1773884978e
 
 
-	etag = 145c7fb55216852edef0876fc52d0e706c79e3c1f2aab3782ef900d9c34884f8
+	etag = 5db4da024e4ecfb90be14feb4db952efa2109ee2ec84e715921291808d57b749
 	weak
 [file "src/SponsorLink/Tests/keys/kzu.key"]
 	url = https://github.com/devlooped/SponsorLink/blob/main/samples/dotnet/Tests/keys/kzu.key
@@ -374,15 +374,15 @@
 	weak
 [file "src/SponsorLink/SponsorLink.Analyzer.targets"]
 	url = https://github.com/devlooped/SponsorLink/blob/main/samples/dotnet/SponsorLink.Analyzer.targets
-	sha = 1f083cf675260f176cc36c70220080a2e6211ddf
+	sha = fb82cf346cea86140a51ae49b9bc730d72f7c7ac
 
 
-	etag = 25b42de9005557475d1d21f28822d690727c2cc0cddc64fdd0d6c13da672cee8
+	etag = 284f794d03adabf10ac5e25ef87d257821a82eac112efe65d6fe23d675f9af7f
 	weak
 [file "src/SponsorLink/SponsorLink.Analyzer.Tests.targets"]
 	url = https://github.com/devlooped/SponsorLink/blob/main/samples/dotnet/SponsorLink.Analyzer.Tests.targets
-	sha = 058dbbc3582042d7fdcaf5741db59d2b46ea1222
-	etag = 2d8bac60892b5565e3419b1fa775c5b977af202304ef3c25a4c6d04c7ac9faf1
+	sha = df44ccc14cc11b5674c55aca9ba8596bdbcf8438
+	etag = a3e9cbcc227dd56a7bed236eaded136f1b80f9f36a4fabce8be695ee844bf881
 	weak
 [file "src/TableStorage/System/Chunk.cs"]
 	url = https://github.com/dotnet/runtime/blob/main/src/libraries/System.Linq/src/System/Linq/Chunk.cs
@@ -412,4 +412,9 @@
 	sha = 586398c3e650495f36601ecc8983a14ed745e058
 
 	etag = 1d6ca61601815a20581fc13f9efdad151ee0e5cf952318723265d5c183d3e1cc
+	weak
+[file ".github/workflows/dotnet-file-core.yml"]
+	url = https://github.com/devlooped/oss/blob/main/.github/workflows/dotnet-file-core.yml
+	sha = 875284ba5d565f529aba2f5d24ab8ed27c1d1c79
+	etag = 8de1d974bf73b1945b5c8be684c3a0b7364114a0d795c9d68837aed9b3aff331
 	weak
