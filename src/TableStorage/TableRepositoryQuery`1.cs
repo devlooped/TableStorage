@@ -19,7 +19,7 @@ using Microsoft.OData.Client;
 
 namespace Devlooped
 {
-    class TableRepositoryQuery<T> : IQueryable<T>, IQueryProvider, IAsyncEnumerable<T>
+    partial class TableRepositoryQuery<T> : IQueryable<T>, IQueryProvider, IAsyncEnumerable<T>
     {
         readonly CloudStorageAccount account;
         readonly IStringDocumentSerializer serializer;
@@ -53,9 +53,9 @@ namespace Devlooped
             // The type name can contain the + sign if it's a nested type, too. So we
             // need to remove the type name plus the dot and just leave the string 
             // value as part of the filter string.
-            var rawqs = Regex.Replace(
-                query.RequestUri.GetComponents(UriComponents.Query, UriFormat.Unescaped),
-                "(\\W)[\\w\\+\\.]+('\\w+')", "$1$2");
+            var rawqs = FilterExpr().Replace(
+                query.RequestUri.GetComponents(UriComponents.Query, UriFormat.Unescaped), 
+                "$1$2");
 
             // We need to count & break manually because $top is interpreted as the max records per page 
             // if the set matches more items. This is clearly unintuitive and *not* what one typically 
@@ -228,6 +228,14 @@ namespace Devlooped
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
+#if NET8_0_OR_GREATER
+        [GeneratedRegex("(\\W)[\\w\\+\\.]+('\\w+')", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase)]
+        private static partial Regex FilterExpr();
+#else
+        static Regex FilterExpr() => filterExpr;
+        static readonly Regex filterExpr = new Regex("(\\W)[\\w\\+\\.]+('\\w+')", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
+#endif
+
         static Dictionary<string, object> JsonElementToDictionary(JsonElement element)
         {
             var dictionary = new Dictionary<string, object>();
@@ -296,7 +304,6 @@ namespace Devlooped
 
             return dictionary;
         }
-
 
         class ProjectionVisitor : ExpressionVisitor
         {

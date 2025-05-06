@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <AssemblyName>Devlooped.TableStorage</AssemblyName>
-    <TargetFrameworks>netstandard2.0;netstandard2.1;net6.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net6.0;net8.0</TargetFrameworks>
     <IsPackable>true</IsPackable>
     <Description>Repository pattern with POCO object support for storing to Azure/CosmosDB Table Storage</Description>
   </PropertyGroup>
@@ -18,7 +18,7 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="Tests" />
-    <Compile Remove="System\*.cs" Condition="'$(TargetFramework)' == 'net6.0'" />
+    <Compile Remove="System\*.cs" Condition="'$(TargetFramework)' == 'net6.0' or '$(TargetFramework)' == 'net8.0'" />
   </ItemGroup>
 
   <ItemGroup>
