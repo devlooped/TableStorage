@@ -1,5 +1,13 @@
 # Changelog
 
+## [v5.2.2](https://github.com/devlooped/TableStorage/tree/v5.2.2) (2025-05-06)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v5.2.1...v5.2.2)
+
+:sparkles: Implemented enhancements:
+
+- Add .NET8 generated regex support for performance [\#355](https://github.com/devlooped/TableStorage/pull/355) (@kzu)
+
 ## [v5.2.1](https://github.com/devlooped/TableStorage/tree/v5.2.1) (2024-10-22)
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/v5.2.0...v5.2.1)
