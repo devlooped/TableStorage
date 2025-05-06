@@ -12,14 +12,12 @@ namespace Devlooped
     [AttributeUsage(AttributeTargets.Class)]
     partial class TableAttribute : Attribute
     {
-        static readonly Regex validator = new Regex("^[A-Za-z][A-Za-z0-9]{2,62}$", RegexOptions.Compiled);
-
         /// <summary>
         /// Initializes the attribute with the table name to use by default.
         /// </summary>
         public TableAttribute(string name)
         {
-            if (!validator.IsMatch(name))
+            if (!ValidatorExpr().IsMatch(name))
                 throw new ArgumentException($"Table name '{name}' contains invalid characters.", nameof(name));
 
             Name = name;
@@ -29,5 +27,13 @@ namespace Devlooped
         /// The default table name to use.
         /// </summary>
         public string Name { get; }
+
+#if NET8_0_OR_GREATER
+        [GeneratedRegex("^[A-Za-z][A-Za-z0-9]{2,62}$", RegexOptions.Compiled)]
+        private static partial Regex ValidatorExpr();
+#else
+        static Regex ValidatorExpr() => validator;
+        static readonly Regex validator = new Regex("^[A-Za-z][A-Za-z0-9]{2,62}$", RegexOptions.Compiled);
+#endif
     }
 }
