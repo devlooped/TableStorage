@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <AssemblyName>Devlooped.TableStorage.CodeAnalysis</AssemblyName>
@@ -13,7 +13,7 @@
   <ItemGroup>
     <PackageReference Include="NuGetizer" Version="1.2.3" PrivateAssets="all" PackTransitive="false" />
     <PackageReference Include="PolySharp" Version="1.14.1" PrivateAssets="all" />
-    <PackageReference Include="ThisAssembly.AssemblyInfo" Version="2.0.5" PrivateAssets="all" />
+    <PackageReference Include="ThisAssembly.AssemblyInfo" Version="2.0.14" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.1" Pack="false" />
   </ItemGroup>
 
@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="ILRepack" Version="2.0.35" />
+    <PackageReference Update="ILRepack" Version="2.0.37" />
   </ItemGroup>
 
 </Project>
