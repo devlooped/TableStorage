@@ -1,5 +1,13 @@
 # Changelog
 
+## [v5.2.3](https://github.com/devlooped/TableStorage/tree/v5.2.3) (2025-05-17)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v5.2.2...v5.2.3)
+
+:sparkles: Implemented enhancements:
+
+- Make default DocumentSerializer public [\#363](https://github.com/devlooped/TableStorage/pull/363) (@kzu)
+
 ## [v5.2.2](https://github.com/devlooped/TableStorage/tree/v5.2.2) (2025-05-06)
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/v5.2.1...v5.2.2)
