@@ -20,6 +20,7 @@ public partial class TableRepository<T> { }
 public partial class AttributedTableRepository<T> { }
 public partial class DocumentRepository { }
 public partial class DocumentRepository<T> { }
+public partial class DocumentSerializer { }
 public partial class AttributedDocumentRepository<T> { }
 public partial class TablePartition { }
 public partial class TablePartition<T> { }
