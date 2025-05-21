@@ -42,7 +42,7 @@ namespace Devlooped
         public byte[] Serialize<T>(T value) => value == null ? new byte[0] : MessagePackSerializer.Serialize(value.GetType(), value, options);
 
 #if NET6_0_OR_GREATER
-        class DateOnlyFormatterResolver : IFormatterResolver
+        internal class DateOnlyFormatterResolver : IFormatterResolver
         {
             public static IFormatterResolver Instance = new DateOnlyFormatterResolver();
 
@@ -54,7 +54,7 @@ namespace Devlooped
                 return null!;
             }
 
-            class DateOnlyFormatter : IMessagePackFormatter<DateOnly>
+            internal class DateOnlyFormatter : IMessagePackFormatter<DateOnly>
             {
                 public static readonly IMessagePackFormatter<DateOnly> Instance = new DateOnlyFormatter();
 

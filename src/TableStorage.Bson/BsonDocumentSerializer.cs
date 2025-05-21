@@ -58,7 +58,7 @@ namespace Devlooped
         class DateOnlyJsonConverter : JsonConverter<DateOnly>
         {
             public override DateOnly ReadJson(JsonReader reader, Type objectType, DateOnly existingValue, bool hasExistingValue, JsonSerializer serializer)
-                => DateOnly.Parse((string)reader.Value, CultureInfo.InvariantCulture);
+                => DateOnly.Parse((string)reader.Value!, CultureInfo.InvariantCulture);
 
             public override void WriteJson(JsonWriter writer, DateOnly value, JsonSerializer serializer)
                 => writer.WriteValue(value.ToString("O", CultureInfo.InvariantCulture));
