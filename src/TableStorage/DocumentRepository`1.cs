@@ -152,7 +152,12 @@ namespace Devlooped
                 {
                     var value = binarySerializer!.Deserialize<T>(document);
                     if (value != null)
+                    {
+                        if (value is IDocumentTimestamp ts)
+                            ts.Timestamp = entity.Timestamp;
+
                         yield return value;
+                    }
                 }
             }
         }
@@ -169,8 +174,11 @@ namespace Devlooped
                 if (document == null)
                     return default;
 
-                return binarySerializer!.Deserialize<T>(document);
+                var value = binarySerializer!.Deserialize<T>(document);
+                if (value is IDocumentTimestamp ts)
+                    ts.Timestamp = result.Value.Timestamp;
 
+                return value;
             }
             catch (RequestFailedException ex) when (ex.Status == 404)
             {
@@ -239,7 +247,11 @@ namespace Devlooped
                 {
                     var value = stringSerializer!.Deserialize<T>(data);
                     if (value != null)
+                    {
+                        if (value is IDocumentTimestamp ts)
+                            ts.Timestamp = document.Timestamp;
                         yield return value;
+                    }
                 }
             }
         }
@@ -256,7 +268,11 @@ namespace Devlooped
                 if (document == null)
                     return default;
 
-                return stringSerializer!.Deserialize<T>(document);
+                var value = stringSerializer!.Deserialize<T>(document);
+                if (value is IDocumentTimestamp ts)
+                    ts.Timestamp = result.Value.Timestamp;
+
+                return value;
             }
             catch (RequestFailedException ex) when (ex.Status == 404)
             {

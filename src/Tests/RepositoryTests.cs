@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Azure.Data.Tables;
 using Xunit;
 using Xunit.Abstractions;
+using static Devlooped.DocumentRepositoryTests;
 
 namespace Devlooped;
 
@@ -581,6 +582,42 @@ public class RepositoryTests : IDisposable
         Assert.Equal("repo", entity[nameof(Dependency.Repository)]);
         // And the Name shouldn't, since it's the PK
         Assert.Null(entity[nameof(Dependency.Name)]);
+    }
+
+    [Fact]
+    public async Task CanFilterBydate()
+    {
+        var repo = TablePartition.Create<TimestampedEntity>(
+            table,
+            nameof(TimestampedEntity),
+            rowKey: x => x.ID);
+
+        var first = await repo.PutAsync(new("Foo"));
+
+        await Task.Delay(100);
+
+        var second = await repo.PutAsync(new("Bar"));
+
+        await Task.Delay(100);
+
+        var third = await repo.PutAsync(new("Baz"));
+
+        var typeName = typeof(DocumentEntity).FullName!.Replace('+', '.');
+
+        var results = await repo.CreateQuery().Where(e => e.Timestamp >= second.Timestamp).AsAsyncEnumerable().ToListAsync();
+
+        Assert.Equal(2, results.Count);
+
+        Assert.Single(await repo.CreateQuery().Where(e =>
+            e.Timestamp > second.Timestamp)
+            .AsAsyncEnumerable()
+            .ToListAsync());
+
+        Assert.Single(await repo.CreateQuery().Where(e =>
+            e.Timestamp < third.Timestamp &&
+            e.Timestamp > first.Timestamp)
+            .AsAsyncEnumerable()
+            .ToListAsync());
     }
 
     record Dependency(string Organization, string Repository, string Type, string Name, string Version);

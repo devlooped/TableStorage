@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using ProtoBuf;
 using ProtoBuf.Meta;
+using ProtobufNetTest;
 
 namespace Devlooped
 {
@@ -17,6 +18,12 @@ namespace Devlooped
         /// Default instance of the serializer.
         /// </summary>
         public static IDocumentSerializer Default { get; } = new ProtobufDocumentSerializer();
+
+        static ProtobufDocumentSerializer()
+        {
+            RuntimeTypeModel.Default.Add(typeof(DateTimeOffset), false).SetSurrogate(typeof(DateTimeOffsetSurrogate));
+            RuntimeTypeModel.Default.Add(typeof(DateTimeOffset?), false).SetSurrogate(typeof(DateTimeOffsetSurrogate));
+        }
 
         /// <inheritdoc />
         public T? Deserialize<T>(byte[] data)

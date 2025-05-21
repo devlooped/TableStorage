@@ -148,6 +148,60 @@ namespace Devlooped
 
         [Theory]
         [MemberData(nameof(Serializers))]
+        public async Task CanFilterBydate(IDocumentSerializer serializer)
+        {
+            var repo = DocumentRepository.Create<DocumentEntity>(table, serializer: serializer);
+
+            var partitionKey = "P5943C610208D4008BEC052272ED07214";
+
+            var first = await repo.PutAsync(new DocumentEntity
+            {
+                PartitionKey = partitionKey,
+                RowKey = "Foo",
+                Title = "Foo",
+            });
+
+            await Task.Delay(100);
+
+            var second = await repo.PutAsync(new DocumentEntity
+            {
+                PartitionKey = partitionKey,
+                RowKey = "Bar",
+                Title = "Bar",
+            });
+
+            await Task.Delay(100);
+
+            var third = await repo.PutAsync(new DocumentEntity
+            {
+                PartitionKey = partitionKey,
+                RowKey = "Baz",
+                Title = "Baz",
+            });
+
+            var typeName = typeof(DocumentEntity).FullName!.Replace('+', '.');
+
+            var results = await repo.EnumerateAsync(e =>
+                e.PartitionKey == partitionKey &&
+                e.Timestamp >= second.Timestamp)
+                .ToListAsync();
+
+            Assert.Equal(2, results.Count);
+
+            Assert.Single((await repo.EnumerateAsync(e =>
+                e.PartitionKey == partitionKey &&
+                e.Timestamp > second.Timestamp)
+                .ToListAsync()));
+
+            Assert.Single((await repo.EnumerateAsync(e =>
+                e.PartitionKey == partitionKey &&
+                e.Timestamp < third.Timestamp &&
+                e.Timestamp > first.Timestamp)
+                .ToListAsync()));
+        }
+
+        [Theory]
+        [MemberData(nameof(Serializers))]
         public async Task CanIncludeProperties(IDocumentSerializer serializer)
         {
             var repo = DocumentRepository.Create<DocumentEntity>(table, serializer: serializer, includeProperties: true);
@@ -207,7 +261,7 @@ namespace Devlooped
 
         [ProtoContract]
         [MessagePackObject]
-        public class DocumentEntity
+        public class DocumentEntity : IDocumentTimestamp
         {
             [PartitionKey]
             [Key(0)]
@@ -223,6 +277,9 @@ namespace Devlooped
             [Key(3)]
             [ProtoMember(4, IsRequired = true)]
             public DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.Today);
+            [Key(4)]
+            [ProtoMember(5)]
+            public DateTimeOffset? Timestamp { get; set; }
         }
     }
 }
