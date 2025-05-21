@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <AssemblyName>Devlooped.TableStorage</AssemblyName>
@@ -10,10 +10,10 @@
   <ItemGroup>
     <PackageReference Include="NuGetizer" Version="1.2.4" />
     <PackageReference Include="Devlooped.CloudStorageAccount" Version="1.3.0" />
-    <PackageReference Include="Azure.Data.Tables" Version="12.9.1" />
-    <PackageReference Include="Microsoft.OData.Client" Version="7.21.3" />
+    <PackageReference Include="Azure.Data.Tables" Version="12.11.0" />
+    <PackageReference Include="Microsoft.OData.Client" Version="8.2.3" />
     <PackageReference Include="PolySharp" Version="1.15.0" PrivateAssets="all" />
-    <PackageReference Include="System.Text.Json" Version="6.0.10" />
+    <PackageReference Include="System.Text.Json" Version="9.0.5" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
