@@ -46,7 +46,8 @@ namespace Devlooped
 
         public async IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellation = default)
         {
-            var query = (DataServiceQuery)new DataServiceContext(account.TableEndpoint).CreateQuery<T>(tableName)
+            var context = new DataServiceContext(account.TableEndpoint);
+            var query = (DataServiceQuery)context.CreateQuery<T>(tableName)
                 .Provider.CreateQuery(expression);
 
             // OData will translate the enum value in a filter to TYPENAME.'ENUMVALUE'.
@@ -114,6 +115,9 @@ namespace Devlooped
 
                 qs["$filter"] = filter;
             }
+
+            // Fix DateTimeOffset filters to ensure proper handling
+            qs["$filter"] = FilterExpressionFixer.Fix(qs["$filter"]);
 
             var builder = new UriBuilder(query.RequestUri)
             {

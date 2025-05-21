@@ -147,7 +147,7 @@ The `DocumentRepository.Create` and `DocumentPartition.Create` factory methods p
 to document-based storage, exposing the a similar API as column-based storage. 
 
 Document repositories cause entities to be persisted as a single document column, alongside type and version 
-information to handle versioning a the app level as needed. 
+information to handle versioning at the app level as needed. 
 
 The API is mostly the same as for column-based repositories (document repositories implement 
 the same underlying `ITableStorage` interface):
@@ -200,6 +200,9 @@ The `Type` column persisted in the documents table is the `Type.FullName` of the
 `Version` is the `[Major].[Minor]` of its assembly, which could be used for advanced data migration scenarios. 
 The major and minor version components are also provided as individual columns for easier querying 
 by various version ranges, using `IDocumentRepository.EnumerateAsync(predicate)`.
+
+If the serialized documents need to access the `Timestamp` managed by Azure Table 
+Storage, you can implement `IDocumentTimestamp` in your entity type.
 
 <!-- #documents -->
 
