@@ -1,5 +1,21 @@
 # Changelog
 
+## [v5.2.4](https://github.com/devlooped/TableStorage/tree/v5.2.4) (2025-05-21)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v5.2.3...v5.2.4)
+
+:bug: Fixed bugs:
+
+- Fix filtering by Timestamp [\#365](https://github.com/devlooped/TableStorage/pull/365) (@kzu)
+
+:hammer: Other:
+
+- Filtering by Timestamp isn't working [\#328](https://github.com/devlooped/TableStorage/issues/328)
+
+:twisted_rightwards_arrows: Merged:
+
+- Address minor build warnings [\#367](https://github.com/devlooped/TableStorage/pull/367) (@kzu)
+
 ## [v5.2.3](https://github.com/devlooped/TableStorage/tree/v5.2.3) (2025-05-17)
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/v5.2.2...v5.2.3)
