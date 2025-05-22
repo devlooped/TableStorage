@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Mono.Linq.Expressions;
 
 namespace Devlooped
 {
@@ -66,7 +67,7 @@ namespace Devlooped
 
         /// <inheritdoc />
         public IAsyncEnumerable<T> EnumerateAsync(Expression<Func<IDocumentEntity, bool>> predicate, CancellationToken cancellation = default)
-            => repository.EnumerateAsync(e => e.PartitionKey == PartitionKey, cancellation);
+            => repository.EnumerateAsync(predicate.AndAlso(x => x.PartitionKey == PartitionKey), cancellation);
 
         /// <inheritdoc />
         public Task<T?> GetAsync(string rowKey, CancellationToken cancellation = default)
