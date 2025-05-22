@@ -22,11 +22,19 @@ namespace Devlooped
         TableConnection table = new TableConnection(CloudStorageAccount.DevelopmentStorageAccount, "a" + Guid.NewGuid().ToString("n"));
         void IDisposable.Dispose() => this.table.GetTableAsync().Result.Delete();
 
+        protected virtual IDocumentRepository<DocumentEntity> CreateRepository(IDocumentSerializer serializer)
+            => DocumentRepository.Create<DocumentEntity>(table, serializer: serializer);
+
+        protected virtual IDocumentPartition<DocumentEntity> CreatePartition(IDocumentSerializer serializer)
+            => DocumentPartition.Create<DocumentEntity>(table, serializer: serializer);
+
+        protected virtual bool VerifyTableStorage => true;
+
         [Theory]
         [MemberData(nameof(Serializers))]
         public async Task DocumentEndToEnd(IDocumentSerializer serializer)
         {
-            var repo = DocumentRepository.Create<DocumentEntity>(table, serializer: serializer);
+            var repo = CreateRepository(serializer);
 
             var partitionKey = "P" + Guid.NewGuid().ToString("N");
             var rowKey = "R" + Guid.NewGuid().ToString("N");
@@ -56,7 +64,7 @@ namespace Devlooped
             Assert.Single(entities);
 
             // Verify that the entity is not serialized as a string for non-string serializer
-            if (serializer is not IStringDocumentSerializer)
+            if (VerifyTableStorage && serializer is not IStringDocumentSerializer)
             {
                 var generic = TableRepository.Create(table);
                 var row = await generic.GetAsync(partitionKey, rowKey);
@@ -76,7 +84,7 @@ namespace Devlooped
         [MemberData(nameof(Serializers))]
         public async Task DocumentPartitionEndToEnd(IDocumentSerializer serializer)
         {
-            var repo = DocumentPartition.Create<DocumentEntity>(table, serializer: serializer);
+            var repo = CreatePartition(serializer);
 
             var partitionKey = "P" + Guid.NewGuid().ToString("N");
             var rowKey = "R" + Guid.NewGuid().ToString("N");
@@ -116,7 +124,7 @@ namespace Devlooped
         [MemberData(nameof(Serializers))]
         public async Task CanQueryDocument(IDocumentSerializer serializer)
         {
-            var repo = DocumentRepository.Create<DocumentEntity>(table, serializer: serializer);
+            var repo = CreateRepository(serializer);
 
             var partitionKey = "P5943C610208D4008BEC052272ED07214";
 
@@ -150,7 +158,7 @@ namespace Devlooped
         [MemberData(nameof(Serializers))]
         public async Task CanFilterBydate(IDocumentSerializer serializer)
         {
-            var repo = DocumentRepository.Create<DocumentEntity>(table, serializer: serializer);
+            var repo = CreateRepository(serializer);
 
             var partitionKey = "P5943C610208D4008BEC052272ED07214";
 
@@ -257,6 +265,16 @@ namespace Devlooped
 
             entity = client.GetEntity<TableEntity>(partitionKey, "Foo");
             Assert.Equal("Foo", entity.Value["Title"]);
+        }
+
+        [Fact]
+        public async Task CanDeleteNonExistentEntity()
+        {
+            Assert.False(await CreateRepository(DocumentSerializer.Default)
+                    .DeleteAsync("foo", "bar"));
+
+            Assert.False(await CreatePartition(DocumentSerializer.Default)
+                    .DeleteAsync("foo"));
         }
 
         [ProtoContract]
