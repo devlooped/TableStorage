@@ -1,5 +1,17 @@
 # Changelog
 
+## [v5.3.0](https://github.com/devlooped/TableStorage/tree/v5.3.0) (2025-05-22)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v5.2.4...v5.3.0)
+
+:sparkles: Implemented enhancements:
+
+- Add in-memory repository implementations for easier testing [\#368](https://github.com/devlooped/TableStorage/pull/368) (@kzu)
+
+:bug: Fixed bugs:
+
+- Fix document partition query bug with entity properties [\#369](https://github.com/devlooped/TableStorage/pull/369) (@kzu)
+
 ## [v5.2.4](https://github.com/devlooped/TableStorage/tree/v5.2.4) (2025-05-21)
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/v5.2.3...v5.2.4)
