@@ -277,6 +277,31 @@ namespace Devlooped
                     .DeleteAsync("foo"));
         }
 
+        [Fact]
+        public async Task CanQueryPartitionByExpression()
+        {
+            var partition = CreatePartition(DocumentSerializer.Default);
+            var partitionKey = TablePartition.GetDefaultPartitionKey<DocumentEntity>();
+
+            await partition.PutAsync(new DocumentEntity
+            {
+                PartitionKey = partitionKey,
+                RowKey = "Foo",
+                Title = "Foo",
+            });
+
+            await partition.PutAsync(new DocumentEntity
+            {
+                PartitionKey = partitionKey,
+                RowKey = "Bar",
+                Title = "Bar",
+            });
+
+            var entity = await partition.EnumerateAsync(x => x.RowKey == "Bar").ToListAsync();
+
+            Assert.Single(entity);
+        }
+
         [ProtoContract]
         [MessagePackObject]
         public class DocumentEntity : IDocumentTimestamp

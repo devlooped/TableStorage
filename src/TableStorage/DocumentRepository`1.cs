@@ -15,6 +15,7 @@ namespace Devlooped
     /// <inheritdoc />
     partial class DocumentRepository<T> : IDocumentRepository<T> where T : class
     {
+        static readonly string documentType = typeof(T).FullName?.Replace('+', '.') ?? typeof(T).Name;
         static readonly string documentVersion;
         static readonly int documentMajorVersion;
         static readonly int documentMinorVersion;
@@ -325,7 +326,7 @@ namespace Devlooped
         {
             var te = new TableEntity(this.partitionKey.Invoke(entity), this.rowKey.Invoke(entity))
             {
-                { "Type", typeof(T).FullName?.Replace('+', '.') },
+                { "Type", documentType },
                 { "Version", documentVersion },
                 { "MajorVersion", documentMajorVersion },
                 { "MinorVersion", documentMinorVersion },
