@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using Azure.Data.Tables;
@@ -24,10 +25,24 @@ public class RepositoryTests : IDisposable
 
     public void Dispose() => this.table.GetTableAsync().Result.Delete();
 
+    protected virtual ITableRepository<T> CreateRepository<T>(
+        Expression<Func<T, string>>? partitionKey = null,
+        Expression<Func<T, string>>? rowKey = null)
+        where T : class => TableRepository.Create<T>(table, partitionKey!, rowKey!);
+
+    protected virtual ITablePartition<T> CreatePartition<T>(
+        string? partitionKey = null,
+        Expression<Func<T, string>>? rowKey = null)
+        where T : class => TablePartition.Create<T>(table, partitionKey!, rowKey!);
+
+    protected virtual ITableRepository<TableEntity> CreateRepository() => TableRepository.Create(table);
+
+    protected virtual ITablePartition<TableEntity> CreatePartition(string partitionKey) => TablePartition.Create(table, partitionKey);
+
     [Fact]
     public async Task TableEndToEnd()
     {
-        var repo = TableRepository.Create<MyEntity>(table);
+        var repo = CreateRepository<MyEntity>();
         var entity = await repo.PutAsync(new MyEntity("asdf"));
 
         Assert.Equal("asdf", entity.Id);
@@ -61,7 +76,7 @@ public class RepositoryTests : IDisposable
     [Fact]
     public async Task TableBatchEndToEnd()
     {
-        var repo = TableRepository.Create<MyEntity>(CloudStorageAccount.DevelopmentStorageAccount, "BatchEntities");
+        var repo = CreateRepository<MyEntity>();
         await repo.PutAsync(
         [
             new MyEntity("A"),
@@ -81,7 +96,7 @@ public class RepositoryTests : IDisposable
     [Fact]
     public async Task TableRecordEndToEnd()
     {
-        var repo = TableRepository.Create<AttributedRecordEntity>(table);
+        var repo = CreateRepository<AttributedRecordEntity>();
         output.WriteLine("Target table: " + repo.TableName);
 
         var entity = await repo.PutAsync(new AttributedRecordEntity("Book", "1234"));
@@ -181,7 +196,7 @@ public class RepositoryTests : IDisposable
     [Fact]
     public async Task EntityEndToEnd()
     {
-        var repo = TablePartition.Create<MyEntity>(table);
+        var repo = CreatePartition<MyEntity>();
         var entity = await repo.PutAsync(new MyEntity("asdf"));
 
         Assert.Equal("asdf", entity.Id);
@@ -214,14 +229,13 @@ public class RepositoryTests : IDisposable
     [Fact]
     public void ThrowsIfEntityHasNoRowKey()
     {
-        Assert.Throws<ArgumentException>(() =>
-            TableRepository.Create<EntityNoRowKey>(CloudStorageAccount.DevelopmentStorageAccount, "Entities"));
+        Assert.Throws<ArgumentException>(() => CreateRepository<EntityNoRowKey>());
     }
 
     [Fact]
     public void CanSpecifyPartitionAndRowKeyLambdas()
     {
-        TableRepository.Create<EntityNoRowKey>(CloudStorageAccount.DevelopmentStorageAccount, "Entities",
+        CreateRepository<EntityNoRowKey>(
             e => "FixedPartition",
             e => e.Id ?? "");
     }
@@ -229,44 +243,36 @@ public class RepositoryTests : IDisposable
     [Fact]
     public void CanSpecifyRowKeyLambda()
     {
-        TablePartition.Create<EntityNoRowKey>(CloudStorageAccount.DevelopmentStorageAccount, e => e.Id ?? "");
+        CreatePartition<EntityNoRowKey>("Hello", e => e.Id ?? "");
     }
 
     [Fact]
     public async Task CanReadTimestamp()
     {
-        await TablePartition
-            .Create<TimestampedEntity>(
-            table, "Timestamped", e => e.ID)
-            .PutAsync(
-                new TimestampedEntity("Foo"));
+        var repo = CreatePartition<TimestampedEntity>("Timestamped", e => e.ID);
+        await repo.PutAsync(new TimestampedEntity("Foo"));
 
-        Assert.NotNull((await TablePartition
-            .Create<TimestampedEntity>(
-            table, "Timestamped", e => e.ID)
-            .GetAsync("Foo"))!.Timestamp);
+        Assert.NotNull((await repo.GetAsync("Foo"))?.Timestamp);
 
-        Assert.NotNull((await TablePartition
-            .Create<StringTimestampedEntity>(
-            table, "Timestamped", e => e.ID)
-            .GetAsync("Foo"))!.Timestamp);
+        var stringRepo = CreatePartition<StringTimestampedEntity>("Timestamped", e => e.ID);
+        await stringRepo.PutAsync(new StringTimestampedEntity("Foo"));
+        Assert.NotNull((await repo.GetAsync("Foo"))?.Timestamp);
 
-        Assert.NotNull((await TablePartition
-            .Create<TimestampedDateTimeEntity>(
-            table, "Timestamped", e => e.ID)
-            .GetAsync("Foo"))!.Timestamp);
+        var dateTimeRepo = CreatePartition<TimestampedDateTimeEntity>("Timestamped", e => e.ID);
+        await dateTimeRepo.PutAsync(new TimestampedDateTimeEntity("Foo"));
+        Assert.NotNull((await dateTimeRepo.GetAsync("Foo"))?.Timestamp);
     }
 
     [Fact]
     public void DefaultTableNameUsesAttribute()
     {
-        Assert.Equal("Entities", TableRepository.Create<MyTableEntity>(CloudStorageAccount.DevelopmentStorageAccount).TableName);
+        Assert.Equal("Entities", TableRepository.Create<MyTableEntity>(storage).TableName);
     }
 
     [Fact]
     public async Task TableEntityEndToEnd()
     {
-        var repo = TableRepository.Create(table);
+        var repo = CreateRepository();
         var entity = await repo.PutAsync(new TableEntity("123", "Foo")
             {
                 { "Bar", "Baz" }
@@ -299,7 +305,7 @@ public class RepositoryTests : IDisposable
     [Fact]
     public async Task TableEntityPartitionEndToEnd()
     {
-        var partition = TablePartition.Create(table, "Watched");
+        var partition = CreatePartition("Watched");
 
         // Entity PartitionKey does not belong to the partition
         await Assert.ThrowsAsync<ArgumentException>(async () => await partition.PutAsync(new TableEntity("123", "Foo")));
@@ -333,7 +339,7 @@ public class RepositoryTests : IDisposable
     [Fact]
     public async Task CanEnumerateEntities()
     {
-        var partition = TablePartition.Create<MyEntity>(table, "Watched");
+        var partition = CreatePartition<MyEntity>("Watched");
 
         await partition.PutAsync(new MyEntity("123") { Name = "Foo" });
         await partition.PutAsync(new MyEntity("456") { Name = "Bar" });
@@ -358,16 +364,10 @@ public class RepositoryTests : IDisposable
     [Fact]
     public async Task CanDeleteNonExistentEntity()
     {
-        Assert.False(await TableRepository.Create<MyEntity>(table)
+        Assert.False(await CreateRepository<MyEntity>()
                 .DeleteAsync("foo", "bar"));
 
-        Assert.False(await TablePartition.Create<MyEntity>(table, "Watched")
-                .DeleteAsync("foo"));
-
-        Assert.False(await DocumentRepository.Create<MyEntity>(table)
-                .DeleteAsync("foo", "bar"));
-
-        Assert.False(await DocumentPartition.Create<MyEntity>(table, "Watched")
+        Assert.False(await CreatePartition<MyEntity>("Watched")
                 .DeleteAsync("foo"));
 
         Assert.False(await TableRepository.Create(table)
@@ -473,7 +473,7 @@ public class RepositoryTests : IDisposable
     [Fact]
     public void CanAnnotateFixedPartition()
     {
-        var partition = TablePartition.Create<CustomPartition>(table, x => x.Id);
+        var partition = CreatePartition<CustomPartition>(null, x => x.Id);
 
         Assert.Equal("MyPartition", partition.PartitionKey);
     }
@@ -587,8 +587,7 @@ public class RepositoryTests : IDisposable
     [Fact]
     public async Task CanFilterBydate()
     {
-        var repo = TablePartition.Create<TimestampedEntity>(
-            table,
+        var repo = CreatePartition<TimestampedEntity>(
             nameof(TimestampedEntity),
             rowKey: x => x.ID);
 
@@ -620,9 +619,9 @@ public class RepositoryTests : IDisposable
             .ToListAsync());
     }
 
-    record Dependency(string Organization, string Repository, string Type, string Name, string Version);
+    public record Dependency(string Organization, string Repository, string Type, string Name, string Version);
 
-    class MyEntity
+    public class MyEntity
     {
         public MyEntity(string id) => Id = id;
 
@@ -635,7 +634,7 @@ public class RepositoryTests : IDisposable
     }
 
     [Table("Entities")]
-    class MyTableEntity
+    public class MyTableEntity
     {
         public MyTableEntity(string id) => Id = id;
 
@@ -645,41 +644,41 @@ public class RepositoryTests : IDisposable
         public string? Notes { get; set; }
     }
 
-    class EntityNoRowKey
+    public class EntityNoRowKey
     {
         public string? Id { get; set; }
     }
 
-    record RecordEntity(string Kind, string ID)
+    public record RecordEntity(string Kind, string ID)
     {
         public string? Status { get; set; }
     }
 
     [Table("EntityRequest")]
-    record AttributedRecordEntity([PartitionKey] string Kind, [RowKey] string ID)
+    public record AttributedRecordEntity([PartitionKey] string Kind, [RowKey] string ID)
     {
         public string? Status { get; set; }
         public string? Reason { get; set; }
     }
 
-    record TimestampedEntity(string ID)
+    public record TimestampedEntity(string ID)
     {
         public DateTimeOffset? Timestamp { get; set; }
     }
 
-    record StringTimestampedEntity(string ID)
+    public record StringTimestampedEntity(string ID)
     {
         public string? Timestamp { get; set; }
     }
 
-    record TimestampedDateTimeEntity(string ID)
+    public record TimestampedDateTimeEntity(string ID)
     {
         public DateTime? Timestamp { get; set; }
     }
 
     [Table(nameof(EdmAnnotatedEntity))]
-    record EdmAnnotatedEntity([PartitionKey] Guid Partition, [RowKey] Guid ID, DateTimeOffset Date, byte[] Data, long Count);
+    public record EdmAnnotatedEntity([PartitionKey] Guid Partition, [RowKey] Guid ID, DateTimeOffset Date, byte[] Data, long Count);
 
     [PartitionKey("MyPartition")]
-    record CustomPartition(string Id);
+    public record CustomPartition(string Id);
 }

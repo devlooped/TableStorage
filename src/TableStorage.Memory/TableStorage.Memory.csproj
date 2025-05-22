@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>Devlooped.TableStorage.Memory</AssemblyName>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <IsPackable>true</IsPackable>
+    <Description>In-memory implementations for easy testing of Azure/CosmosDB Table Storage</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\TableStorage\ExpressionExtensions.cs" Link="ExpressionExtensions.cs" />
+    <Compile Include="..\TableStorage\NonMutatingAttribute.cs" Link="NonMutatingAttribute.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Bcl.HashCode" Version="6.0.0" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="NuGetizer" Version="1.2.4" />
+    <PackageReference Include="PolySharp" Version="1.15.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="9.0.5" />
+    <PackageReference Include="Mono.Linq.Expressions" Version="2.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TableStorage\TableStorage.csproj" />
+  </ItemGroup>
+
+</Project>

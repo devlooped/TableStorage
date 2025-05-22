@@ -38,6 +38,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TableStorage.Newtonsoft.Sou
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TableStorage.CodeAnalysis", "src\TableStorage.CodeAnalysis\TableStorage.CodeAnalysis.csproj", "{BC1CD1F2-5E6B-43B1-8672-E70F784F90C0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TableStorage.Memory", "src\TableStorage.Memory\TableStorage.Memory.csproj", "{4ABD67F9-D620-4D24-8B62-B2ACD6309B4E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -92,6 +94,10 @@ Global
 		{BC1CD1F2-5E6B-43B1-8672-E70F784F90C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BC1CD1F2-5E6B-43B1-8672-E70F784F90C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BC1CD1F2-5E6B-43B1-8672-E70F784F90C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4ABD67F9-D620-4D24-8B62-B2ACD6309B4E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4ABD67F9-D620-4D24-8B62-B2ACD6309B4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4ABD67F9-D620-4D24-8B62-B2ACD6309B4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4ABD67F9-D620-4D24-8B62-B2ACD6309B4E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
