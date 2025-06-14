@@ -1,5 +1,13 @@
 # Changelog
 
+## [v5.3.1](https://github.com/devlooped/TableStorage/tree/v5.3.1) (2025-06-14)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v5.3.0...v5.3.1)
+
+:bug: Fixed bugs:
+
+- When updating the in-memory entity value, replace [\#372](https://github.com/devlooped/TableStorage/pull/372) (@kzu)
+
 ## [v5.3.0](https://github.com/devlooped/TableStorage/tree/v5.3.0) (2025-05-22)
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/v5.2.4...v5.3.0)
