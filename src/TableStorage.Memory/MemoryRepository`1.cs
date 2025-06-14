@@ -167,7 +167,7 @@ public class MemoryRepository<T> : ITableRepository<T>, IDocumentRepository<T> w
             (key, value) =>
             {
                 key.Timestamp = DateTimeOffset.UtcNow;
-                return SetTimestamp(value, key.Timestamp);
+                return SetTimestamp(entity, key.Timestamp);
             }
         );
 
