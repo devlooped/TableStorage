@@ -72,10 +72,10 @@ public class MemoryRepository<T> : ITableRepository<T>, IDocumentRepository<T> w
     public string TableName { get; private set; }
 
     /// <inheritdoc />
-    public IQueryable<T> CreateQuery() => storage.Values.SelectMany(x => x.Values).AsQueryable();
+    public IQueryable<T> CreateQuery() => new InterceptingQueryable<T>(storage.Values.SelectMany(x => x.Values).AsQueryable());
 
     public IQueryable<T> CreateQuery(string partitionKey)
-        => storage.TryGetValue(partitionKey, out var values) ? values.Values.AsQueryable() : Enumerable.Empty<T>().AsQueryable();
+        => new InterceptingQueryable<T>(storage.TryGetValue(partitionKey, out var values) ? values.Values.AsQueryable() : Enumerable.Empty<T>().AsQueryable());
 
     /// <inheritdoc />
     public Task<bool> DeleteAsync(string partitionKey, string rowKey, CancellationToken cancellation = default)
@@ -259,6 +259,48 @@ public class MemoryRepository<T> : ITableRepository<T>, IDocumentRepository<T> w
     {
         public bool Equals(DocumentEntity x, DocumentEntity y) => x.PartitionKey == y.PartitionKey && x.RowKey == y.RowKey;
         public int GetHashCode(DocumentEntity obj) => HashCode.Combine(obj.PartitionKey, obj.RowKey);
+    }
+
+    class InterceptingQueryable<TElement>(IQueryable<TElement> inner) : IQueryable<TElement>
+    {
+        public Type ElementType => inner.ElementType;
+        public Expression Expression => inner.Expression;
+        public IQueryProvider Provider => new InterceptingQueryProvider<TElement>(inner.Provider);
+        public IEnumerator<TElement> GetEnumerator() => inner.GetEnumerator();
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
+    }
+
+    class InterceptingQueryProvider<TElement>(IQueryProvider inner) : IQueryProvider
+    {
+        public IQueryable CreateQuery(Expression expression) => inner.CreateQuery(Intercept(expression));
+        public IQueryable<TElement1> CreateQuery<TElement1>(Expression expression) => new InterceptingQueryable<TElement1>(inner.CreateQuery<TElement1>(Intercept(expression)));
+        public object? Execute(Expression expression) => inner.Execute(Intercept(expression));
+        public TResult Execute<TResult>(Expression expression) => inner.Execute<TResult>(Intercept(expression));
+
+        Expression Intercept(Expression expression)
+        {
+            // Look for OrderBy/OrderByDescending on "Timestamp"
+            var visitor = new OrderByTimestampVisitor();
+            visitor.Visit(expression);
+            return expression;
+        }
+
+        class OrderByTimestampVisitor : ExpressionVisitor
+        {
+            protected override Expression VisitMethodCall(MethodCallExpression node)
+            {
+                if ((node.Method.Name == nameof(Queryable.OrderBy) || node.Method.Name == nameof(Queryable.OrderByDescending))
+                    && node.Arguments.Count >= 2)
+                {
+                    if (node.Arguments[1] is UnaryExpression unary && unary.Operand is LambdaExpression lambda)
+                    {
+                        if (lambda.Body is MemberExpression member && member.Member.Name == "Timestamp")
+                            throw new NotSupportedException("Ordering by timestamp is not supported in Azure Table Storage queries.");
+                    }
+                }
+                return base.VisitMethodCall(node);
+            }
+        }
     }
 }
 

@@ -38,7 +38,7 @@ public static class MemoryRepository
     public static MemoryRepository<T> Create<T>(
         Expression<Func<T, string>> partitionKey,
         Expression<Func<T, string>> rowKey) where T : class
-        => Create<T>(typeof(T).Name, partitionKey, rowKey);
+        => Create(typeof(T).Name, partitionKey, rowKey);
 
     /// <summary>
     /// Creates an <see cref="ITableRepository{T}"/> for the given entity type 

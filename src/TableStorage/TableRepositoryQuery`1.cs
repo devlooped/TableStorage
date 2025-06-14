@@ -19,7 +19,7 @@ using Microsoft.OData.Client;
 
 namespace Devlooped
 {
-    partial class TableRepositoryQuery<T> : IQueryable<T>, IQueryProvider, IAsyncEnumerable<T>
+    partial class TableRepositoryQuery<T> : IQueryable<T>, IQueryProvider, IAsyncEnumerable<T>, IOrderedQueryable<T>
     {
         readonly CloudStorageAccount account;
         readonly IStringDocumentSerializer serializer;
@@ -117,7 +117,8 @@ namespace Devlooped
             }
 
             // Fix DateTimeOffset filters to ensure proper handling
-            qs["$filter"] = FilterExpressionFixer.Fix(qs["$filter"]);
+            qs["$filter"] = ODataExpression.FixFilter(qs["$filter"]);
+            ODataExpression.VerifyNoOrderByTimestamp(qs["$orderby"]);
 
             var builder = new UriBuilder(query.RequestUri)
             {

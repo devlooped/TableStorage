@@ -14,14 +14,32 @@ namespace Devlooped;
 /// <summary>
 /// Helper class that fixes filter expressions containing DateTimeOffset comparisons.
 /// </summary>
-internal static class FilterExpressionFixer
+internal static partial class ODataExpression
 {
+    public static void VerifyNoOrderByTimestamp(string? expression)
+    {
+        if (string.IsNullOrEmpty(expression))
+            return;
+
+        // Check if the expression contains an order by on a timestamp property
+        if (OrderByExpr().IsMatch(expression))
+            throw new NotSupportedException("Ordering by timestamp is not supported in Azure Table Storage queries.");
+    }
+
+#if NET8_0_OR_GREATER
+    [GeneratedRegex("timestamp\\s+(asc|desc)", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase)]
+    private static partial Regex OrderByExpr();
+#else
+    static Regex OrderByExpr() => orderByExpr;
+    static readonly Regex orderByExpr = new Regex("timestamp\\s+(asc|desc)", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
+#endif
+
     /// <summary>
     /// Fixes filter expressions involving DateTimeOffset by converting them to the format expected by Azure Table Storage.
     /// </summary>
     /// <param name="filter">The filter expression to fix.</param>
     /// <returns>A fixed filter expression where DateTimeOffset comparisons are properly formatted.</returns>
-    public static string? Fix(string? filter)
+    public static string? FixFilter(string? filter)
     {
         if (string.IsNullOrEmpty(filter))
             return filter;
@@ -31,7 +49,7 @@ internal static class FilterExpressionFixer
 
         if (node == null)
             return filter;
-        
+
         try
         {
             return node.Accept(new QueryTokenToFilterStringVisitor());

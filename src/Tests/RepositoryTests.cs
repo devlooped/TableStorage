@@ -17,13 +17,16 @@ public class RepositoryTests : IDisposable
     CloudStorageAccount storage = CloudStorageAccount.DevelopmentStorageAccount;
     TableConnection table;
 
-    public RepositoryTests(ITestOutputHelper output)
+    public RepositoryTests(ITestOutputHelper output) : this(output, CloudStorageAccount.DevelopmentStorageAccount) { }
+
+    protected RepositoryTests(ITestOutputHelper output, CloudStorageAccount storage)
     {
         this.output = output;
+        this.storage = storage;
         table = new TableConnection(storage, "a" + Guid.NewGuid().ToString("n"));
     }
 
-    public void Dispose() => this.table.GetTableAsync().Result.Delete();
+    public virtual void Dispose() => this.table.GetTableAsync().Result.Delete();
 
     protected virtual ITableRepository<T> CreateRepository<T>(
         Expression<Func<T, string>>? partitionKey = null,
@@ -140,7 +143,7 @@ public class RepositoryTests : IDisposable
 
         Assert.True(entity.Equals(saved));
 
-        var client = CloudStorageAccount.DevelopmentStorageAccount.CreateCloudTableClient();
+        var client = storage.CreateCloudTableClient();
         var table = client.GetTableClient(repo.TableName);
 
         var result = await table.GetEntityAsync<TableEntity>("Request", "1234");
@@ -168,7 +171,7 @@ public class RepositoryTests : IDisposable
         var entity = new RecordEntity("Request", "1234") { Status = "OK" };
         await repo.PutAsync(entity);
 
-        var client = CloudStorageAccount.DevelopmentStorageAccount.CreateCloudTableClient();
+        var client = storage.CreateCloudTableClient();
         var table = client.GetTableClient(repo.TableName);
         var result = await table.GetEntityAsync<TableEntity>("Prefix-Request", "1234");
 
@@ -185,7 +188,7 @@ public class RepositoryTests : IDisposable
         await repo.DeleteAsync("Book", "1234");
         var entity = await repo.PutAsync(new AttributedRecordEntity("Book", "1234"));
 
-        var generic = await new TableEntityRepository(CloudStorageAccount.DevelopmentStorageAccount, repo.TableName)
+        var generic = await new TableEntityRepository(storage, repo.TableName)
             .GetAsync(entity.Kind, entity.ID);
 
         Assert.NotNull(generic);
@@ -388,7 +391,7 @@ public class RepositoryTests : IDisposable
         Assert.Equal("OK", record.Status);
         Assert.Equal("Done", record.Reason);
 
-        await CloudStorageAccount.DevelopmentStorageAccount
+        await storage
             .CreateTableServiceClient()
             .GetTableClient(nameof(CanMergeEntity))
             .DeleteAsync();
@@ -429,7 +432,7 @@ public class RepositoryTests : IDisposable
         Assert.Equal("Done", entity["Reason"]);
         Assert.Equal(7.32d, entity["Price"]);
 
-        await CloudStorageAccount.DevelopmentStorageAccount
+        await storage
             .CreateTableServiceClient()
             .GetTableClient(nameof(CanMergeDynamicEntity))
             .DeleteAsync();
@@ -496,7 +499,7 @@ public class RepositoryTests : IDisposable
     [Fact]
     public async Task CanGetFromEntity()
     {
-        var repo = TableRepository.Create<AttributedRecordEntity>(CloudStorageAccount.DevelopmentStorageAccount);
+        var repo = TableRepository.Create<AttributedRecordEntity>(storage);
         try
         {
             var entity = await repo.PutAsync(new AttributedRecordEntity("Book", "1234"));
@@ -509,7 +512,7 @@ public class RepositoryTests : IDisposable
             Assert.Equal(entity.ID, stored.ID);
             Assert.Equal(entity.Kind, stored.Kind);
 
-            var generic = await new TableEntityRepository(CloudStorageAccount.DevelopmentStorageAccount, TableRepository.GetDefaultTableName<AttributedRecordEntity>())
+            var generic = await new TableEntityRepository(storage, TableRepository.GetDefaultTableName<AttributedRecordEntity>())
                 .GetAsync(new TableEntity(entity.Kind, entity.ID));
 
             Assert.NotNull(generic);
@@ -518,7 +521,7 @@ public class RepositoryTests : IDisposable
         }
         finally
         {
-            await CloudStorageAccount.DevelopmentStorageAccount.CreateTableServiceClient()
+            await storage.CreateTableServiceClient()
                 .GetTableClient(repo.TableName)
                 .DeleteAsync();
         }
@@ -593,11 +596,11 @@ public class RepositoryTests : IDisposable
 
         var first = await repo.PutAsync(new("Foo"));
 
-        await Task.Delay(100);
+        await Task.Delay(1000);
 
         var second = await repo.PutAsync(new("Bar"));
 
-        await Task.Delay(100);
+        await Task.Delay(1000);
 
         var third = await repo.PutAsync(new("Baz"));
 
@@ -617,6 +620,19 @@ public class RepositoryTests : IDisposable
             e.Timestamp > first.Timestamp)
             .AsAsyncEnumerable()
             .ToListAsync());
+    }
+
+    [Fact]
+    public async Task CanNotOrderBydate()
+    {
+        // See https://grok.com/chat/0fd5e46c-b45f-4bc8-9727-97c3b30f2259
+        var repo = CreatePartition<TimestampedEntity>(
+            nameof(TimestampedEntity),
+            rowKey: x => x.ID);
+
+        await Assert.ThrowsAsync<NotSupportedException>(() => repo.CreateQuery()
+            .OrderByDescending(x => x.Timestamp)
+            .AsAsyncEnumerable().ToListAsync());
     }
 
     public record Dependency(string Organization, string Repository, string Type, string Name, string Version);

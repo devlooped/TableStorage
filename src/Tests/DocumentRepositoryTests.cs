@@ -19,7 +19,13 @@ namespace Devlooped
             new object[] { ProtobufDocumentSerializer.Default },
         };
 
-        TableConnection table = new TableConnection(CloudStorageAccount.DevelopmentStorageAccount, "a" + Guid.NewGuid().ToString("n"));
+        TableConnection table;
+
+        public DocumentRepositoryTests() : this(CloudStorageAccount.DevelopmentStorageAccount) { }
+
+        public DocumentRepositoryTests(CloudStorageAccount storage) =>
+            table = new TableConnection(storage, "a" + Guid.NewGuid().ToString("n"));
+
         void IDisposable.Dispose() => this.table.GetTableAsync().Result.Delete();
 
         protected virtual IDocumentRepository<DocumentEntity> CreateRepository(IDocumentSerializer serializer)
