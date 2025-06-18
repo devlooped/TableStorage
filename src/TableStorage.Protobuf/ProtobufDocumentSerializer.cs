@@ -26,24 +26,21 @@ namespace Devlooped
         }
 
         /// <inheritdoc />
-        public T? Deserialize<T>(byte[] data)
+        public T? Deserialize<T>(Stream stream)
         {
-            if (data.Length == 0)
+            if (stream.CanSeek && stream.Length == 0)
                 return default;
 
-            using var mem = new MemoryStream(data);
-            return (T?)Serializer.Deserialize(typeof(T), mem);
+            return (T?)Serializer.Deserialize(typeof(T), stream);
         }
 
         /// <inheritdoc />
-        public byte[] Serialize<T>(T value)
+        public void Serialize<T>(T value, Stream stream)
         {
             if (value == null)
-                return new byte[0];
+                return;
 
-            using var mem = new MemoryStream();
-            Serializer.Serialize(mem, value);
-            return mem.ToArray();
+            Serializer.Serialize(stream, value);
         }
     }
 }

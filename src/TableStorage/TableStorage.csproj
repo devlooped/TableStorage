@@ -13,7 +13,6 @@
     <PackageReference Include="Azure.Data.Tables" Version="12.9.1" />
     <PackageReference Include="Microsoft.OData.Client" Version="7.21.3" />
     <PackageReference Include="PolySharp" Version="1.15.0" PrivateAssets="all" />
-    <PackageReference Include="System.Text.Json" Version="6.0.10" />
     <PackageReference Include="Mono.Linq.Expressions" Version="2.0.0" />
   </ItemGroup>
 
@@ -24,7 +23,7 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="Tests" />
-    <Compile Remove="System\*.cs" Condition="'$(TargetFramework)' == 'net6.0' or '$(TargetFramework)' == 'net8.0'" />
+    <Compile Remove="System\Chunk.cs" Condition="'$(TargetFramework)' == 'net6.0' or '$(TargetFramework)' == 'net8.0'" />
   </ItemGroup>
 
   <ItemGroup>

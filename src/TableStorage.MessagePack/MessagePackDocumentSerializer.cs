@@ -2,6 +2,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.IO;
 using MessagePack;
 using MessagePack.Formatters;
 using MessagePack.Resolvers;
@@ -36,10 +37,18 @@ namespace Devlooped
         }
 
         /// <inheritdoc />
-        public T? Deserialize<T>(byte[] data) => data.Length == 0 ? default : MessagePackSerializer.Deserialize<T>(data, options);
+        public T? Deserialize<T>(Stream data) => data.Length == 0 ? default : MessagePackSerializer.Deserialize<T>(data, options);
 
         /// <inheritdoc />
-        public byte[] Serialize<T>(T value) => value == null ? new byte[0] : MessagePackSerializer.Serialize(value.GetType(), value, options);
+        public void Serialize<T>(T value, Stream stream)
+        {
+            if (value == null)
+                return;
+            if (stream == null)
+                throw new ArgumentNullException(nameof(stream));
+
+            MessagePackSerializer.Serialize(stream, value, options);
+        }
 
 #if NET6_0_OR_GREATER
         internal class DateOnlyFormatterResolver : IFormatterResolver
