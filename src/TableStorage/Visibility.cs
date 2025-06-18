@@ -34,3 +34,10 @@ public partial class PartitionKeyAttribute { }
 public partial class RowKeyAttribute { }
 public partial class TableAttribute { }
 public partial class TableStorageAttribute { }
+
+#if NET8_0_OR_GREATER
+public partial class BlobStorage { }
+public partial class BlobPartition { }
+public partial class BlobStorage<T> { }
+public partial class BlobPartition<T> { }
+#endif

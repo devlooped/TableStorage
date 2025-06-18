@@ -32,26 +32,24 @@ namespace Devlooped
         public static IDocumentSerializer Default { get; } = new BsonDocumentSerializer();
 
         /// <inheritdoc />
-        public T? Deserialize<T>(byte[] data)
+        public T? Deserialize<T>(Stream data)
         {
             if (data.Length == 0)
                 return default;
 
-            using var mem = new MemoryStream(data);
-            using var reader = new Newtonsoft.Json.Bson.BsonDataReader(mem);
+            var reader = new Newtonsoft.Json.Bson.BsonDataReader(data);
             return (T?)serializer.Deserialize<T>(reader);
         }
 
         /// <inheritdoc />
-        public byte[] Serialize<T>(T value)
+        public void Serialize<T>(T value, Stream stream)
         {
             if (value == null)
-                return new byte[0];
+                return;
 
-            using var mem = new MemoryStream();
-            using var writer = new Newtonsoft.Json.Bson.BsonDataWriter(mem);
+            var writer = new Newtonsoft.Json.Bson.BsonDataWriter(stream);
             serializer.Serialize(writer, value);
-            return mem.ToArray();
+            writer.Flush();
         }
 
 #if NET6_0_OR_GREATER
