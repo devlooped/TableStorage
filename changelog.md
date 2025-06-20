@@ -1,5 +1,13 @@
 # Changelog
 
+## [v5.4.0](https://github.com/devlooped/TableStorage/tree/v5.4.0) (2025-06-18)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v5.3.1...v5.4.0)
+
+:sparkles: Implemented enhancements:
+
+- Introduce blob-based storage using ITableStorage\<T\> API [\#381](https://github.com/devlooped/TableStorage/pull/381) (@kzu)
+
 ## [v5.3.1](https://github.com/devlooped/TableStorage/tree/v5.3.1) (2025-06-14)
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/v5.3.0...v5.3.1)
