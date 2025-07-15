@@ -4,8 +4,8 @@
     <Description Condition="'$(IsPackable)' != 'false'">
       $(Description)
 
-      > This project uses SponsorLink and may issue IDE-only warnings if no active sponsorship is detected.
-      > Learn more at https://github.com/devlooped#sponsorlink.
+      &gt; This project uses SponsorLink and may issue IDE-only warnings if no active sponsorship is detected.
+      &gt; Learn more at https://github.com/devlooped#sponsorlink.
     </Description>
     <IsAnalyzer>$(PackFolder.StartsWith('analyzers/'))</IsAnalyzer>
   </PropertyGroup>
@@ -22,7 +22,7 @@
     </ParameterGroup>
     <Task>
       <Using Namespace="System" />
-      <Using Namespace="Microsoft.Build.Framework"/>
+      <Using Namespace="Microsoft.Build.Framework" />
       <Code Type="Fragment" Language="cs">
         <![CDATA[
         var version = this.BuildEngine4.GetRegisteredTaskObject("Version", RegisteredTaskObjectLifetime.Build);
