@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <AssemblyName>Devlooped.TableStorage.Newtonsoft</AssemblyName>
-    <TargetFrameworks>netstandard2.0;net6.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net8.0</TargetFrameworks>
     <IsPackable>true</IsPackable>
     <Description>A Json.NET serializer for use with document-based repositories.</Description>
   </PropertyGroup>
