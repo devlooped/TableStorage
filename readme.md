@@ -18,7 +18,7 @@ To pay the Maintenance Fee, [become a Sponsor](https://github.com/sponsors/devlo
 OSMF tier. A single fee covers all of [Devlooped packages](https://www.nuget.org/profiles/Devlooped).
 
 <!-- https://github.com/devlooped/.github/raw/main/osmf.md -->
-
+---
 <!-- #content -->
 Repository pattern with POCO object support for storing to Azure/CosmosDB Table Storage
 
