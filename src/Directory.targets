@@ -1,12 +1,6 @@
 <Project InitialTargets="SetLocalVersion">
 
   <PropertyGroup>
-    <Description Condition="'$(IsPackable)' != 'false'">
-      $(Description)
-
-      > This project uses SponsorLink and may issue IDE-only warnings if no active sponsorship is detected.
-      > Learn more at https://github.com/devlooped#sponsorlink.
-    </Description>
     <IsAnalyzer>$(PackFolder.StartsWith('analyzers/'))</IsAnalyzer>
   </PropertyGroup>
 

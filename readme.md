@@ -2,15 +2,12 @@
 ============
 
 [![Version](https://img.shields.io/nuget/v/Devlooped.TableStorage.svg?color=royalblue)](https://www.nuget.org/packages/Devlooped.TableStorage) 
-[![Downloads](https://img.shields.io/nuget/dt/Devlooped.TableStorage.svg?color=green)](https://www.nuget.org/packages/Devlooped.TableStorage) 
-[![License](https://img.shields.io/github/license/devlooped/TableStorage.svg?color=blue)](https://github.com/devlooped/TableStorage/blob/main/license.txt) 
-[![Build](https://github.com/devlooped/TableStorage/workflows/build/badge.svg?branch=main)](https://github.com/devlooped/TableStorage/actions)
+[![Downloads](https://img.shields.io/nuget/dt/Devlooped.TableStorage.svg?color=darkmagenta)](https://www.nuget.org/packages/Devlooped.TableStorage) 
+[![EULA](https://img.shields.io/badge/EULA-OSMF-blue?labelColor=black&color=C9FF30)](osmfeula.txt)
+[![OSS](https://img.shields.io/github/license/devlooped/oss.svg?color=blue)](license.txt) 
 
-<!-- include https://github.com/devlooped/.github/raw/main/sponsorlink.md -->
-*This project uses [SponsorLink](https://github.com/devlooped#sponsorlink) 
-and may issue IDE-only warnings if no active sponsorship is detected.*
+<!-- include https://github.com/devlooped/.github/raw/main/osmf.md -->
 
-<!-- https://github.com/devlooped/.github/raw/main/sponsorlink.md -->
 <!-- #content -->
 Repository pattern with POCO object support for storing to Azure/CosmosDB Table Storage
 

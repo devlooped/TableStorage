@@ -26,8 +26,4 @@
     <Compile Remove="System\Chunk.cs" Condition="'$(TargetFramework)' == 'net6.0' or '$(TargetFramework)' == 'net8.0'" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\TableStorage.CodeAnalysis\TableStorage.CodeAnalysis.csproj" ReferenceOutputAssembly="false" OutputItemType="None" />
-  </ItemGroup>
-
 </Project>
