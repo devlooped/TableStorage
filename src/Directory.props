@@ -8,6 +8,14 @@
     
     <PackageProjectUrl>https://clarius.org/TableStorage</PackageProjectUrl>
     <Product>Devlooped.TableStorage</Product>
+
+    <PackageLicenseExpression></PackageLicenseExpression>
+    <PackageLicenseFile>OSMFEULA.txt</PackageLicenseFile>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)..\osmfeula.txt" Link="osmfeula.txt" PackagePath="OSMFEULA.txt" />
+  </ItemGroup>
 
 </Project>

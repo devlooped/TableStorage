@@ -1,11 +1,4 @@
 <Solution>
-  <Folder Name="/Solution Items/">
-    <File Path=".github/workflows/build.yml" />
-    <File Path=".github/workflows/publish.yml" />
-    <File Path=".netconfig" />
-    <File Path="readme.md" />
-    <File Path="src/Directory.props" />
-  </Folder>
   <Folder Name="/Source/">
     <Project Path="src/TableStorage.Bson.Source/TableStorage.Bson.Source.csproj" />
     <Project Path="src/TableStorage.MessagePack.Source/TableStorage.MessagePack.Source.csproj" />
@@ -14,7 +7,6 @@
     <Project Path="src/TableStorage.Source/TableStorage.Source.csproj" />
   </Folder>
   <Project Path="src/TableStorage.Bson/TableStorage.Bson.csproj" />
-  <Project Path="src/TableStorage.CodeAnalysis/TableStorage.CodeAnalysis.csproj" />
   <Project Path="src/TableStorage.Memory/TableStorage.Memory.csproj" />
   <Project Path="src/TableStorage.MessagePack/TableStorage.MessagePack.csproj" />
   <Project Path="src/TableStorage.Newtonsoft/TableStorage.Newtonsoft.csproj" />
