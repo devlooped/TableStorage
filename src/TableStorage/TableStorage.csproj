@@ -22,6 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="10.0.0" />
     <InternalsVisibleTo Include="Tests" />
     <Compile Remove="System\Chunk.cs" Condition="'$(TargetFramework)' == 'net6.0' or '$(TargetFramework)' == 'net8.0'" />
   </ItemGroup>
