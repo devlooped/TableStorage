@@ -1,5 +1,17 @@
 # Changelog
 
+## [v5.5.0](https://github.com/devlooped/TableStorage/tree/v5.5.0) (2025-11-17)
+
+[Full Changelog](https://github.com/devlooped/TableStorage/compare/v5.4.0...v5.5.0)
+
+:hammer: Other:
+
+- Adopting SponsorLink in v5.2+ [\#317](https://github.com/devlooped/TableStorage/issues/317)
+
+:twisted_rightwards_arrows: Merged:
+
+- Drop SponsorLink, adopt OSMF [\#427](https://github.com/devlooped/TableStorage/pull/427) (@kzu)
+
 ## [v5.4.0](https://github.com/devlooped/TableStorage/tree/v5.4.0) (2025-06-18)
 
 [Full Changelog](https://github.com/devlooped/TableStorage/compare/v5.3.1...v5.4.0)
