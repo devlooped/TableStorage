@@ -371,6 +371,7 @@ The versioning scheme for packages is:
 [![Michael Hagedorn](https://avatars.githubusercontent.com/u/61711586?u=8f653dfcb641e8c18cc5f78692ebc6bb3a0c92be&v=4&s=39 "Michael Hagedorn")](https://github.com/Eule02)
 [![torutek](https://avatars.githubusercontent.com/u/33917059?v=4&s=39 "torutek")](https://github.com/torutek)
 [![mccaffers](https://avatars.githubusercontent.com/u/16667079?u=739e110e62a75870c981640447efa5eb2cb3bc8f&v=4&s=39 "mccaffers")](https://github.com/mccaffers)
+[![Christoph Hochstätter](https://avatars.githubusercontent.com/u/17645550?u=01bbdcb84d03cac26260f1c951e046d24a324591&v=4&s=39 "Christoph Hochstätter")](https://github.com/christoh)
 
 
 <!-- sponsors.md -->
